@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useState, useMemo, useRef, useCallback } from 'react';
 import { PageContainer } from '@/components/layout';
 import { Skeleton } from '@/components/ui/skeleton';
 import type {
@@ -9,6 +9,8 @@ import type {
   ReplySentiment,
   DemographicDistribution,
 } from '@/lib/types/emailbison';
+import { exportPageToPDF } from '@/lib/export-pdf';
+import { exportToCSV } from '@/lib/export-csv';
 import {
   Brain,
   Users,
@@ -25,6 +27,9 @@ import {
   AlertTriangle,
   Sparkles,
   Filter,
+  Download,
+  FileSpreadsheet,
+  Loader2,
 } from 'lucide-react';
 
 // --- Utility Components ---
@@ -386,6 +391,8 @@ export default function AnalyticsPage() {
   const [report, setReport] = useState<AnalyticsReport | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [exporting, setExporting] = useState(false);
+  const contentRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const fetchAnalytics = async () => {
@@ -402,6 +409,45 @@ export default function AnalyticsPage() {
     };
     fetchAnalytics();
   }, []);
+
+  const handleExportPDF = useCallback(async () => {
+    if (!contentRef.current || exporting) return;
+    setExporting(true);
+    try {
+      const date = new Date().toISOString().split('T')[0];
+      await exportPageToPDF(contentRef.current, `Selery-Analytics-Report-${date}.pdf`, {
+        title: 'Response Analytics',
+        subtitle: report?.workspaceName || 'Selery Fulfillment',
+      });
+    } finally {
+      setExporting(false);
+    }
+  }, [exporting, report]);
+
+  const handleExportCSV = useCallback(() => {
+    if (!report) return;
+    const rows = report.replies
+      .filter((r) => !r.isAutomated || r.isInterested)
+      .map((r) => ({
+        Name: r.name,
+        Email: r.email,
+        Company: r.company,
+        Title: r.title || '',
+        Industry: r.industry,
+        Seniority: r.seniority,
+        Sentiment: r.sentiment,
+        Intent: r.intent,
+        Campaign: r.campaignName,
+        Summary: r.summary || '',
+        'Buying Signals': r.buyingSignals.join('; '),
+        Objections: r.objections.join('; '),
+        Themes: r.themes.join('; '),
+        'Reply Date': r.replyDate,
+        Interested: r.isInterested ? 'Yes' : 'No',
+      }));
+    const date = new Date().toISOString().split('T')[0];
+    exportToCSV(rows, `Selery-Analyzed-Replies-${date}.csv`);
+  }, [report]);
 
   if (loading) {
     return (
@@ -435,6 +481,26 @@ export default function AnalyticsPage() {
 
   return (
     <PageContainer className="space-y-8 pb-12">
+      {/* Export Buttons */}
+      <div className="flex items-center justify-end gap-3 hide-on-export">
+        <button
+          onClick={handleExportCSV}
+          className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg border bg-white hover:bg-gray-50 text-gray-700 transition-colors"
+        >
+          <FileSpreadsheet className="h-4 w-4" />
+          Download CSV
+        </button>
+        <button
+          onClick={handleExportPDF}
+          disabled={exporting}
+          className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg bg-violet-600 hover:bg-violet-700 text-white transition-colors disabled:opacity-50"
+        >
+          {exporting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Download className="h-4 w-4" />}
+          {exporting ? 'Generating...' : 'Export PDF'}
+        </button>
+      </div>
+
+      <div ref={contentRef} className="space-y-8">
       {/* Hero Section */}
       <div className="bg-gradient-to-r from-violet-600 via-purple-600 to-indigo-700 text-white rounded-3xl p-8 shadow-xl">
         <div className="flex items-center gap-4 mb-6">
@@ -616,6 +682,8 @@ export default function AnalyticsPage() {
           campaigns={report.campaigns}
         />
       </div>
+
+      </div>{/* end contentRef */}
     </PageContainer>
   );
 }

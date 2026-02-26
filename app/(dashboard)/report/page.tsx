@@ -1,9 +1,11 @@
 'use client';
 
-import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useState, useMemo, useRef, useCallback } from 'react';
 import { PageContainer } from '@/components/layout';
 import { Skeleton } from '@/components/ui/skeleton';
 import type { PerformanceReport, CampaignPerformance, InterestedLeadDetail } from '@/lib/types/emailbison';
+import { exportPageToPDF } from '@/lib/export-pdf';
+import { exportToCSV } from '@/lib/export-csv';
 import {
   TrendingUp,
   Users,
@@ -13,6 +15,9 @@ import {
   Search,
   ChevronDown,
   CheckCircle,
+  Download,
+  FileSpreadsheet,
+  Loader2,
 } from 'lucide-react';
 
 // Hero metric card component
@@ -458,6 +463,8 @@ export default function ReportPage() {
   const [report, setReport] = useState<PerformanceReport | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [exporting, setExporting] = useState(false);
+  const contentRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const fetchReport = async () => {
@@ -475,6 +482,36 @@ export default function ReportPage() {
 
     fetchReport();
   }, []);
+
+  const handleExportPDF = useCallback(async () => {
+    if (!contentRef.current || exporting) return;
+    setExporting(true);
+    try {
+      const date = new Date().toISOString().split('T')[0];
+      await exportPageToPDF(contentRef.current, `Selery-Performance-Report-${date}.pdf`, {
+        title: 'Performance Report',
+        subtitle: report?.workspaceName || 'Selery Fulfillment',
+      });
+    } finally {
+      setExporting(false);
+    }
+  }, [exporting, report]);
+
+  const handleExportCSV = useCallback(() => {
+    if (!report) return;
+    const rows = report.interestedLeads.map((lead) => ({
+      Name: lead.name,
+      Email: lead.email,
+      Company: lead.company,
+      Title: lead.title || '',
+      Industry: lead.industry,
+      Campaign: lead.campaign,
+      'Reply Preview': lead.replyPreview || '',
+      'Reply Date': lead.replyDate,
+    }));
+    const date = new Date().toISOString().split('T')[0];
+    exportToCSV(rows, `Selery-Interested-Leads-${date}.csv`);
+  }, [report]);
 
   if (loading) {
     return (
@@ -497,6 +534,26 @@ export default function ReportPage() {
 
   return (
     <PageContainer className="space-y-8 pb-12">
+      {/* Export Buttons */}
+      <div className="flex items-center justify-end gap-3 hide-on-export">
+        <button
+          onClick={handleExportCSV}
+          className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg border bg-white hover:bg-gray-50 text-gray-700 transition-colors"
+        >
+          <FileSpreadsheet className="h-4 w-4" />
+          Download CSV
+        </button>
+        <button
+          onClick={handleExportPDF}
+          disabled={exporting}
+          className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white transition-colors disabled:opacity-50"
+        >
+          {exporting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Download className="h-4 w-4" />}
+          {exporting ? 'Generating...' : 'Export PDF'}
+        </button>
+      </div>
+
+      <div ref={contentRef} className="space-y-8">
       {/* Hero Section */}
       <div className="bg-gradient-to-r from-indigo-600 via-purple-600 to-purple-700 text-white rounded-3xl p-8 shadow-xl">
         <div className="flex items-center justify-between mb-8">
@@ -630,6 +687,7 @@ export default function ReportPage() {
         </div>
       )}
 
+      </div>{/* end contentRef */}
     </PageContainer>
   );
 }
