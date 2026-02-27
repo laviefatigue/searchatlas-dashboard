@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useMemo, useRef, useCallback } from 'react';
+import React, { useEffect, useState, useMemo, useRef, useCallback } from 'react';
 import { PageContainer } from '@/components/layout';
 import { Skeleton } from '@/components/ui/skeleton';
 import type {
@@ -14,6 +14,8 @@ import type {
   CampaignComparisonItem,
   SequenceStepPerformance,
   DomainStats,
+  CopyAnalysis,
+  StrategicSummary,
 } from '@/lib/types/emailbison';
 import { exportPageToPDF } from '@/lib/export-pdf';
 import { exportToCSV } from '@/lib/export-csv';
@@ -41,6 +43,10 @@ import {
   Zap,
   Target,
   ArrowRight,
+  CheckCircle,
+  Lightbulb,
+  Shield,
+  Crosshair,
 } from 'lucide-react';
 
 // ── Utility Components ────────────────────────────────────────────────
@@ -187,10 +193,55 @@ function ConversionFunnel({ funnel }: { funnel: FastAnalytics['funnel'] }) {
   );
 }
 
+// Sequence step interface for lazy loading
+interface SequenceStep {
+  id: number;
+  sequence_step_id?: string;
+  order: number;
+  subject: string;
+  body: string;
+  delay_days?: number;
+  delay_hours?: number;
+  is_variant?: boolean;
+  variant_letter?: string;
+  is_thread_reply?: boolean;
+  sent?: number;
+  unique_replies?: number;
+  reply_rate?: number;
+  interested?: number;
+  bounced?: number;
+}
+
 function CampaignComparison({ campaigns }: { campaigns: CampaignComparisonItem[] }) {
+  const [expandedId, setExpandedId] = useState<number | null>(null);
+  const [sequenceData, setSequenceData] = useState<Record<number, SequenceStep[]>>({});
+  const [seqLoading, setSeqLoading] = useState<number | null>(null);
+
   if (campaigns.length === 0) return null;
 
   const bestInterest = Math.max(...campaigns.map(c => c.interestRate));
+
+  const handleExpand = async (campaignId: number) => {
+    if (expandedId === campaignId) {
+      setExpandedId(null);
+      return;
+    }
+    setExpandedId(campaignId);
+    if (!sequenceData[campaignId]) {
+      setSeqLoading(campaignId);
+      try {
+        const response = await fetch(`/api/emailbison/campaigns/${campaignId}/sequence`);
+        if (response.ok) {
+          const { data } = await response.json();
+          setSequenceData(prev => ({ ...prev, [campaignId]: data || [] }));
+        }
+      } catch (error) {
+        console.error('Failed to fetch sequence:', error);
+      } finally {
+        setSeqLoading(null);
+      }
+    }
+  };
 
   return (
     <div className="rounded-lg border bg-card shadow-sm overflow-hidden">
@@ -198,12 +249,14 @@ function CampaignComparison({ campaigns }: { campaigns: CampaignComparisonItem[]
         <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-2">
           <BarChart3 className="h-4 w-4" />
           Campaign Comparison
+          <span className="text-xs font-normal text-muted-foreground ml-auto">Click to expand</span>
         </h3>
       </div>
       <div className="overflow-x-auto">
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b bg-muted/30">
+              <th className="h-10 px-4 text-left font-medium text-muted-foreground text-xs uppercase tracking-wider w-8"></th>
               <th className="h-10 px-4 text-left font-medium text-muted-foreground text-xs uppercase tracking-wider">Campaign</th>
               <th className="h-10 px-4 text-right font-medium text-muted-foreground text-xs uppercase tracking-wider">Sent</th>
               <th className="h-10 px-4 text-right font-medium text-muted-foreground text-xs uppercase tracking-wider">Contacted</th>
@@ -215,45 +268,178 @@ function CampaignComparison({ campaigns }: { campaigns: CampaignComparisonItem[]
           </thead>
           <tbody>
             {campaigns.map((c) => (
-              <tr key={c.id} className="border-b border-border/50 hover:bg-muted/20 transition-colors">
-                <td className="py-3 px-4">
-                  <div className="flex items-center gap-2">
-                    <span className={`w-2 h-2 rounded-full flex-shrink-0 ${c.status === 'Active' ? 'bg-emerald-500' : 'bg-gray-400'}`} />
-                    <span className="font-medium text-foreground truncate max-w-[200px]" title={c.name}>
-                      {c.name.replace(/^Cycle \d+:\s*/, '').replace(/^Campaign \d+,\s*/, '')}
-                    </span>
-                  </div>
-                </td>
-                <td className="py-3 px-4 text-right text-muted-foreground">{c.emailsSent.toLocaleString()}</td>
-                <td className="py-3 px-4 text-right text-muted-foreground">{c.leadsContacted.toLocaleString()}</td>
-                <td className="py-3 px-4 text-right">
-                  <span className="font-medium">{c.replyRate}%</span>
-                </td>
-                <td className="py-3 px-4 text-right">
-                  <span className={`font-bold ${c.interestRate === bestInterest && c.interestRate > 0 ? 'text-emerald-600' : ''}`}>
-                    {c.interestRate}%
-                  </span>
-                  {c.interested > 0 && (
-                    <span className="text-xs text-muted-foreground ml-1">({c.interested})</span>
-                  )}
-                </td>
-                <td className="py-3 px-4 text-right">
-                  <span className={c.bounceRate > 3 ? 'text-red-600 font-medium' : 'text-muted-foreground'}>
-                    {c.bounceRate}%
-                  </span>
-                </td>
-                <td className="py-3 px-4 text-right">
-                  <div className="flex items-center gap-2 justify-end">
-                    <div className="w-16 h-1.5 bg-muted rounded-full overflow-hidden">
-                      <div
-                        className="h-full bg-indigo-500 rounded-full"
-                        style={{ width: `${Math.min(c.completionPct, 100)}%` }}
-                      />
+              <React.Fragment key={c.id}>
+                <tr
+                  className="border-b border-border/50 hover:bg-muted/20 transition-colors cursor-pointer"
+                  onClick={() => handleExpand(c.id)}
+                >
+                  <td className="py-3 px-4">
+                    <ChevronDown className={`h-4 w-4 text-muted-foreground transition-transform ${expandedId === c.id ? 'rotate-180' : ''}`} />
+                  </td>
+                  <td className="py-3 px-4">
+                    <div className="flex items-center gap-2">
+                      <span className={`w-2 h-2 rounded-full flex-shrink-0 ${c.status === 'Active' ? 'bg-emerald-500' : 'bg-gray-400'}`} />
+                      <span className="font-medium text-foreground truncate max-w-[200px]" title={c.name}>
+                        {c.name.replace(/^Cycle \d+:\s*/, '').replace(/^Campaign \d+,\s*/, '')}
+                      </span>
                     </div>
-                    <span className="text-xs text-muted-foreground w-9 text-right">{c.completionPct.toFixed(0)}%</span>
-                  </div>
-                </td>
-              </tr>
+                  </td>
+                  <td className="py-3 px-4 text-right text-muted-foreground">{c.emailsSent.toLocaleString()}</td>
+                  <td className="py-3 px-4 text-right text-muted-foreground">{c.leadsContacted.toLocaleString()}</td>
+                  <td className="py-3 px-4 text-right">
+                    <span className="font-medium">{c.replyRate}%</span>
+                  </td>
+                  <td className="py-3 px-4 text-right">
+                    <span className={`font-bold ${c.interestRate === bestInterest && c.interestRate > 0 ? 'text-emerald-600' : ''}`}>
+                      {c.interestRate}%
+                    </span>
+                    {c.interested > 0 && (
+                      <span className="text-xs text-muted-foreground ml-1">({c.interested})</span>
+                    )}
+                  </td>
+                  <td className="py-3 px-4 text-right">
+                    <span className={c.bounceRate > 3 ? 'text-red-600 font-medium' : 'text-muted-foreground'}>
+                      {c.bounceRate}%
+                    </span>
+                  </td>
+                  <td className="py-3 px-4 text-right">
+                    <div className="flex items-center gap-2 justify-end">
+                      <div className="w-16 h-1.5 bg-muted rounded-full overflow-hidden">
+                        <div
+                          className="h-full bg-indigo-500 rounded-full"
+                          style={{ width: `${Math.min(c.completionPct, 100)}%` }}
+                        />
+                      </div>
+                      <span className="text-xs text-muted-foreground w-9 text-right">{c.completionPct.toFixed(0)}%</span>
+                    </div>
+                  </td>
+                </tr>
+                {expandedId === c.id && (
+                  <tr className="bg-muted/30">
+                    <td colSpan={8} className="p-6">
+                      <div className="space-y-4">
+                        {/* Stats Grid */}
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                          <div className="bg-card rounded-lg p-3 border">
+                            <p className="text-xs text-muted-foreground mb-1">Leads Reached</p>
+                            <p className="font-bold text-lg">{c.leadsContacted.toLocaleString()}</p>
+                          </div>
+                          <div className="bg-card rounded-lg p-3 border">
+                            <p className="text-xs text-muted-foreground mb-1">Emails Sent</p>
+                            <p className="font-bold text-lg">{c.emailsSent.toLocaleString()}</p>
+                          </div>
+                          <div className="bg-card rounded-lg p-3 border">
+                            <p className="text-xs text-muted-foreground mb-1">Replies</p>
+                            <p className="font-bold text-lg">{c.uniqueReplies.toLocaleString()}</p>
+                          </div>
+                          <div className="bg-card rounded-lg p-3 border">
+                            <p className="text-xs text-muted-foreground mb-1">Interested</p>
+                            <p className="font-bold text-lg text-blue-600">{c.interested.toLocaleString()}</p>
+                          </div>
+                        </div>
+
+                        {/* Email Sequence */}
+                        <div className="bg-card rounded-lg border overflow-hidden">
+                          <div className="bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-indigo-950/20 dark:to-purple-950/20 px-4 py-3 border-b">
+                            <div className="flex items-center gap-2">
+                              <Mail className="h-4 w-4 text-indigo-600" />
+                              <p className="text-sm font-semibold text-indigo-700 dark:text-indigo-400">Email Sequence</p>
+                            </div>
+                          </div>
+                          <div className="p-4">
+                            {seqLoading === c.id ? (
+                              <div className="flex items-center justify-center py-8">
+                                <Loader2 className="h-6 w-6 animate-spin text-indigo-600" />
+                                <span className="ml-2 text-sm text-muted-foreground">Loading...</span>
+                              </div>
+                            ) : sequenceData[c.id] && sequenceData[c.id].length > 0 ? (
+                              <div className="space-y-4">
+                                {sequenceData[c.id].map((step, idx) => (
+                                  <div key={step.id || idx} className="border rounded-lg overflow-hidden">
+                                    <div className="bg-muted/50 px-4 py-2 flex items-center justify-between">
+                                      <div className="flex items-center gap-2">
+                                        <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-indigo-100 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-400 text-xs font-bold">
+                                          {idx + 1}
+                                        </span>
+                                        <span className="text-sm font-medium">Step {idx + 1}</span>
+                                        {step.is_variant && (
+                                          <span className="text-xs bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-400 px-2 py-0.5 rounded">
+                                            Variant {step.variant_letter || ''}
+                                          </span>
+                                        )}
+                                        {step.is_thread_reply && (
+                                          <span className="text-xs bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 px-2 py-0.5 rounded">
+                                            Thread Reply
+                                          </span>
+                                        )}
+                                      </div>
+                                      <div className="flex items-center gap-3 text-xs text-muted-foreground">
+                                        {step.sent !== undefined && <span>{step.sent?.toLocaleString()} sent</span>}
+                                        {step.reply_rate !== undefined && <span className="font-medium text-blue-600">{step.reply_rate}% reply</span>}
+                                        {(step.delay_days || step.delay_hours) && (
+                                          <span>{step.delay_days ? `${step.delay_days}d` : ''}{step.delay_hours ? `${step.delay_hours}h` : ''} delay</span>
+                                        )}
+                                      </div>
+                                    </div>
+                                    <div className="p-4 space-y-3">
+                                      <div>
+                                        <p className="text-xs text-muted-foreground uppercase tracking-wider font-semibold mb-1">Subject</p>
+                                        <p className="text-sm font-medium text-foreground">{step.subject}</p>
+                                      </div>
+                                      {step.body ? (
+                                        <div>
+                                          <p className="text-xs text-muted-foreground uppercase tracking-wider font-semibold mb-1">Body</p>
+                                          <div
+                                            className="text-sm text-muted-foreground whitespace-pre-wrap bg-muted/30 rounded-lg p-3 max-h-48 overflow-y-auto"
+                                            dangerouslySetInnerHTML={{ __html: step.body?.replace(/\n/g, '<br/>') || '' }}
+                                          />
+                                        </div>
+                                      ) : (
+                                        <div className="flex items-center gap-4 text-sm bg-muted/30 rounded-lg p-3">
+                                          {step.sent !== undefined && (
+                                            <div><span className="text-muted-foreground">Sent: </span><span className="font-medium">{step.sent?.toLocaleString()}</span></div>
+                                          )}
+                                          {step.unique_replies !== undefined && (
+                                            <div><span className="text-muted-foreground">Replies: </span><span className="font-medium text-blue-600">{step.unique_replies}</span></div>
+                                          )}
+                                          {step.interested !== undefined && (
+                                            <div><span className="text-muted-foreground">Interested: </span><span className="font-medium text-blue-600">{step.interested}</span></div>
+                                          )}
+                                          {step.bounced !== undefined && (
+                                            <div><span className="text-muted-foreground">Bounced: </span><span className="font-medium text-red-500">{step.bounced}</span></div>
+                                          )}
+                                        </div>
+                                      )}
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+                            ) : (
+                              <div className="text-center py-6 text-muted-foreground">
+                                <MessageSquare className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                                <p className="text-sm">No sequence data available</p>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Performance Summary */}
+                        <div className="bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-indigo-950/20 dark:to-purple-950/20 rounded-lg p-4 border border-indigo-500/10">
+                          <div className="flex items-center gap-2 mb-2">
+                            <Target className="h-4 w-4 text-indigo-600" />
+                            <p className="text-xs text-indigo-600 uppercase tracking-wider font-semibold">Performance Summary</p>
+                          </div>
+                          <p className="text-sm text-muted-foreground">
+                            Reached <span className="font-semibold text-foreground">{c.leadsContacted.toLocaleString()}</span> leads
+                            {' '}&rarr; <span className="font-semibold text-foreground">{c.uniqueReplies.toLocaleString()}</span> replied ({c.replyRate}%)
+                            {' '}&rarr; <span className="font-semibold text-blue-600">{c.interested.toLocaleString()}</span> interested ({c.interestRate}%)
+                          </p>
+                        </div>
+                      </div>
+                    </td>
+                  </tr>
+                )}
+              </React.Fragment>
             ))}
           </tbody>
         </table>
@@ -672,6 +858,151 @@ function LeadDeepDive({
   );
 }
 
+// ── Strategic Insights (Phase 2 — AI second pass) ─────────────────────
+
+function StrategicInsights({ summary }: { summary: StrategicSummary }) {
+  return (
+    <div className="space-y-6">
+      {/* Executive Brief */}
+      <div className="bg-gradient-to-r from-violet-600 via-purple-600 to-indigo-600 rounded-2xl p-6 text-white shadow-lg">
+        <div className="flex items-start gap-3">
+          <div className="w-10 h-10 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center flex-shrink-0 mt-0.5">
+            <Brain className="h-5 w-5" />
+          </div>
+          <div>
+            <h3 className="font-bold text-lg mb-2">Strategic Analysis</h3>
+            <p className="text-white/90 leading-relaxed">{summary.executiveBrief}</p>
+          </div>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Key Findings */}
+        {summary.keyFindings.length > 0 && (
+          <div className="rounded-lg border bg-card shadow-sm p-6">
+            <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-4 flex items-center gap-2">
+              <Lightbulb className="h-4 w-4 text-amber-500" /> Key Findings
+            </h3>
+            <ul className="space-y-3">
+              {summary.keyFindings.map((finding, i) => (
+                <li key={i} className="flex items-start gap-3">
+                  <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 text-xs font-bold flex-shrink-0 mt-0.5">
+                    {i + 1}
+                  </span>
+                  <span className="text-sm text-foreground leading-relaxed">{finding}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+
+        {/* Recommendations */}
+        {summary.recommendations.length > 0 && (
+          <div className="rounded-lg border bg-card shadow-sm p-6">
+            <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-4 flex items-center gap-2">
+              <Target className="h-4 w-4 text-blue-600" /> Recommendations
+            </h3>
+            <ul className="space-y-3">
+              {summary.recommendations.map((rec, i) => (
+                <li key={i} className="flex items-start gap-3">
+                  <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 text-xs font-bold flex-shrink-0 mt-0.5">
+                    {i + 1}
+                  </span>
+                  <span className="text-sm text-foreground leading-relaxed">{rec}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+      </div>
+
+      {/* Objection Playbook */}
+      {summary.objectionPlaybook.length > 0 && (
+        <div className="rounded-lg border bg-card shadow-sm overflow-hidden">
+          <div className="p-4 bg-gradient-to-r from-red-50 to-orange-50 dark:from-red-950/20 dark:to-orange-950/20 border-b">
+            <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-2">
+              <Shield className="h-4 w-4 text-red-600" />
+              Objection Playbook
+              <span className="text-xs font-normal text-muted-foreground ml-auto">How to handle the top pushbacks</span>
+            </h3>
+          </div>
+          <div className="divide-y">
+            {summary.objectionPlaybook.map((item, i) => (
+              <div key={i} className="p-4 hover:bg-muted/20 transition-colors">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="font-medium text-red-700 dark:text-red-400 text-sm">&ldquo;{item.objection}&rdquo;</span>
+                  <span className="text-xs bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 px-2 py-0.5 rounded-full font-medium">{item.frequency}x</span>
+                </div>
+                <div className="bg-emerald-50 dark:bg-emerald-950/20 rounded-lg p-3 border border-emerald-500/20">
+                  <div className="flex items-center gap-1 mb-1">
+                    <Crosshair className="h-3 w-3 text-emerald-600" />
+                    <span className="text-xs font-semibold text-emerald-700 dark:text-emerald-400 uppercase">Suggested Angle</span>
+                  </div>
+                  <p className="text-sm text-emerald-700 dark:text-emerald-300">{item.suggestedResponse}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Bottom row: Best Segments + Copy Recommendations + Competitors */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Best Segments */}
+        {summary.bestSegments.length > 0 && (
+          <div className="rounded-lg border bg-card shadow-sm p-6">
+            <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-4 flex items-center gap-2">
+              <TrendingUp className="h-4 w-4 text-emerald-600" /> Best Segments
+            </h3>
+            <ul className="space-y-2">
+              {summary.bestSegments.map((seg, i) => (
+                <li key={i} className="flex items-start gap-2 text-sm">
+                  <span className="text-emerald-500 mt-0.5">&#x2713;</span>
+                  <span className="text-foreground">{seg}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+
+        {/* Copy Recommendations */}
+        {summary.copyRecommendations.length > 0 && (
+          <div className="rounded-lg border bg-card shadow-sm p-6">
+            <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-4 flex items-center gap-2">
+              <MessageSquare className="h-4 w-4 text-violet-600" /> Copy Recommendations
+            </h3>
+            <ul className="space-y-2">
+              {summary.copyRecommendations.map((rec, i) => (
+                <li key={i} className="flex items-start gap-2 text-sm">
+                  <span className="text-violet-500 mt-0.5">&#x2022;</span>
+                  <span className="text-foreground">{rec}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+
+        {/* Competitor Intelligence */}
+        {summary.competitorMentions.length > 0 && (
+          <div className="rounded-lg border bg-card shadow-sm p-6">
+            <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-4 flex items-center gap-2">
+              <Building2 className="h-4 w-4 text-orange-600" /> Competitor Intelligence
+            </h3>
+            <div className="space-y-3">
+              {summary.competitorMentions.map((c, i) => (
+                <div key={i} className="flex items-center justify-between">
+                  <span className="text-sm font-medium text-foreground">{c.name}</span>
+                  <span className="text-xs bg-orange-100 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400 px-2 py-0.5 rounded-full font-medium">{c.count} mention{c.count !== 1 ? 's' : ''}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
 // ── Phase 2 Skeleton ──────────────────────────────────────────────────
 
 function Phase2Skeleton() {
@@ -704,6 +1035,10 @@ export default function AnalyticsPage() {
   const [report, setReport] = useState<AnalyticsReport | null>(null);
   const [phase2Loading, setPhase2Loading] = useState(true);
   const [phase2Error, setPhase2Error] = useState<string | null>(null);
+
+  // Phase 3: Copy analysis
+  const [copyData, setCopyData] = useState<CopyAnalysis | null>(null);
+  const [phase3Loading, setPhase3Loading] = useState(true);
 
   const [exporting, setExporting] = useState(false);
   const [activeCycle, setActiveCycle] = useState<number | null>(null);
@@ -863,6 +1198,24 @@ export default function AnalyticsPage() {
       }
     };
     fetchDeep();
+  }, []);
+
+  // Phase 3: Copy analysis (starts immediately, renders when ready)
+  useEffect(() => {
+    const fetchCopy = async () => {
+      try {
+        const response = await fetch('/api/analytics/copy');
+        if (response.ok) {
+          const { data } = await response.json();
+          setCopyData(data);
+        }
+      } catch {
+        // Copy analysis is optional — fail silently
+      } finally {
+        setPhase3Loading(false);
+      }
+    };
+    fetchCopy();
   }, []);
 
   const handleExportPDF = useCallback(async () => {
@@ -1039,6 +1392,82 @@ export default function AnalyticsPage() {
           {senderData && <SenderPerformance data={senderData} />}
         </div>
 
+        {/* ── Copy Analysis (Phase 3) ─────────────────────────── */}
+        {phase3Loading ? (
+          <div className="flex items-center gap-3 text-muted-foreground">
+            <Loader2 className="h-4 w-4 animate-spin" />
+            <span className="text-sm">Analyzing email copy...</span>
+          </div>
+        ) : copyData?.subjects?.analysis ? (
+          <div className="rounded-lg border bg-card shadow-sm overflow-hidden">
+            <div className="flex flex-col space-y-1.5 p-6 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/20 dark:to-indigo-950/20 border-b">
+              <h2 className="flex items-center gap-3 text-xl font-bold">
+                <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-lg flex items-center justify-center">
+                  <CheckCircle className="h-5 w-5 text-white" />
+                </div>
+                Copy Analysis
+              </h2>
+              <p className="text-muted-foreground">
+                Insights from {copyData.summary.totalCampaignsAnalyzed} campaigns
+              </p>
+            </div>
+            <div className="p-6 space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="bg-blue-50 dark:bg-blue-950/20 p-4 rounded-xl border border-blue-500/20">
+                  <div className="flex items-center gap-2 mb-2">
+                    <MessageSquare className="h-4 w-4 text-blue-600" />
+                    <h4 className="font-semibold text-blue-700 dark:text-blue-400 text-sm">Subject Lines</h4>
+                  </div>
+                  <p className="text-sm text-blue-600 dark:text-blue-500">
+                    {copyData.subjects.analysis.keyInsight}
+                  </p>
+                </div>
+                {copyData.body?.analysis && (
+                  <div className="bg-blue-50 dark:bg-blue-950/20 p-4 rounded-xl border border-blue-500/20">
+                    <div className="flex items-center gap-2 mb-2">
+                      <Target className="h-4 w-4 text-blue-600" />
+                      <h4 className="font-semibold text-blue-700 dark:text-blue-400 text-sm">Opening Hooks</h4>
+                    </div>
+                    <p className="text-sm text-blue-600 dark:text-blue-500">
+                      {copyData.body.analysis.contrast}
+                    </p>
+                  </div>
+                )}
+                {copyData.cta?.analysis && (
+                  <div className="bg-blue-50 dark:bg-blue-950/20 p-4 rounded-xl border border-blue-500/20">
+                    <div className="flex items-center gap-2 mb-2">
+                      <Mail className="h-4 w-4 text-blue-600" />
+                      <h4 className="font-semibold text-blue-700 dark:text-blue-400 text-sm">CTAs</h4>
+                    </div>
+                    <p className="text-sm text-blue-600 dark:text-blue-500">
+                      {copyData.cta.analysis.commitmentAnalysis}
+                    </p>
+                  </div>
+                )}
+              </div>
+
+              {/* Performance Highlight */}
+              {filteredFastData && (
+                <div className="bg-gradient-to-r from-blue-600 to-indigo-600 p-5 rounded-xl text-white">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-white/80 text-sm mb-1">Performance Summary</p>
+                      <p className="font-semibold">
+                        {filteredFastData.heroMetrics.leadsContacted.toLocaleString()} leads contacted across {filteredFastData.heroMetrics.activeCampaigns} campaigns
+                        with {filteredFastData.heroMetrics.avgReplyRate}% average response rate.
+                      </p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-3xl font-bold">{filteredFastData.heroMetrics.totalInterested}</p>
+                      <p className="text-white/70 text-sm">interested leads</p>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        ) : null}
+
         {/* ── PHASE 2: AI-Powered Analysis ──────────────────────── */}
         {phase2Loading ? (
           <Phase2Skeleton />
@@ -1050,6 +1479,17 @@ export default function AnalyticsPage() {
           </div>
         ) : filteredReport ? (
           <>
+            {/* Strategic Insights (AI second pass) */}
+            {filteredReport.strategicSummary && (
+              <div>
+                <h2 className="text-2xl font-bold text-foreground mb-4 flex items-center gap-2">
+                  <Sparkles className="h-6 w-6 text-violet-600" />
+                  Strategic Insights
+                </h2>
+                <StrategicInsights summary={filteredReport.strategicSummary} />
+              </div>
+            )}
+
             {/* Response Intelligence */}
             <div>
               <h2 className="text-2xl font-bold text-foreground mb-4 flex items-center gap-2">

@@ -3,58 +3,32 @@
 import { useEffect, useState } from 'react';
 import { Loader2, Users, Mail, TrendingUp, MessageSquare } from 'lucide-react';
 import { PageContainer } from '@/components/layout';
-import { CampaignListFromReport } from '@/components/campaigns/CampaignListFromReport';
+import type { FastAnalytics, CampaignComparisonItem } from '@/lib/types/emailbison';
 import { toast } from 'sonner';
 
-interface CampaignPerformance {
-  rank: number;
-  id: number;
-  name: string;
-  subjectLine: string;
-  replyRate: number;
-  interestRate: number;
-  leadsContacted: number;
-  emailsSent: number;
-  uniqueReplies: number;
-  interested: number;
-}
-
-interface ReportData {
-  campaigns: CampaignPerformance[];
-  heroMetrics: {
-    totalCampaigns: number;
-    leadsContacted: number;
-    messagesSent: number;
-    avgResponseRate: number;
-    emailPositives: number;
-  };
-}
-
 export default function CampaignsPage() {
-  const [reportData, setReportData] = useState<ReportData | null>(null);
+  const [fastData, setFastData] = useState<FastAnalytics | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const fetchReport = async () => {
+    const fetchData = async () => {
       try {
-        // Use the report API which has accurate, filtered data
-        const response = await fetch('/api/report');
-        if (!response.ok) throw new Error('Failed to fetch report');
+        const response = await fetch('/api/analytics/fast');
+        if (!response.ok) throw new Error('Failed to fetch analytics');
         const json = await response.json();
-        // API returns { data: { ... } }
-        setReportData(json.data);
+        setFastData(json.data);
       } catch (error) {
-        console.error('Error fetching report:', error);
+        console.error('Error fetching campaigns:', error);
         toast.error('Failed to load campaigns');
       } finally {
         setIsLoading(false);
       }
     };
 
-    fetchReport();
+    fetchData();
   }, []);
 
-  if (isLoading || !reportData) {
+  if (isLoading || !fastData) {
     return (
       <PageContainer>
         <div className="flex h-full items-center justify-center">
@@ -64,18 +38,17 @@ export default function CampaignsPage() {
     );
   }
 
-  const { campaigns, heroMetrics } = reportData;
+  const { heroMetrics, campaignComparison } = fastData;
 
   return (
     <PageContainer className="space-y-6">
       <div>
         <h2 className="text-2xl font-bold">Campaigns</h2>
         <p className="text-muted-foreground">
-          {heroMetrics.totalCampaigns} campaigns across all verticals
+          {heroMetrics.activeCampaigns} active campaigns
         </p>
       </div>
 
-      {/* Aggregate Stats - from report API (accurate, filtered data) */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
         <div className="rounded-lg border bg-card p-4">
           <div className="flex items-center gap-3">
@@ -83,7 +56,7 @@ export default function CampaignsPage() {
               <Mail className="h-5 w-5 text-blue-500" />
             </div>
             <div>
-              <p className="text-2xl font-bold">{heroMetrics.totalCampaigns}</p>
+              <p className="text-2xl font-bold">{heroMetrics.activeCampaigns}</p>
               <p className="text-sm text-muted-foreground">Campaigns</p>
             </div>
           </div>
@@ -105,8 +78,8 @@ export default function CampaignsPage() {
               <MessageSquare className="h-5 w-5 text-purple-500" />
             </div>
             <div>
-              <p className="text-2xl font-bold">{heroMetrics.messagesSent.toLocaleString()}</p>
-              <p className="text-sm text-muted-foreground">Messages Sent</p>
+              <p className="text-2xl font-bold">{heroMetrics.emailsSent.toLocaleString()}</p>
+              <p className="text-sm text-muted-foreground">Emails Sent</p>
             </div>
           </div>
         </div>
@@ -116,7 +89,7 @@ export default function CampaignsPage() {
               <TrendingUp className="h-5 w-5 text-green-500" />
             </div>
             <div>
-              <p className="text-2xl font-bold">{heroMetrics.emailPositives}</p>
+              <p className="text-2xl font-bold">{heroMetrics.totalInterested}</p>
               <p className="text-sm text-muted-foreground">Interested</p>
             </div>
           </div>
@@ -127,14 +100,47 @@ export default function CampaignsPage() {
               <TrendingUp className="h-5 w-5 text-emerald-500" />
             </div>
             <div>
-              <p className="text-2xl font-bold">{heroMetrics.avgResponseRate}%</p>
+              <p className="text-2xl font-bold">{heroMetrics.avgReplyRate}%</p>
               <p className="text-sm text-muted-foreground">Response Rate</p>
             </div>
           </div>
         </div>
       </div>
 
-      <CampaignListFromReport campaigns={campaigns} />
+      {/* Campaign Table */}
+      <div className="rounded-lg border bg-card shadow-sm overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="border-b bg-muted/30">
+                <th className="h-10 px-4 text-left font-medium text-muted-foreground text-xs uppercase">Campaign</th>
+                <th className="h-10 px-4 text-right font-medium text-muted-foreground text-xs uppercase">Sent</th>
+                <th className="h-10 px-4 text-right font-medium text-muted-foreground text-xs uppercase">Contacted</th>
+                <th className="h-10 px-4 text-right font-medium text-muted-foreground text-xs uppercase">Reply %</th>
+                <th className="h-10 px-4 text-right font-medium text-muted-foreground text-xs uppercase">Interest %</th>
+                <th className="h-10 px-4 text-right font-medium text-muted-foreground text-xs uppercase">Interested</th>
+              </tr>
+            </thead>
+            <tbody>
+              {campaignComparison.map((c: CampaignComparisonItem) => (
+                <tr key={c.id} className="border-b border-border/50 hover:bg-muted/20">
+                  <td className="py-3 px-4">
+                    <div className="flex items-center gap-2">
+                      <span className={`w-2 h-2 rounded-full flex-shrink-0 ${c.status === 'Active' ? 'bg-emerald-500' : 'bg-gray-400'}`} />
+                      <span className="font-medium text-foreground truncate max-w-[250px]" title={c.name}>{c.name}</span>
+                    </div>
+                  </td>
+                  <td className="py-3 px-4 text-right text-muted-foreground">{c.emailsSent.toLocaleString()}</td>
+                  <td className="py-3 px-4 text-right text-muted-foreground">{c.leadsContacted.toLocaleString()}</td>
+                  <td className="py-3 px-4 text-right font-medium">{c.replyRate}%</td>
+                  <td className="py-3 px-4 text-right font-bold">{c.interestRate}%</td>
+                  <td className="py-3 px-4 text-right text-blue-600 font-medium">{c.interested}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
     </PageContainer>
   );
 }

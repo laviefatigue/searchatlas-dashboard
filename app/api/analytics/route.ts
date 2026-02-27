@@ -7,6 +7,7 @@ import type {
   ReplySentiment,
   ReplyIntent,
   SeniorityLevel,
+  StrategicSummary,
 } from '@/lib/types/emailbison';
 
 const EMAILBISON_API_URL = process.env.EMAILBISON_API_URL || 'https://spellcast.hirecharm.com';
@@ -379,6 +380,153 @@ function ruleBasedClassification(text: string): AIClassification {
   };
 }
 
+// ── Second-pass AI: Strategic Summary ─────────────────────────────────
+async function generateStrategicSummary(
+  analyzedReplies: AnalyzedReply[],
+  sentimentBreakdown: Record<ReplySentiment, number>,
+  topThemes: Array<{ theme: string; count: number }>,
+  topObjections: Array<{ objection: string; count: number }>,
+  topBuyingSignals: Array<{ signal: string; count: number }>,
+  industryDist: DemographicDistribution[],
+  seniorityDist: DemographicDistribution[],
+): Promise<StrategicSummary | null> {
+  if (!ANTHROPIC_API_KEY || analyzedReplies.length === 0) return null;
+
+  const client = new Anthropic({ apiKey: ANTHROPIC_API_KEY });
+
+  // Gather sample replies for context
+  const positiveReplies = analyzedReplies
+    .filter(r => r.isInterested)
+    .slice(0, 5)
+    .map(r => `- ${r.name} (${r.company}, ${r.title || 'no title'}): "${r.replyText.substring(0, 200)}"`);
+
+  const negativeReplies = analyzedReplies
+    .filter(r => r.sentiment === 'negative' && r.replyText.length > 20)
+    .slice(0, 10)
+    .map(r => `- ${r.name} (${r.company}, ${r.title || 'no title'}): "${r.replyText.substring(0, 200)}"`);
+
+  // Extract competitor mentions from reply text
+  const competitorPatterns = /\b(shipbob|shipmunk|deliverr|flexport|fulfillment by amazon|fba|shopify fulfillment|red stag|saddle creek|rakuten|shipmonk|easypost|shiphero|whiplash|fulfilltopia|quiet logistics)\b/gi;
+  const competitorMap = new Map<string, { count: number; contexts: string[] }>();
+  for (const r of analyzedReplies) {
+    const matches = r.replyText.matchAll(competitorPatterns);
+    for (const match of matches) {
+      const name = match[0].charAt(0).toUpperCase() + match[0].slice(1).toLowerCase();
+      const existing = competitorMap.get(name) || { count: 0, contexts: [] };
+      existing.count++;
+      if (existing.contexts.length < 3) {
+        existing.contexts.push(`${r.name} (${r.company}): "${r.replyText.substring(0, 100)}"`);
+      }
+      competitorMap.set(name, existing);
+    }
+  }
+
+  const competitorMentions = Array.from(competitorMap.entries())
+    .map(([name, data]) => ({
+      name,
+      count: data.count,
+      context: data.contexts[0] || '',
+    }))
+    .sort((a, b) => b.count - a.count);
+
+  // Interested segments analysis
+  const interestedReplies = analyzedReplies.filter(r => r.isInterested);
+  const interestedIndustries = new Map<string, number>();
+  const interestedSeniorities = new Map<string, number>();
+  for (const r of interestedReplies) {
+    interestedIndustries.set(r.industry, (interestedIndustries.get(r.industry) || 0) + 1);
+    interestedSeniorities.set(r.seniority, (interestedSeniorities.get(r.seniority) || 0) + 1);
+  }
+
+  const prompt = `You are a cold email strategist analyzing campaign results for **Selery Fulfillment**, a 3PL company that handles warehousing, fulfillment, and shipping for e-commerce brands.
+
+## Campaign Data
+- **Total replies analyzed**: ${analyzedReplies.length}
+- **Sentiment**: ${sentimentBreakdown.positive} positive (${analyzedReplies.length > 0 ? ((sentimentBreakdown.positive / analyzedReplies.length) * 100).toFixed(0) : 0}%), ${sentimentBreakdown.neutral} neutral (${analyzedReplies.length > 0 ? ((sentimentBreakdown.neutral / analyzedReplies.length) * 100).toFixed(0) : 0}%), ${sentimentBreakdown.negative} negative (${analyzedReplies.length > 0 ? ((sentimentBreakdown.negative / analyzedReplies.length) * 100).toFixed(0) : 0}%)
+- **Interested leads**: ${interestedReplies.length}
+
+## Top Themes
+${topThemes.slice(0, 8).map(t => `- ${t.theme}: ${t.count} replies`).join('\n')}
+
+## Top Objections
+${topObjections.slice(0, 8).map(o => `- ${o.objection}: ${o.count} replies`).join('\n')}
+
+## Top Buying Signals
+${topBuyingSignals.slice(0, 8).map(s => `- ${s.signal}: ${s.count} replies`).join('\n')}
+
+## Industry Distribution (respondents)
+${industryDist.slice(0, 8).map(d => `- ${d.label}: ${d.count} (${d.interestedCount} interested)`).join('\n')}
+
+## Seniority Distribution (respondents)
+${seniorityDist.slice(0, 6).map(d => `- ${d.label}: ${d.count} (${d.interestedCount} interested)`).join('\n')}
+
+## Interested Industries
+${Array.from(interestedIndustries.entries()).sort((a, b) => b[1] - a[1]).map(([ind, ct]) => `- ${ind}: ${ct}`).join('\n') || '(none)'}
+
+## Competitor Mentions
+${competitorMentions.length > 0 ? competitorMentions.map(c => `- ${c.name}: mentioned ${c.count}x`).join('\n') : '(none detected)'}
+
+## Sample Positive Replies (interested leads)
+${positiveReplies.length > 0 ? positiveReplies.join('\n') : '(none)'}
+
+## Sample Negative Replies
+${negativeReplies.length > 0 ? negativeReplies.join('\n') : '(none)'}
+
+---
+
+Based on this data, produce a strategic analysis. Return ONLY valid JSON with this exact structure:
+
+{
+  "executiveBrief": "2-3 sentence executive summary of campaign performance, focusing on what matters most",
+  "keyFindings": ["3-5 specific, data-driven findings. Reference actual numbers. E.g., 'X% of negative replies cite existing 3PL relationships, suggesting the ICP includes too many already-served companies'"],
+  "recommendations": ["3-5 specific, actionable next steps. Be concrete. E.g., 'Add a pre-qualification question about current fulfillment setup to filter out companies already locked into contracts'"],
+  "objectionPlaybook": [{"objection": "the specific objection", "frequency": number_of_times, "suggestedResponse": "A specific email copy angle or rebuttal strategy to handle this objection in follow-up messaging"}],
+  "bestSegments": ["Which ICP segments (industry + seniority combos) show the highest engagement and should be prioritized"],
+  "copyRecommendations": ["2-4 specific suggestions for improving email copy in the next cycle, based on what positive vs negative replies reveal about messaging effectiveness"]
+}
+
+RULES:
+- Be specific and reference actual data. No generic advice like "improve targeting" — say WHO to target and WHY.
+- For objection playbook, give real email copy angles — not vague "address their concerns."
+- For copy recommendations, reference patterns you see in the positive vs negative replies.
+- If no competitor mentions were found, omit competitorMentions from analysis.
+- Keep bestSegments to 2-4 entries max.
+- No markdown, no explanation — just the JSON.`;
+
+  try {
+    const response = await client.messages.create({
+      model: 'claude-haiku-4-5-20251001',
+      max_tokens: 4096,
+      messages: [{ role: 'user', content: prompt }],
+    });
+
+    const content = response.content[0];
+    if (content.type === 'text') {
+      let jsonText = content.text.trim();
+      if (jsonText.startsWith('```')) {
+        jsonText = jsonText.replace(/^```(?:json)?\n?/, '').replace(/\n?```$/, '');
+      }
+      const parsed = JSON.parse(jsonText);
+      return {
+        executiveBrief: parsed.executiveBrief || '',
+        keyFindings: parsed.keyFindings || [],
+        recommendations: parsed.recommendations || [],
+        objectionPlaybook: (parsed.objectionPlaybook || []).map((o: { objection: string; frequency: number; suggestedResponse: string }) => ({
+          objection: o.objection,
+          frequency: o.frequency || 0,
+          suggestedResponse: o.suggestedResponse || '',
+        })),
+        competitorMentions: competitorMentions,
+        bestSegments: parsed.bestSegments || [],
+        copyRecommendations: parsed.copyRecommendations || [],
+      };
+    }
+  } catch (err) {
+    console.error('[Analytics] Strategic summary AI error:', err);
+  }
+  return null;
+}
+
 function buildDistribution(items: string[]): DemographicDistribution[] {
   const counts = new Map<string, number>();
   for (const item of items) {
@@ -647,6 +795,30 @@ export async function GET(request: Request) {
       }))
       .sort((a, b) => b.interestedCount - a.interestedCount);
 
+    const topThemesArr = Array.from(themeCount.entries())
+      .map(([theme, count]) => ({ theme, count }))
+      .sort((a, b) => b.count - a.count)
+      .slice(0, 10);
+    const topObjectionsArr = Array.from(objectionCount.entries())
+      .map(([objection, count]) => ({ objection, count }))
+      .sort((a, b) => b.count - a.count)
+      .slice(0, 10);
+    const topBuyingSignalsArr = Array.from(signalCount.entries())
+      .map(([signal, count]) => ({ signal, count }))
+      .sort((a, b) => b.count - a.count)
+      .slice(0, 10);
+
+    // Second-pass AI: generate strategic summary from aggregated data
+    const strategicSummary = await generateStrategicSummary(
+      analyzedReplies,
+      sentimentBreakdown,
+      topThemesArr,
+      topObjectionsArr,
+      topBuyingSignalsArr,
+      industryDist,
+      seniorityDist,
+    );
+
     const report: AnalyticsReport = {
       workspaceName,
       totalReplies: allReplies.length,
@@ -657,18 +829,10 @@ export async function GET(request: Request) {
       seniorityDistribution: seniorityDist,
       topCompanies: companyDist,
       pipelineCompanies,
-      topThemes: Array.from(themeCount.entries())
-        .map(([theme, count]) => ({ theme, count }))
-        .sort((a, b) => b.count - a.count)
-        .slice(0, 10),
-      topObjections: Array.from(objectionCount.entries())
-        .map(([objection, count]) => ({ objection, count }))
-        .sort((a, b) => b.count - a.count)
-        .slice(0, 10),
-      topBuyingSignals: Array.from(signalCount.entries())
-        .map(([signal, count]) => ({ signal, count }))
-        .sort((a, b) => b.count - a.count)
-        .slice(0, 10),
+      topThemes: topThemesArr,
+      topObjections: topObjectionsArr,
+      topBuyingSignals: topBuyingSignalsArr,
+      strategicSummary: strategicSummary || undefined,
       replies: analyzedReplies,
       campaigns: activeCampaigns.map(c => ({ id: c.id, name: c.name })),
       industries: [...new Set(industries)].sort(),

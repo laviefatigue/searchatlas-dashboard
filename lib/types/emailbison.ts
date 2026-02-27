@@ -436,6 +436,24 @@ export interface DemographicDistribution {
   interestedCount: number;
 }
 
+export interface StrategicSummary {
+  executiveBrief: string;
+  keyFindings: string[];
+  recommendations: string[];
+  objectionPlaybook: Array<{
+    objection: string;
+    frequency: number;
+    suggestedResponse: string;
+  }>;
+  competitorMentions: Array<{
+    name: string;
+    count: number;
+    context: string;
+  }>;
+  bestSegments: string[];
+  copyRecommendations: string[];
+}
+
 export interface AnalyticsReport {
   workspaceName: string;
   totalReplies: number;
@@ -452,6 +470,8 @@ export interface AnalyticsReport {
   topThemes: Array<{ theme: string; count: number }>;
   topObjections: Array<{ objection: string; count: number }>;
   topBuyingSignals: Array<{ signal: string; count: number }>;
+  // Strategic AI summary
+  strategicSummary?: StrategicSummary;
   // All analyzed replies
   replies: AnalyzedReply[];
   // Filters
