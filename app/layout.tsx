@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "EmailBison Dashboard",
+  title: "Selery Dashboard",
   description: "Monitor your email campaigns",
 };
 

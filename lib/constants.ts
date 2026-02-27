@@ -1,6 +1,6 @@
 // App constants
 
-export const APP_NAME = 'EmailBison Dashboard';
+export const APP_NAME = 'Selery Dashboard';
 
 export const COOKIE_NAME = 'emailbison_token';
 
