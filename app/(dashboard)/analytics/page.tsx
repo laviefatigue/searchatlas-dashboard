@@ -43,6 +43,10 @@ import {
   Target,
   ArrowRight,
   CheckCircle,
+  Linkedin,
+  ExternalLink,
+  MapPin,
+  Phone,
 } from 'lucide-react';
 
 // ── Utility Components ────────────────────────────────────────────────
@@ -604,6 +608,17 @@ function SenderPerformance({ data }: { data: SenderAnalytics }) {
   );
 }
 
+interface EnrichedContact {
+  email: string;
+  fullName: string | null;
+  title: string | null;
+  headline: string | null;
+  linkedinUrl: string | null;
+  location: string | null;
+  company: string | null;
+  phone: string | null;
+}
+
 function PipelineCompanies({
   companies,
   replies,
@@ -611,6 +626,48 @@ function PipelineCompanies({
   companies: DemographicDistribution[];
   replies: AnalyzedReply[];
 }) {
+  const [enriched, setEnriched] = useState<Record<string, EnrichedContact>>({});
+  const [enrichLoading, setEnrichLoading] = useState(false);
+  const enrichedRef = useRef(false);
+
+  // Collect unique emails from pipeline companies
+  const emailsToEnrich = useMemo(() => {
+    const emails: string[] = [];
+    for (const c of companies) {
+      const companyReplies = replies.filter(r => r.company === c.label && r.isInterested);
+      for (const r of companyReplies) {
+        if (r.email && !emails.includes(r.email)) {
+          emails.push(r.email);
+        }
+      }
+    }
+    return emails;
+  }, [companies, replies]);
+
+  // Fetch enrichment data once when pipeline companies appear
+  useEffect(() => {
+    if (emailsToEnrich.length === 0 || enrichedRef.current) return;
+    enrichedRef.current = true;
+    setEnrichLoading(true);
+    fetch('/api/analytics/enrich', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ emails: emailsToEnrich }),
+    })
+      .then(r => r.json())
+      .then(data => {
+        if (data.results) {
+          const map: Record<string, EnrichedContact> = {};
+          for (const c of data.results as EnrichedContact[]) {
+            map[c.email] = c;
+          }
+          setEnriched(map);
+        }
+      })
+      .catch(() => { /* silently fail — enrichment is optional */ })
+      .finally(() => setEnrichLoading(false));
+  }, [emailsToEnrich]);
+
   if (companies.length === 0) {
     return (
       <div className="rounded-lg border bg-card shadow-sm p-8 text-center">
@@ -627,12 +684,15 @@ function PipelineCompanies({
         <Building2 className="h-4 w-4 text-selery-gold" />
         Pipeline Companies
         <span className="text-xs font-normal">({companies.length})</span>
+        {enrichLoading && <Loader2 className="h-3 w-3 animate-spin text-muted-foreground" />}
       </h3>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
         {companies.map((c) => {
           const companyReplies = replies.filter(r => r.company === c.label && r.isInterested);
           const latestReply = companyReplies[0];
           const domain = latestReply?.email?.split('@')[1];
+          const enrichData = latestReply?.email ? enriched[latestReply.email] : null;
+          const hasEnrichment = enrichData && (enrichData.linkedinUrl || enrichData.phone || enrichData.location);
           return (
             <div key={c.label} className="p-3 rounded-lg bg-selery-gold/5 dark:bg-selery-gold/10 border border-selery-gold/20 dark:border-selery-gold/20">
               <div className="flex items-center justify-between mb-1">
@@ -647,10 +707,44 @@ function PipelineCompanies({
               </div>
               {latestReply && (
                 <div className="mt-2">
-                  <p className="text-xs text-muted-foreground">{latestReply.name}{latestReply.title ? ` - ${latestReply.title}` : ''}</p>
+                  <p className="text-xs text-muted-foreground">
+                    {enrichData?.fullName || latestReply.name}
+                    {(enrichData?.title || latestReply.title) ? ` - ${enrichData?.title || latestReply.title}` : ''}
+                  </p>
                   <p className="text-xs text-muted-foreground mt-0.5 truncate max-w-[250px]" title={latestReply.campaignName}>
                     via {latestReply.campaignName}
                   </p>
+                </div>
+              )}
+              {/* Enriched contact details from AI-Ark */}
+              {hasEnrichment && (
+                <div className="mt-2 pt-2 border-t border-selery-gold/10 flex flex-wrap items-center gap-2">
+                  {enrichData.linkedinUrl && (
+                    <a
+                      href={enrichData.linkedinUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1 text-[11px] text-selery-cyan hover:underline"
+                    >
+                      <Linkedin className="h-3 w-3" />
+                      LinkedIn
+                    </a>
+                  )}
+                  {enrichData.phone && (
+                    <a
+                      href={`tel:${enrichData.phone}`}
+                      className="inline-flex items-center gap-1 text-[11px] text-selery-cyan hover:underline"
+                    >
+                      <Phone className="h-3 w-3" />
+                      {enrichData.phone}
+                    </a>
+                  )}
+                  {enrichData.location && (
+                    <span className="inline-flex items-center gap-1 text-[11px] text-muted-foreground">
+                      <MapPin className="h-3 w-3" />
+                      {enrichData.location}
+                    </span>
+                  )}
                 </div>
               )}
             </div>
