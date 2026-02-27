@@ -1,6 +1,0 @@
-<svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <!-- Main circle (o shape) with opening -->
-  <path d="M20 6C12.268 6 6 12.268 6 20C6 27.732 12.268 34 20 34C27.732 34 34 27.732 34 20C34 16.134 32.464 12.634 29.95 10.05" stroke="currentColor" stroke-width="4" stroke-linecap="round"/>
-  <!-- Small dot -->
-  <circle cx="32" cy="6" r="3" fill="currentColor"/>
-</svg>

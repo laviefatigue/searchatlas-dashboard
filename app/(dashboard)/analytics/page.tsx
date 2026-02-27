@@ -52,7 +52,7 @@ const toTitleCase = (s: string) => s.replace(/\b\w/g, c => c.toUpperCase());
 
 function SentimentBadge({ sentiment }: { sentiment: ReplySentiment }) {
   const config = {
-    positive: { label: 'Positive', bg: 'bg-emerald-100 dark:bg-emerald-950/30', text: 'text-emerald-700 dark:text-emerald-400', icon: ThumbsUp },
+    positive: { label: 'Positive', bg: 'bg-selery-gold/10 dark:bg-selery-gold/20', text: 'text-selery-gold dark:text-selery-gold', icon: ThumbsUp },
     negative: { label: 'Negative', bg: 'bg-red-100 dark:bg-red-950/30', text: 'text-red-700 dark:text-red-400', icon: ThumbsDown },
     neutral: { label: 'Neutral', bg: 'bg-gray-100 dark:bg-gray-800', text: 'text-gray-700 dark:text-gray-400', icon: Minus },
   }[sentiment];
@@ -67,12 +67,12 @@ function SentimentBadge({ sentiment }: { sentiment: ReplySentiment }) {
 
 function IntentBadge({ intent }: { intent: string }) {
   const colors: Record<string, string> = {
-    'interested': 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-400',
+    'interested': 'bg-selery-gold/10 text-selery-gold dark:bg-selery-gold/20 dark:text-selery-gold',
     'not-interested': 'bg-red-100 text-red-700 dark:bg-red-950/30 dark:text-red-400',
-    'needs-info': 'bg-blue-100 text-blue-700 dark:bg-blue-950/30 dark:text-blue-400',
+    'needs-info': 'bg-selery-cyan/10 text-selery-cyan dark:bg-selery-cyan/20 dark:text-selery-cyan',
     'referral': 'bg-selery-navy/10 text-selery-navy dark:bg-selery-navy/20 dark:text-selery-cyan',
     'out-of-office': 'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400',
-    'unsubscribe': 'bg-orange-100 text-orange-700 dark:bg-orange-950/30 dark:text-orange-400',
+    'unsubscribe': 'bg-red-100 text-red-700 dark:bg-red-950/30 dark:text-red-400',
   };
   return (
     <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${colors[intent] || colors['needs-info']}`}>
@@ -101,7 +101,7 @@ function HorizontalBarChart({
             </span>
             <div className="flex items-center gap-3">
               {showInterested && item.interestedCount > 0 && (
-                <span className="text-xs text-emerald-600 font-medium">
+                <span className="text-xs text-selery-gold font-medium">
                   {item.interestedCount} interested
                 </span>
               )}
@@ -130,7 +130,7 @@ function SentimentOverview({
   total: number;
 }) {
   const items = [
-    { key: 'positive' as const, label: 'Positive', color: 'bg-emerald-500', count: breakdown.positive },
+    { key: 'positive' as const, label: 'Positive', color: 'bg-selery-gold', count: breakdown.positive },
     { key: 'neutral' as const, label: 'Neutral', color: 'bg-gray-400', count: breakdown.neutral },
     { key: 'negative' as const, label: 'Negative', color: 'bg-red-500', count: breakdown.negative },
   ];
@@ -154,10 +154,10 @@ function SentimentOverview({
 
 function ConversionFunnel({ funnel }: { funnel: FastAnalytics['funnel'] }) {
   const steps = [
-    { label: 'Total Leads', value: funnel.totalLeads, color: 'from-slate-500 to-slate-600' },
-    { label: 'Contacted', value: funnel.contacted, color: 'from-blue-500 to-blue-600' },
-    { label: 'Replied', value: funnel.replied, color: 'from-selery-cyan to-selery-cyan' },
-    { label: 'Interested', value: funnel.interested, color: 'from-emerald-500 to-emerald-600' },
+    { label: 'Total Leads', value: funnel.totalLeads, color: 'from-gray-500 to-gray-600' },
+    { label: 'Contacted', value: funnel.contacted, color: 'from-selery-cyan to-selery-cyan' },
+    { label: 'Replied', value: funnel.replied, color: 'from-selery-navy to-selery-navy' },
+    { label: 'Interested', value: funnel.interested, color: 'from-selery-gold to-selery-gold' },
   ];
 
   return (
@@ -244,7 +244,7 @@ function CampaignComparison({ campaigns }: { campaigns: CampaignComparisonItem[]
 
   return (
     <div className="rounded-lg border bg-card shadow-sm overflow-hidden">
-      <div className="p-4 bg-gradient-to-r from-blue-50 to-selery-cyan/5 dark:from-blue-950/20 dark:to-selery-cyan/10 border-b">
+      <div className="p-4 bg-gradient-to-r from-selery-cyan/5 to-selery-navy/5 dark:from-selery-cyan/10 dark:to-selery-navy/10 border-b">
         <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-2">
           <BarChart3 className="h-4 w-4" />
           Campaign Comparison
@@ -277,7 +277,7 @@ function CampaignComparison({ campaigns }: { campaigns: CampaignComparisonItem[]
                   </td>
                   <td className="py-3 px-4">
                     <div className="flex items-center gap-2">
-                      <span className={`w-2 h-2 rounded-full flex-shrink-0 ${c.status === 'Active' ? 'bg-emerald-500' : 'bg-gray-400'}`} />
+                      <span className={`w-2 h-2 rounded-full flex-shrink-0 ${c.status === 'Active' ? 'bg-selery-gold' : 'bg-gray-400'}`} />
                       <span className="font-medium text-foreground truncate max-w-[200px]" title={c.name}>
                         {c.name.replace(/^Cycle \d+:\s*/, '').replace(/^Campaign \d+,\s*/, '')}
                       </span>
@@ -289,7 +289,7 @@ function CampaignComparison({ campaigns }: { campaigns: CampaignComparisonItem[]
                     <span className="font-medium">{c.replyRate}%</span>
                   </td>
                   <td className="py-3 px-4 text-right">
-                    <span className={`font-bold ${c.interestRate === bestInterest && c.interestRate > 0 ? 'text-emerald-600' : ''}`}>
+                    <span className={`font-bold ${c.interestRate === bestInterest && c.interestRate > 0 ? 'text-selery-gold' : ''}`}>
                       {c.interestRate}%
                     </span>
                     {c.interested > 0 && (
@@ -333,7 +333,7 @@ function CampaignComparison({ campaigns }: { campaigns: CampaignComparisonItem[]
                           </div>
                           <div className="bg-card rounded-lg p-3 border">
                             <p className="text-xs text-muted-foreground mb-1">Interested</p>
-                            <p className="font-bold text-lg text-blue-600">{c.interested.toLocaleString()}</p>
+                            <p className="font-bold text-lg text-selery-gold">{c.interested.toLocaleString()}</p>
                           </div>
                         </div>
 
@@ -367,14 +367,14 @@ function CampaignComparison({ campaigns }: { campaigns: CampaignComparisonItem[]
                                           </span>
                                         )}
                                         {step.is_thread_reply && (
-                                          <span className="text-xs bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 px-2 py-0.5 rounded">
+                                          <span className="text-xs bg-selery-cyan/10 dark:bg-selery-cyan/20 text-selery-cyan dark:text-selery-cyan px-2 py-0.5 rounded">
                                             Thread Reply
                                           </span>
                                         )}
                                       </div>
                                       <div className="flex items-center gap-3 text-xs text-muted-foreground">
                                         {step.sent !== undefined && <span>{step.sent?.toLocaleString()} sent</span>}
-                                        {step.reply_rate !== undefined && <span className="font-medium text-blue-600">{step.reply_rate}% reply</span>}
+                                        {step.reply_rate !== undefined && <span className="font-medium text-selery-cyan">{step.reply_rate}% reply</span>}
                                         {(step.delay_days || step.delay_hours) && (
                                           <span>{step.delay_days ? `${step.delay_days}d` : ''}{step.delay_hours ? `${step.delay_hours}h` : ''} delay</span>
                                         )}
@@ -399,10 +399,10 @@ function CampaignComparison({ campaigns }: { campaigns: CampaignComparisonItem[]
                                             <div><span className="text-muted-foreground">Sent: </span><span className="font-medium">{step.sent?.toLocaleString()}</span></div>
                                           )}
                                           {step.unique_replies !== undefined && (
-                                            <div><span className="text-muted-foreground">Replies: </span><span className="font-medium text-blue-600">{step.unique_replies}</span></div>
+                                            <div><span className="text-muted-foreground">Replies: </span><span className="font-medium text-selery-cyan">{step.unique_replies}</span></div>
                                           )}
                                           {step.interested !== undefined && (
-                                            <div><span className="text-muted-foreground">Interested: </span><span className="font-medium text-blue-600">{step.interested}</span></div>
+                                            <div><span className="text-muted-foreground">Interested: </span><span className="font-medium text-selery-gold">{step.interested}</span></div>
                                           )}
                                           {step.bounced !== undefined && (
                                             <div><span className="text-muted-foreground">Bounced: </span><span className="font-medium text-red-500">{step.bounced}</span></div>
@@ -431,7 +431,7 @@ function CampaignComparison({ campaigns }: { campaigns: CampaignComparisonItem[]
                           <p className="text-sm text-muted-foreground">
                             Reached <span className="font-semibold text-foreground">{c.leadsContacted.toLocaleString()}</span> leads
                             {' '}&rarr; <span className="font-semibold text-foreground">{c.uniqueReplies.toLocaleString()}</span> replied ({c.replyRate}%)
-                            {' '}&rarr; <span className="font-semibold text-blue-600">{c.interested.toLocaleString()}</span> interested ({c.interestRate}%)
+                            {' '}&rarr; <span className="font-semibold text-selery-gold">{c.interested.toLocaleString()}</span> interested ({c.interestRate}%)
                           </p>
                         </div>
                       </div>
@@ -468,7 +468,7 @@ function SequenceStepAnalysis({ steps }: { steps: SequenceStepPerformance[] }) {
                 <span className="text-xs text-muted-foreground">{step.totalSent.toLocaleString()} sent</span>
                 <span className="text-xs font-medium">{step.replyRate}% reply</span>
                 {step.totalInterested > 0 && (
-                  <span className="text-xs font-medium text-emerald-600">{step.interestRate}% interest ({step.totalInterested})</span>
+                  <span className="text-xs font-medium text-selery-gold">{step.interestRate}% interest ({step.totalInterested})</span>
                 )}
               </div>
             </div>
@@ -480,7 +480,7 @@ function SequenceStepAnalysis({ steps }: { steps: SequenceStepPerformance[] }) {
               />
               {step.interestRate > 0 && (
                 <div
-                  className="h-full bg-emerald-500 transition-all duration-500"
+                  className="h-full bg-selery-gold transition-all duration-500"
                   style={{ width: `${(step.interestRate / maxReplyRate) * 100}%` }}
                   title={`${step.interestRate}% interest rate`}
                 />
@@ -491,7 +491,7 @@ function SequenceStepAnalysis({ steps }: { steps: SequenceStepPerformance[] }) {
       </div>
       <div className="flex items-center gap-4 mt-4 text-xs text-muted-foreground">
         <div className="flex items-center gap-1"><div className="w-3 h-3 bg-selery-cyan rounded" /> Reply rate</div>
-        <div className="flex items-center gap-1"><div className="w-3 h-3 bg-emerald-500 rounded" /> Interest rate</div>
+        <div className="flex items-center gap-1"><div className="w-3 h-3 bg-selery-gold rounded" /> Interest rate</div>
       </div>
     </div>
   );
@@ -504,7 +504,7 @@ function SenderPerformance({ data }: { data: SenderAnalytics }) {
 
   return (
     <div className="rounded-lg border bg-card shadow-sm overflow-hidden">
-      <div className="p-4 bg-gradient-to-r from-orange-50 to-amber-50 dark:from-orange-950/20 dark:to-amber-950/20 border-b">
+      <div className="p-4 bg-gradient-to-r from-selery-cyan/5 to-selery-navy/5 dark:from-selery-cyan/10 dark:to-selery-navy/10 border-b">
         <div className="flex items-center justify-between">
           <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-2">
             <Mail className="h-4 w-4" />
@@ -624,7 +624,7 @@ function PipelineCompanies({
   return (
     <div className="rounded-lg border bg-card shadow-sm p-6">
       <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-4 flex items-center gap-2">
-        <Building2 className="h-4 w-4 text-emerald-600" />
+        <Building2 className="h-4 w-4 text-selery-gold" />
         Pipeline Companies
         <span className="text-xs font-normal">({companies.length})</span>
       </h3>
@@ -633,10 +633,10 @@ function PipelineCompanies({
           const companyReplies = replies.filter(r => r.company === c.label && r.isInterested);
           const latestReply = companyReplies[0];
           return (
-            <div key={c.label} className="p-3 rounded-lg bg-emerald-50/50 dark:bg-emerald-950/10 border border-emerald-200/50 dark:border-emerald-800/30">
+            <div key={c.label} className="p-3 rounded-lg bg-selery-gold/5 dark:bg-selery-gold/10 border border-selery-gold/20 dark:border-selery-gold/20">
               <div className="flex items-center justify-between mb-1">
                 <span className="font-medium text-sm truncate max-w-[180px]" title={c.label}>{c.label}</span>
-                <span className="text-xs bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 px-1.5 py-0.5 rounded font-medium">
+                <span className="text-xs bg-selery-gold/10 dark:bg-selery-gold/20 text-selery-gold dark:text-selery-gold px-1.5 py-0.5 rounded font-medium">
                   {c.interestedCount} interested
                 </span>
               </div>
@@ -741,7 +741,7 @@ function LeadDeepDive({
               {campaigns.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
             </select>
             {(sentimentFilter || industryFilter || campaignFilter) && (
-              <button onClick={() => { setSentimentFilter(''); setIndustryFilter(''); setCampaignFilter(''); }} className="h-8 px-3 text-xs rounded-lg border bg-red-50 text-red-600 hover:bg-red-100">
+              <button onClick={() => { setSentimentFilter(''); setIndustryFilter(''); setCampaignFilter(''); }} className="h-8 px-3 text-xs rounded-lg border bg-gray-100 text-gray-600 hover:bg-gray-200">
                 Clear filters
               </button>
             )}
@@ -775,7 +775,7 @@ function LeadDeepDive({
                   </td>
                   <td className="py-3 px-4">
                     <p className="font-medium text-foreground">{reply.name}</p>
-                    {reply.title && <p className="text-xs text-blue-600">{reply.title}</p>}
+                    {reply.title && <p className="text-xs text-selery-cyan">{reply.title}</p>}
                   </td>
                   <td className="py-3 px-4">
                     <p className="font-medium">{reply.company}</p>
@@ -805,12 +805,12 @@ function LeadDeepDive({
                         </div>
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                           {reply.buyingSignals.length > 0 && (
-                            <div className="bg-emerald-50 dark:bg-emerald-950/20 rounded-lg p-3 border border-emerald-500/20">
+                            <div className="bg-selery-gold/5 dark:bg-selery-gold/10 rounded-lg p-3 border border-selery-gold/20">
                               <div className="flex items-center gap-1 mb-2">
-                                <Sparkles className="h-3 w-3 text-emerald-600" />
-                                <p className="text-xs font-semibold text-emerald-700 dark:text-emerald-400 uppercase">Buying Signals</p>
+                                <Sparkles className="h-3 w-3 text-selery-gold" />
+                                <p className="text-xs font-semibold text-selery-gold dark:text-selery-gold uppercase">Buying Signals</p>
                               </div>
-                              <ul className="space-y-1">{reply.buyingSignals.map((s, i) => <li key={i} className="text-xs text-emerald-600">{s}</li>)}</ul>
+                              <ul className="space-y-1">{reply.buyingSignals.map((s, i) => <li key={i} className="text-xs text-selery-gold">{s}</li>)}</ul>
                             </div>
                           )}
                           {reply.objections.length > 0 && (
@@ -823,12 +823,12 @@ function LeadDeepDive({
                             </div>
                           )}
                           {reply.themes.length > 0 && (
-                            <div className="bg-blue-50 dark:bg-blue-950/20 rounded-lg p-3 border border-blue-500/20">
+                            <div className="bg-selery-cyan/5 dark:bg-selery-cyan/10 rounded-lg p-3 border border-selery-cyan/20">
                               <div className="flex items-center gap-1 mb-2">
-                                <MessageSquare className="h-3 w-3 text-blue-600" />
-                                <p className="text-xs font-semibold text-blue-700 dark:text-blue-400 uppercase">Themes</p>
+                                <MessageSquare className="h-3 w-3 text-selery-cyan" />
+                                <p className="text-xs font-semibold text-selery-navy dark:text-selery-cyan uppercase">Themes</p>
                               </div>
-                              <div className="flex flex-wrap gap-1">{reply.themes.map((t, i) => <span key={i} className="text-xs bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 px-2 py-0.5 rounded">{t}</span>)}</div>
+                              <div className="flex flex-wrap gap-1">{reply.themes.map((t, i) => <span key={i} className="text-xs bg-selery-cyan/10 dark:bg-selery-cyan/20 text-selery-navy dark:text-selery-cyan px-2 py-0.5 rounded">{t}</span>)}</div>
                             </div>
                           )}
                         </div>
@@ -836,7 +836,7 @@ function LeadDeepDive({
                           <span>Email: {reply.email}</span>
                           <span>Seniority: {reply.seniority}</span>
                           <span>Industry: {reply.industry}</span>
-                          {reply.isInterested && <span className="text-emerald-600 font-medium">Marked Interested</span>}
+                          {reply.isInterested && <span className="text-selery-gold font-medium">Marked Interested</span>}
                         </div>
                       </div>
                     </td>
@@ -1179,12 +1179,11 @@ export default function AnalyticsPage() {
         {hero && (
           <div className="bg-selery-navy text-white rounded-3xl p-8 shadow-xl">
             <div className="flex items-center gap-4 mb-6">
-              <div className="w-10 h-10 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center">
-                <Brain className="h-5 w-5" />
-              </div>
+              <img src="/selery-logo.png" alt="Selery" className="h-10 object-contain" />
+              <div className="h-8 w-px bg-white/30" />
               <div>
                 <span className="text-white/80 font-medium text-sm uppercase tracking-wider">OUTBOUND ANALYTICS</span>
-                <h1 className="text-3xl font-bold">{filteredFastData?.workspaceName || 'Selery'}{activeCycle !== null ? ` — Cycle ${activeCycle}` : ''}</h1>
+                <h1 className="text-3xl font-bold">{activeCycle !== null ? `Cycle ${activeCycle}` : 'All Cycles'}</h1>
               </div>
             </div>
             <div className="grid grid-cols-2 md:grid-cols-6 gap-4">
@@ -1267,33 +1266,33 @@ export default function AnalyticsPage() {
             </div>
             <div className="p-6 space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div className="bg-blue-50 dark:bg-blue-950/20 p-4 rounded-xl border border-blue-500/20">
+                <div className="bg-selery-cyan/5 dark:bg-selery-cyan/10 p-4 rounded-xl border border-selery-cyan/20">
                   <div className="flex items-center gap-2 mb-2">
-                    <MessageSquare className="h-4 w-4 text-blue-600" />
-                    <h4 className="font-semibold text-blue-700 dark:text-blue-400 text-sm">Subject Lines</h4>
+                    <MessageSquare className="h-4 w-4 text-selery-cyan" />
+                    <h4 className="font-semibold text-selery-navy dark:text-selery-cyan text-sm">Subject Lines</h4>
                   </div>
-                  <p className="text-sm text-blue-600 dark:text-blue-500">
+                  <p className="text-sm text-selery-navy/80 dark:text-selery-cyan/80">
                     {copyData.subjects.analysis.keyInsight}
                   </p>
                 </div>
                 {copyData.body?.analysis && (
-                  <div className="bg-blue-50 dark:bg-blue-950/20 p-4 rounded-xl border border-blue-500/20">
+                  <div className="bg-selery-cyan/5 dark:bg-selery-cyan/10 p-4 rounded-xl border border-selery-cyan/20">
                     <div className="flex items-center gap-2 mb-2">
-                      <Target className="h-4 w-4 text-blue-600" />
-                      <h4 className="font-semibold text-blue-700 dark:text-blue-400 text-sm">Opening Hooks</h4>
+                      <Target className="h-4 w-4 text-selery-cyan" />
+                      <h4 className="font-semibold text-selery-navy dark:text-selery-cyan text-sm">Opening Hooks</h4>
                     </div>
-                    <p className="text-sm text-blue-600 dark:text-blue-500">
+                    <p className="text-sm text-selery-navy/80 dark:text-selery-cyan/80">
                       {copyData.body.analysis.contrast}
                     </p>
                   </div>
                 )}
                 {copyData.cta?.analysis && (
-                  <div className="bg-blue-50 dark:bg-blue-950/20 p-4 rounded-xl border border-blue-500/20">
+                  <div className="bg-selery-cyan/5 dark:bg-selery-cyan/10 p-4 rounded-xl border border-selery-cyan/20">
                     <div className="flex items-center gap-2 mb-2">
-                      <Mail className="h-4 w-4 text-blue-600" />
-                      <h4 className="font-semibold text-blue-700 dark:text-blue-400 text-sm">CTAs</h4>
+                      <Mail className="h-4 w-4 text-selery-cyan" />
+                      <h4 className="font-semibold text-selery-navy dark:text-selery-cyan text-sm">CTAs</h4>
                     </div>
-                    <p className="text-sm text-blue-600 dark:text-blue-500">
+                    <p className="text-sm text-selery-navy/80 dark:text-selery-cyan/80">
                       {copyData.cta.analysis.commitmentAnalysis}
                     </p>
                   </div>
@@ -1360,12 +1359,12 @@ export default function AnalyticsPage() {
                 {filteredReport.topBuyingSignals.length > 0 && (
                   <div className="rounded-lg border bg-card shadow-sm p-6">
                     <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-4 flex items-center gap-2">
-                      <Sparkles className="h-4 w-4 text-emerald-600" /> Buying Signals
+                      <Sparkles className="h-4 w-4 text-selery-gold" /> Buying Signals
                     </h3>
                     <div className="space-y-2">
                       {filteredReport.topBuyingSignals.map((s) => (
                         <div key={s.signal} className="flex items-center justify-between">
-                          <span className="text-sm font-medium text-emerald-700 dark:text-emerald-400">{toTitleCase(s.signal)}</span>
+                          <span className="text-sm font-medium text-selery-gold dark:text-selery-gold">{toTitleCase(s.signal)}</span>
                           <span className="text-sm text-muted-foreground">{s.count}x</span>
                         </div>
                       ))}

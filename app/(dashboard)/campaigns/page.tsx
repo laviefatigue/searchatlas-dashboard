@@ -52,8 +52,8 @@ export default function CampaignsPage() {
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
         <div className="rounded-lg border bg-card p-4">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg bg-blue-500/10 flex items-center justify-center">
-              <Mail className="h-5 w-5 text-blue-500" />
+            <div className="w-10 h-10 rounded-lg bg-selery-cyan/10 flex items-center justify-center">
+              <Mail className="h-5 w-5 text-selery-cyan" />
             </div>
             <div>
               <p className="text-2xl font-bold">{heroMetrics.activeCampaigns}</p>
@@ -85,8 +85,8 @@ export default function CampaignsPage() {
         </div>
         <div className="rounded-lg border bg-card p-4">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg bg-green-500/10 flex items-center justify-center">
-              <TrendingUp className="h-5 w-5 text-green-500" />
+            <div className="w-10 h-10 rounded-lg bg-selery-gold/10 flex items-center justify-center">
+              <TrendingUp className="h-5 w-5 text-selery-gold" />
             </div>
             <div>
               <p className="text-2xl font-bold">{heroMetrics.totalInterested}</p>
@@ -96,8 +96,8 @@ export default function CampaignsPage() {
         </div>
         <div className="rounded-lg border bg-card p-4">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg bg-emerald-500/10 flex items-center justify-center">
-              <TrendingUp className="h-5 w-5 text-emerald-500" />
+            <div className="w-10 h-10 rounded-lg bg-selery-cyan/10 flex items-center justify-center">
+              <TrendingUp className="h-5 w-5 text-selery-cyan" />
             </div>
             <div>
               <p className="text-2xl font-bold">{heroMetrics.avgReplyRate}%</p>
@@ -126,7 +126,7 @@ export default function CampaignsPage() {
                 <tr key={c.id} className="border-b border-border/50 hover:bg-muted/20">
                   <td className="py-3 px-4">
                     <div className="flex items-center gap-2">
-                      <span className={`w-2 h-2 rounded-full flex-shrink-0 ${c.status === 'Active' ? 'bg-emerald-500' : 'bg-gray-400'}`} />
+                      <span className={`w-2 h-2 rounded-full flex-shrink-0 ${c.status === 'Active' ? 'bg-selery-gold' : 'bg-gray-400'}`} />
                       <span className="font-medium text-foreground truncate max-w-[250px]" title={c.name}>{c.name}</span>
                     </div>
                   </td>
@@ -134,7 +134,7 @@ export default function CampaignsPage() {
                   <td className="py-3 px-4 text-right text-muted-foreground">{c.leadsContacted.toLocaleString()}</td>
                   <td className="py-3 px-4 text-right font-medium">{c.replyRate}%</td>
                   <td className="py-3 px-4 text-right font-bold">{c.interestRate}%</td>
-                  <td className="py-3 px-4 text-right text-blue-600 font-medium">{c.interested}</td>
+                  <td className="py-3 px-4 text-right text-selery-gold font-medium">{c.interested}</td>
                 </tr>
               ))}
             </tbody>

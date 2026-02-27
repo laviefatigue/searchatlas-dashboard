@@ -94,21 +94,21 @@
   --ring: #3b82f6;
 
   /* Charts - Campaign Metrics */
-  --chart-1: #3b82f6; /* Sent - Blue */
-  --chart-2: #22c55e; /* Opens - Green */
-  --chart-3: #28BFFC; /* Replies - Selery Cyan */
+  --chart-1: #28BFFC; /* Sent - Selery Cyan */
+  --chart-2: #F9B416; /* Opens - Selery Gold */
+  --chart-3: #1C2655; /* Replies - Selery Navy */
   --chart-4: #ef4444; /* Bounced - Red */
-  --chart-5: #f59e0b; /* Interested - Amber */
+  --chart-5: #F9B416; /* Interested - Selery Gold */
 
-  /* Sidebar */
-  --sidebar: #fafafa;
-  --sidebar-foreground: #1a1a1a;
-  --sidebar-primary: #3b82f6;
+  /* Sidebar — Selery navy */
+  --sidebar: #1C2655;
+  --sidebar-foreground: #ffffff;
+  --sidebar-primary: #28BFFC;
   --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #f0f4ff;
-  --sidebar-accent-foreground: #1a1a1a;
-  --sidebar-border: #e5e5e5;
-  --sidebar-ring: #3b82f6;
+  --sidebar-accent: rgba(40, 191, 252, 0.15);
+  --sidebar-accent-foreground: #ffffff;
+  --sidebar-border: rgba(255, 255, 255, 0.1);
+  --sidebar-ring: #28BFFC;
 }
 
 .dark {
@@ -132,19 +132,19 @@
   --border: #262626;
   --input: #262626;
   --ring: #60a5fa;
-  --chart-1: #60a5fa;
-  --chart-2: #4ade80;
-  --chart-3: #28BFFC;
+  --chart-1: #28BFFC;
+  --chart-2: #F9B416;
+  --chart-3: #4A5A8A;
   --chart-4: #f87171;
-  --chart-5: #fbbf24;
-  --sidebar: #171717;
-  --sidebar-foreground: #fafafa;
-  --sidebar-primary: #60a5fa;
-  --sidebar-primary-foreground: #0a0a0a;
-  --sidebar-accent: #1e293b;
-  --sidebar-accent-foreground: #fafafa;
-  --sidebar-border: #262626;
-  --sidebar-ring: #60a5fa;
+  --chart-5: #F9B416;
+  --sidebar: #121B3D;
+  --sidebar-foreground: #ffffff;
+  --sidebar-primary: #28BFFC;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: rgba(40, 191, 252, 0.15);
+  --sidebar-accent-foreground: #ffffff;
+  --sidebar-border: rgba(255, 255, 255, 0.1);
+  --sidebar-ring: #28BFFC;
 }
 
 @layer base {
