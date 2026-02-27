@@ -598,6 +598,9 @@ export async function GET(request: Request) {
       }
     }
 
+    // Pipeline companies: only companies with at least one interested reply
+    const pipelineCompanies = companyDist.filter(c => c.interestedCount > 0);
+
     const report: AnalyticsReport = {
       workspaceName,
       totalReplies: allReplies.length,
@@ -607,6 +610,7 @@ export async function GET(request: Request) {
       industryDistribution: industryDist,
       seniorityDistribution: seniorityDist,
       topCompanies: companyDist,
+      pipelineCompanies,
       topThemes: Array.from(themeCount.entries())
         .map(([theme, count]) => ({ theme, count }))
         .sort((a, b) => b.count - a.count)

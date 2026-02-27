@@ -446,6 +446,7 @@ export interface AnalyticsReport {
   industryDistribution: DemographicDistribution[];
   seniorityDistribution: DemographicDistribution[];
   topCompanies: DemographicDistribution[];
+  pipelineCompanies: DemographicDistribution[];
   // Themes
   topThemes: Array<{ theme: string; count: number }>;
   topObjections: Array<{ objection: string; count: number }>;
@@ -455,4 +456,109 @@ export interface AnalyticsReport {
   // Filters
   campaigns: Array<{ id: number; name: string }>;
   industries: string[];
+}
+
+// ── Fast Analytics Types (Phase 1 — instant, no AI) ──────────────────
+
+export interface CampaignComparisonItem {
+  id: number;
+  name: string;
+  status: string;
+  leadsContacted: number;
+  emailsSent: number;
+  uniqueReplies: number;
+  interested: number;
+  replyRate: number;
+  interestRate: number;
+  bounceRate: number;
+  completionPct: number;
+}
+
+export interface SequenceStepPerformance {
+  stepNumber: number;
+  subject: string;
+  totalSent: number;
+  totalReplies: number;
+  totalInterested: number;
+  replyRate: number;
+  interestRate: number;
+  campaignCount: number;
+}
+
+export interface FunnelData {
+  totalLeads: number;
+  contacted: number;
+  replied: number;
+  interested: number;
+}
+
+export interface FastAnalytics {
+  workspaceName: string;
+  heroMetrics: {
+    totalCampaigns: number;
+    activeCampaigns: number;
+    totalLeads: number;
+    leadsContacted: number;
+    emailsSent: number;
+    totalReplies: number;
+    totalInterested: number;
+    avgReplyRate: number;
+    avgInterestRate: number;
+    avgBounceRate: number;
+  };
+  funnel: FunnelData;
+  campaignComparison: CampaignComparisonItem[];
+  sequenceStepPerformance: SequenceStepPerformance[];
+}
+
+// ── Sender Analytics Types ───────────────────────────────────────────
+
+export type EmailProvider = 'Google' | 'Microsoft' | 'Other';
+
+export interface ProviderStats {
+  provider: EmailProvider;
+  accountCount: number;
+  emailsSent: number;
+  contacted: number;
+  replied: number;
+  bounced: number;
+  interested: number;
+  replyRate: number;
+  bounceRate: number;
+  interestRate: number;
+}
+
+export interface DomainStats {
+  domain: string;
+  provider: EmailProvider;
+  accountCount: number;
+  emailsSent: number;
+  contacted: number;
+  replied: number;
+  bounced: number;
+  interested: number;
+  replyRate: number;
+  bounceRate: number;
+  interestRate: number;
+}
+
+export interface TopSender {
+  email: string;
+  domain: string;
+  provider: EmailProvider;
+  status: string;
+  emailsSent: number;
+  replied: number;
+  bounced: number;
+  interested: number;
+  replyRate: number;
+  bounceRate: number;
+}
+
+export interface SenderAnalytics {
+  totalAccounts: number;
+  connectedAccounts: number;
+  byProvider: ProviderStats[];
+  byDomain: DomainStats[];
+  topSenders: TopSender[];
 }
