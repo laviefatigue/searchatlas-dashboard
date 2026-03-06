@@ -171,6 +171,7 @@ export interface SenderEmail {
   daily_limit: number;
   type: string;
   status: string;
+  warmup_enabled: boolean;
   emails_sent_count: number;
   total_replied_count: number;
   total_opened_count: number;

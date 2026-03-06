@@ -1,49 +1,25 @@
 import { NextResponse } from 'next/server';
+import { switchWorkspace, getAllSenderEmails } from '@/lib/api/emailbison';
+import type { SenderEmail } from '@/lib/types/emailbison';
 
-// EmailBison API Configuration
-const EMAILBISON_API_URL = process.env.EMAILBISON_API_URL || 'https://spellcast.hirecharm.com';
-const EMAILBISON_API_TOKEN = process.env.EMAILBISON_API_TOKEN || '';
+// Environment-driven workspace configuration
+const WORKSPACE_ID = parseInt(process.env.WORKSPACE_ID || '0', 10);
+const WORKSPACE_NAME = process.env.WORKSPACE_NAME || 'Dashboard';
 
-interface EmailBisonTag {
-  id: number;
-  name: string;
-  default?: boolean;
-}
+function categorizeProvider(inbox: SenderEmail): string {
+  // 1. Check the `type` field first (most reliable — set by OAuth connection)
+  const inboxType = (inbox.type || '').toLowerCase();
 
-interface EmailBisonInbox {
-  id: number;
-  name: string;
-  email: string;
-  status: string;
-  warmup_enabled: boolean;
-  daily_limit: number;
-  emails_sent_count: number;
-  total_replied_count: number;
-  total_opened_count: number;
-  bounced_count: number;
-  total_leads_contacted_count: number;
-  interested_leads_count: number;
-  tags?: EmailBisonTag[];
-}
-
-async function fetchEmailBison(endpoint: string) {
-  const response = await fetch(`${EMAILBISON_API_URL}${endpoint}`, {
-    headers: {
-      'Authorization': `Bearer ${EMAILBISON_API_TOKEN}`,
-      'Content-Type': 'application/json',
-    },
-    cache: 'no-store',
-  });
-
-  if (!response.ok) {
-    throw new Error(`EmailBison API error: ${response.status} ${response.statusText}`);
+  // Google types
+  if (inboxType.includes('google') || inboxType.includes('gmail')) {
+    return 'Google';
+  }
+  // Microsoft Entra / Outlook types
+  if (inboxType.includes('microsoft') || inboxType.includes('entra') || inboxType.includes('outlook') || inboxType.includes('azure')) {
+    return 'Microsoft';
   }
 
-  return response.json();
-}
-
-function categorizeProvider(inbox: EmailBisonInbox): string {
-  // Check tags first (most reliable)
+  // 2. Fall back to tags
   const tags = inbox.tags || [];
   const tagNames = tags.map(t => t.name.toLowerCase());
 
@@ -54,7 +30,7 @@ function categorizeProvider(inbox: EmailBisonInbox): string {
     return 'Microsoft';
   }
 
-  // Fall back to email domain analysis
+  // 3. Fall back to email domain analysis
   const email = inbox.email.toLowerCase();
   if (email.includes('gmail') || email.includes('googlemail')) {
     return 'Google';
@@ -66,7 +42,7 @@ function categorizeProvider(inbox: EmailBisonInbox): string {
   return 'Other';
 }
 
-function calculateHealthScore(inbox: EmailBisonInbox): number {
+function calculateHealthScore(inbox: SenderEmail): number {
   let score = 60; // Base score
 
   // Connection status (most important)
@@ -98,19 +74,22 @@ function calculateHealthScore(inbox: EmailBisonInbox): number {
 
 export async function GET() {
   try {
-    // Fetch all senders/inboxes from EmailBison API
-    // The API key is workspace-scoped, so we get all inboxes for that workspace
-    const sendersData = await fetchEmailBison('/api/sender-emails');
-    const inboxes: EmailBisonInbox[] = sendersData.data || sendersData || [];
+    // Switch workspace if configured
+    if (WORKSPACE_ID > 0) {
+      await switchWorkspace(WORKSPACE_ID).catch(() => {});
+    }
+
+    // Fetch all senders/inboxes from EmailBison API (handles pagination)
+    const inboxes = await getAllSenderEmails();
 
     if (!inboxes.length) {
       throw new Error('No inboxes found for this workspace');
     }
 
     // Calculate infrastructure metrics
-    const liveInboxes = inboxes.filter((i: EmailBisonInbox) => i.status === 'Connected');
-    const deadInboxes = inboxes.filter((i: EmailBisonInbox) => i.status !== 'Connected');
-    const warmingInboxes = inboxes.filter((i: EmailBisonInbox) => i.warmup_enabled);
+    const liveInboxes = inboxes.filter((i: SenderEmail) => i.status === 'Connected');
+    const deadInboxes = inboxes.filter((i: SenderEmail) => i.status !== 'Connected');
+    const warmingInboxes = inboxes.filter((i: SenderEmail) => i.warmup_enabled);
 
     // Calculate health scores
     const healthScores = liveInboxes.map(calculateHealthScore);
@@ -129,7 +108,7 @@ export async function GET() {
 
     // Calculate capacity
     const operationalCapacity = liveInboxes.reduce(
-      (sum: number, inbox: EmailBisonInbox) => sum + (inbox.daily_limit || 40),
+      (sum: number, inbox: SenderEmail) => sum + (inbox.daily_limit || 40),
       0
     );
 
@@ -145,7 +124,7 @@ export async function GET() {
       total_bounced: number;
     }>();
 
-    inboxes.forEach((inbox: EmailBisonInbox) => {
+    inboxes.forEach((inbox: SenderEmail) => {
       const provider = categorizeProvider(inbox);
       const existing = providerMap.get(provider) || {
         live_count: 0,
@@ -190,7 +169,7 @@ export async function GET() {
     })).sort((a, b) => b.live_count - a.live_count);
 
     // Get unique domains
-    const domains = new Set(inboxes.map((i: EmailBisonInbox) => i.email.split('@')[1]));
+    const domains = new Set(inboxes.map((i: SenderEmail) => i.email.split('@')[1]));
 
     // Calculate totals
     const totalSent = inboxes.reduce((sum, i) => sum + (i.emails_sent_count || 0), 0);
@@ -245,7 +224,7 @@ export async function GET() {
       avg_days_to_ready: 14,
       capacity_next_week: warmingInboxes.length * 20,
       capacity_next_month: warmingInboxes.length * 40,
-      inboxes: warmingInboxes.slice(0, 5).map((inbox: EmailBisonInbox) => ({
+      inboxes: warmingInboxes.slice(0, 5).map((inbox: SenderEmail) => ({
         email: inbox.email,
         days_warming: Math.floor(Math.random() * 21) + 1,
         warmup_score: Math.floor(Math.random() * 40) + 50,
@@ -270,12 +249,12 @@ export async function GET() {
       dnsAuthStatus: null,
       atRiskForecast: null,
       client: {
-        id: 'searchatlas',
-        name: 'SearchAtlas',
+        id: WORKSPACE_NAME.toLowerCase().replace(/\s+/g, '-'),
+        name: WORKSPACE_NAME,
         created_at: new Date().toISOString(),
       },
       package: {
-        name: 'SearchAtlas',
+        name: WORKSPACE_NAME,
         inbox_target: Math.max(inboxes.length, 100),
       },
       fetchedAt: new Date().toISOString(),
@@ -303,7 +282,7 @@ export async function GET() {
         sync_source: 'EmailBison API (Error)',
       },
       volumeHistory: { snapshots: [] },
-      client: { name: 'SearchAtlas' },
+      client: { name: WORKSPACE_NAME },
       fetchedAt: new Date().toISOString(),
     }, { status: 500 });
   }
