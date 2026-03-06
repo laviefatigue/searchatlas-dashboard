@@ -26,7 +26,7 @@ export const STATUS_COLORS: Record<string, { bg: string; text: string }> = {
   active: { bg: 'bg-green-500', text: 'text-white' },
   paused: { bg: 'bg-amber-500', text: 'text-white' },
   draft: { bg: 'bg-gray-200', text: 'text-gray-700' },
-  launching: { bg: 'bg-blue-500', text: 'text-white' },
+  launching: { bg: 'bg-selery-cyan', text: 'text-selery-navy' },
   completed: { bg: 'bg-purple-500', text: 'text-white' },
   stopped: { bg: 'bg-red-500', text: 'text-white' },
   failed: { bg: 'bg-red-600', text: 'text-white' },
@@ -35,10 +35,10 @@ export const STATUS_COLORS: Record<string, { bg: string; text: string }> = {
 };
 
 export const CHART_COLORS = {
-  sent: '#3b82f6',      // Blue
+  sent: '#28BFFC',      // Selery Cyan
   opens: '#22c55e',     // Green
-  replies: '#8b5cf6',   // Purple
+  replies: '#1C2655',   // Selery Navy
   bounced: '#ef4444',   // Red
-  interested: '#f59e0b', // Amber
+  interested: '#F9B416', // Selery Gold
   unsubscribed: '#6b7280', // Gray
 };

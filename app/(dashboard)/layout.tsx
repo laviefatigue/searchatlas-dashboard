@@ -18,9 +18,14 @@ export default function DashboardLayout({
         if (response.ok) {
           const data = await response.json();
           setUser(data.data);
+        } else {
+          // Auth failed - continue without user (demo mode)
+          setUser(null);
         }
       } catch (error) {
         console.error('Failed to fetch user:', error);
+        // Continue without user on error (demo mode)
+        setUser(null);
       }
     };
 

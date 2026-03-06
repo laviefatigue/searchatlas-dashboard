@@ -3,13 +3,14 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
-import { BarChart3 } from 'lucide-react';
+import { BarChart3, Server } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { useAuthStore } from '@/lib/stores';
 
 const navigation = [
   { name: 'Analytics', href: '/analytics', icon: BarChart3 },
+  { name: 'Infrastructure', href: '/infrastructure', icon: Server },
 ];
 
 export function Sidebar() {

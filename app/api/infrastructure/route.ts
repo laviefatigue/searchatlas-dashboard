@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 
 // Configuration
 const INFRASTRUCTURE_API_URL = process.env.INFRASTRUCTURE_API_URL || 'http://localhost:8000';
-const INFRASTRUCTURE_CLIENT_ID = process.env.INFRASTRUCTURE_CLIENT_ID || 'e5988a33-ec6c-4b5a-be85-25b8bd0678bb';
+const INFRASTRUCTURE_CLIENT_ID = process.env.INFRASTRUCTURE_CLIENT_ID || '4bd07dc0-059a-448b-b6f4-3275d0c104a9';
 
 // Mock data for demo (based on SearchAtlas infrastructure v2)
 const MOCK_DATA = {
@@ -164,8 +164,8 @@ const MOCK_DATA = {
   },
   client: {
     id: INFRASTRUCTURE_CLIENT_ID,
-    name: 'Selery',
-    created_at: '2024-06-15T00:00:00Z',
+    name: 'SearchAtlas',
+    created_at: '2022-01-15T00:00:00Z',
   },
   package: {
     name: 'Enterprise',

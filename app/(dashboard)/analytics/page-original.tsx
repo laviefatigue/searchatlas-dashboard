@@ -10,8 +10,10 @@ import type {
   ReplyIntent,
   DemographicDistribution,
   FastAnalytics,
+  SenderAnalytics,
   CampaignComparisonItem,
   SequenceStepPerformance,
+  DomainStats,
   CopyAnalysis,
 } from '@/lib/types/emailbison';
 import { exportPageToPDF } from '@/lib/export-pdf';
@@ -36,6 +38,7 @@ import {
   FileSpreadsheet,
   Loader2,
   Mail,
+  Globe,
   Zap,
   Target,
   ArrowRight,
@@ -136,9 +139,9 @@ function SentimentOverview({
     { key: 'negative' as const, label: 'Negative', color: 'bg-red-500', count: breakdown.negative },
   ];
   return (
-    <div className="grid grid-cols-2 md:grid-cols-4 gap-5">
+    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
       {items.map((item) => (
-        <div key={item.key} className="text-center p-5 rounded-xl bg-muted/50 border">
+        <div key={item.key} className="text-center p-4 rounded-xl bg-muted/50 border">
           <div className={`w-3 h-3 ${item.color} rounded-full mx-auto mb-2`} />
           <p className="text-2xl font-bold text-foreground">{item.count}</p>
           <p className="text-xs text-muted-foreground">{item.label}</p>
@@ -316,25 +319,25 @@ function CampaignComparison({ campaigns }: { campaigns: CampaignComparisonItem[]
                 </tr>
                 {expandedId === c.id && (
                   <tr className="bg-muted/30">
-                    <td colSpan={8} className="p-8">
-                      <div className="space-y-6">
+                    <td colSpan={8} className="p-6">
+                      <div className="space-y-4">
                         {/* Stats Grid */}
-                        <div className="grid grid-cols-2 md:grid-cols-4 gap-5">
-                          <div className="bg-card rounded-xl p-4 border">
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                          <div className="bg-card rounded-lg p-3 border">
                             <p className="text-xs text-muted-foreground mb-1">Leads Reached</p>
-                            <p className="font-bold text-xl">{c.leadsContacted.toLocaleString()}</p>
+                            <p className="font-bold text-lg">{c.leadsContacted.toLocaleString()}</p>
                           </div>
-                          <div className="bg-card rounded-xl p-4 border">
+                          <div className="bg-card rounded-lg p-3 border">
                             <p className="text-xs text-muted-foreground mb-1">Emails Sent</p>
-                            <p className="font-bold text-xl">{c.emailsSent.toLocaleString()}</p>
+                            <p className="font-bold text-lg">{c.emailsSent.toLocaleString()}</p>
                           </div>
-                          <div className="bg-card rounded-xl p-4 border">
+                          <div className="bg-card rounded-lg p-3 border">
                             <p className="text-xs text-muted-foreground mb-1">Replies</p>
-                            <p className="font-bold text-xl">{c.uniqueReplies.toLocaleString()}</p>
+                            <p className="font-bold text-lg">{c.uniqueReplies.toLocaleString()}</p>
                           </div>
-                          <div className="bg-card rounded-xl p-4 border">
+                          <div className="bg-card rounded-lg p-3 border">
                             <p className="text-xs text-muted-foreground mb-1">Interested</p>
-                            <p className="font-bold text-xl text-selery-gold">{c.interested.toLocaleString()}</p>
+                            <p className="font-bold text-lg text-selery-gold">{c.interested.toLocaleString()}</p>
                           </div>
                         </div>
 
@@ -455,17 +458,17 @@ function SequenceStepAnalysis({ steps }: { steps: SequenceStepPerformance[] }) {
 
   return (
     <div className="rounded-lg border bg-card shadow-sm p-6">
-      <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-5 flex items-center gap-2">
+      <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-4 flex items-center gap-2">
         <Zap className="h-4 w-4" />
         Sequence Step Performance
         <span className="text-xs font-normal text-muted-foreground">(across {steps[0]?.campaignCount || 0} campaigns)</span>
       </h3>
-      <div className="space-y-5">
+      <div className="space-y-4">
         {steps.map((step) => (
           <div key={step.stepNumber} className="space-y-2">
             <div className="flex items-center justify-between text-sm">
               <span className="font-medium text-foreground">{step.subject}</span>
-              <div className="flex items-center gap-5">
+              <div className="flex items-center gap-4">
                 <span className="text-xs text-muted-foreground">{step.totalSent.toLocaleString()} sent</span>
                 <span className="text-xs font-medium">{step.replyRate}% reply</span>
                 {step.totalInterested > 0 && (
@@ -490,10 +493,117 @@ function SequenceStepAnalysis({ steps }: { steps: SequenceStepPerformance[] }) {
           </div>
         ))}
       </div>
-      <div className="flex items-center gap-5 mt-5 text-xs text-muted-foreground">
+      <div className="flex items-center gap-4 mt-4 text-xs text-muted-foreground">
         <div className="flex items-center gap-1"><div className="w-3 h-3 bg-selery-cyan rounded" /> Reply rate</div>
         <div className="flex items-center gap-1"><div className="w-3 h-3 bg-selery-gold rounded" /> Interest rate</div>
       </div>
+    </div>
+  );
+}
+
+function SenderPerformance({ data }: { data: SenderAnalytics }) {
+  const [showAllDomains, setShowAllDomains] = useState(false);
+  const activeDomains = data.byDomain.filter(d => d.emailsSent > 0);
+  const domainsToShow = showAllDomains ? activeDomains : activeDomains.slice(0, 10);
+
+  return (
+    <div className="rounded-lg border bg-card shadow-sm overflow-hidden">
+      <div className="p-4 bg-gradient-to-r from-selery-cyan/5 to-selery-navy/5 dark:from-selery-cyan/10 dark:to-selery-navy/10 border-b">
+        <div className="flex items-center justify-between">
+          <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-2">
+            <Mail className="h-4 w-4" />
+            Sender & Domain Performance
+          </h3>
+          <div className="flex items-center gap-3 text-xs text-muted-foreground">
+            <span>{data.totalAccounts} accounts</span>
+            <span>{data.connectedAccounts} connected</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Provider Summary */}
+      {data.byProvider.length > 0 && (
+        <div className="p-4 border-b">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+            {data.byProvider.map((p) => (
+              <div key={p.provider} className="p-3 rounded-lg bg-muted/50 border">
+                <div className="flex items-center gap-2 mb-2">
+                  <Globe className="h-4 w-4 text-muted-foreground" />
+                  <span className="font-medium text-sm">{p.provider}</span>
+                  <span className="text-xs text-muted-foreground">({p.accountCount} accounts)</span>
+                </div>
+                <div className="grid grid-cols-3 gap-2 text-center">
+                  <div>
+                    <p className="text-lg font-bold">{p.replyRate}%</p>
+                    <p className="text-xs text-muted-foreground">Reply</p>
+                  </div>
+                  <div>
+                    <p className="text-lg font-bold">{p.bounceRate}%</p>
+                    <p className="text-xs text-muted-foreground">Bounce</p>
+                  </div>
+                  <div>
+                    <p className="text-lg font-bold text-selery-cyan">{p.replied.toLocaleString()}</p>
+                    <p className="text-xs text-muted-foreground">Replied</p>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Domain Breakdown Table */}
+      {activeDomains.length > 0 && (
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="border-b bg-muted/30">
+                <th className="h-9 px-4 text-left font-medium text-muted-foreground text-xs uppercase">Domain</th>
+                <th className="h-9 px-4 text-right font-medium text-muted-foreground text-xs uppercase">Accounts</th>
+                <th className="h-9 px-4 text-right font-medium text-muted-foreground text-xs uppercase">Sent</th>
+                <th className="h-9 px-4 text-right font-medium text-muted-foreground text-xs uppercase">Reply %</th>
+                <th className="h-9 px-4 text-right font-medium text-muted-foreground text-xs uppercase">Bounce %</th>
+                <th className="h-9 px-4 text-right font-medium text-muted-foreground text-xs uppercase">Replied</th>
+              </tr>
+            </thead>
+            <tbody>
+              {domainsToShow.map((d: DomainStats) => (
+                <tr key={d.domain} className="border-b border-border/50 hover:bg-muted/20">
+                  <td className="py-2.5 px-4 font-medium">{d.domain}</td>
+                  <td className="py-2.5 px-4 text-right text-muted-foreground">{d.accountCount}</td>
+                  <td className="py-2.5 px-4 text-right text-muted-foreground">{d.emailsSent.toLocaleString()}</td>
+                  <td className="py-2.5 px-4 text-right font-medium">{d.replyRate}%</td>
+                  <td className="py-2.5 px-4 text-right">
+                    <span className={d.bounceRate > 3 ? 'text-red-600 font-medium' : 'text-muted-foreground'}>
+                      {d.bounceRate}%
+                    </span>
+                  </td>
+                  <td className="py-2.5 px-4 text-right">
+                    <span className="text-muted-foreground">{d.replied.toLocaleString()}</span>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          {activeDomains.length > 10 && (
+            <div className="p-3 text-center border-t">
+              <button
+                onClick={() => setShowAllDomains(!showAllDomains)}
+                className="text-xs text-selery-cyan hover:text-selery-cyan/80 font-medium"
+              >
+                {showAllDomains ? 'Show less' : `Show all ${activeDomains.length} domains`}
+              </button>
+            </div>
+          )}
+        </div>
+      )}
+
+      {activeDomains.length === 0 && (
+        <div className="p-8 text-center text-muted-foreground">
+          <Mail className="h-8 w-8 mx-auto mb-2 opacity-50" />
+          <p className="text-sm">No sending activity yet</p>
+        </div>
+      )}
     </div>
   );
 }
@@ -560,7 +670,7 @@ function PipelineCompanies({
 
   if (companies.length === 0) {
     return (
-      <div className="rounded-lg border bg-card shadow-sm p-6 text-center">
+      <div className="rounded-lg border bg-card shadow-sm p-8 text-center">
         <Building2 className="h-8 w-8 mx-auto mb-2 text-muted-foreground opacity-50" />
         <p className="text-sm text-muted-foreground">No pipeline companies yet</p>
         <p className="text-xs text-muted-foreground mt-1">Companies appear here when they express interest</p>
@@ -570,7 +680,7 @@ function PipelineCompanies({
 
   return (
     <div className="rounded-lg border bg-card shadow-sm p-6">
-      <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-5 flex items-center gap-2">
+      <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-4 flex items-center gap-2">
         <Building2 className="h-4 w-4 text-selery-gold" />
         Pipeline Companies
         <span className="text-xs font-normal">({companies.length})</span>
@@ -781,9 +891,9 @@ function LeadDeepDive({
                 </tr>
                 {expandedId === reply.replyId && (
                   <tr key={`${reply.replyId}-exp`} className="bg-muted/20">
-                    <td colSpan={7} className="p-8">
-                      <div className="space-y-5">
-                        <div className="bg-card rounded-lg border p-5">
+                    <td colSpan={7} className="p-6">
+                      <div className="space-y-4">
+                        <div className="bg-card rounded-lg border p-4">
                           <p className="text-xs text-muted-foreground uppercase tracking-wider font-semibold mb-2">Full Reply</p>
                           <p className="text-sm text-foreground whitespace-pre-wrap bg-muted/30 rounded-lg p-3 max-h-48 overflow-y-auto">
                             {reply.replyText || 'No reply text available'}
@@ -792,7 +902,7 @@ function LeadDeepDive({
                             Subject: {reply.subject} | Date: {new Date(reply.replyDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
                           </p>
                         </div>
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                           {reply.buyingSignals.length > 0 && (
                             <div className="bg-selery-gold/5 dark:bg-selery-gold/10 rounded-lg p-3 border border-selery-gold/20">
                               <div className="flex items-center gap-1 mb-2">
@@ -821,7 +931,7 @@ function LeadDeepDive({
                             </div>
                           )}
                         </div>
-                        <div className="flex flex-wrap gap-5 text-xs text-muted-foreground">
+                        <div className="flex flex-wrap gap-4 text-xs text-muted-foreground">
                           <span>Email: {reply.email}</span>
                           <span>Seniority: {reply.seniority}</span>
                           <span>Industry: {reply.industry}</span>
@@ -870,6 +980,7 @@ function Phase2Skeleton() {
 export default function AnalyticsPage() {
   // Phase 1: Fast data
   const [fastData, setFastData] = useState<FastAnalytics | null>(null);
+  const [senderData, setSenderData] = useState<SenderAnalytics | null>(null);
   const [phase1Loading, setPhase1Loading] = useState(true);
   const [phase1Error, setPhase1Error] = useState<string | null>(null);
 
@@ -1004,10 +1115,17 @@ export default function AnalyticsPage() {
   useEffect(() => {
     const fetchFast = async () => {
       try {
-        const fastRes = await fetch('/api/analytics/fast');
+        const [fastRes, senderRes] = await Promise.all([
+          fetch('/api/analytics/fast'),
+          fetch('/api/analytics/senders'),
+        ]);
         if (fastRes.ok) {
           const { data } = await fastRes.json();
           setFastData(data);
+        }
+        if (senderRes.ok) {
+          const { data } = await senderRes.json();
+          setSenderData(data);
         }
       } catch (err) {
         setPhase1Error(err instanceof Error ? err.message : 'Failed to load analytics');
@@ -1158,8 +1276,8 @@ export default function AnalyticsPage() {
 
         {/* ── PHASE 1: Hero Section ─────────────────────────────── */}
         {hero && (
-          <div className="bg-white dark:bg-gray-900 rounded-3xl p-6 shadow-lg border border-gray-100 dark:border-gray-800">
-            <div className="flex items-center gap-5 mb-8">
+          <div className="bg-white dark:bg-gray-900 rounded-3xl p-8 shadow-lg border border-gray-100 dark:border-gray-800">
+            <div className="flex items-center gap-4 mb-8">
               <img src="/selery-logo.png" alt="Selery" className="h-12 object-contain" />
               <div className="h-10 w-px bg-gray-200 dark:bg-gray-700" />
               <div>
@@ -1167,44 +1285,44 @@ export default function AnalyticsPage() {
                 <h1 className="text-3xl font-bold text-selery-navy dark:text-white">{activeCycle !== null ? `Cycle ${activeCycle}` : 'All Cycles'}</h1>
               </div>
             </div>
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-5">
-              <div className="bg-gray-50 dark:bg-gray-800 rounded-2xl p-5 border border-gray-100 dark:border-gray-700 hover:border-selery-cyan/50 transition-colors">
-                <div className="flex items-center gap-2 mb-3">
+            <div className="grid grid-cols-2 md:grid-cols-6 gap-4">
+              <div className="bg-gray-50 dark:bg-gray-800 rounded-2xl p-4 border border-gray-100 dark:border-gray-700 hover:border-selery-cyan/50 transition-colors">
+                <div className="flex items-center gap-2 mb-2">
                   <BarChart3 className="h-4 w-4 text-selery-cyan" />
                   <span className="text-gray-500 dark:text-gray-400 text-xs font-medium uppercase">Campaigns</span>
                 </div>
                 <p className="text-3xl font-bold text-selery-navy dark:text-white">{hero.activeCampaigns}</p>
               </div>
-              <div className="bg-gray-50 dark:bg-gray-800 rounded-2xl p-5 border border-gray-100 dark:border-gray-700 hover:border-selery-cyan/50 transition-colors">
-                <div className="flex items-center gap-2 mb-3">
+              <div className="bg-gray-50 dark:bg-gray-800 rounded-2xl p-4 border border-gray-100 dark:border-gray-700 hover:border-selery-cyan/50 transition-colors">
+                <div className="flex items-center gap-2 mb-2">
                   <Mail className="h-4 w-4 text-selery-cyan" />
                   <span className="text-gray-500 dark:text-gray-400 text-xs font-medium uppercase">Emails Sent</span>
                 </div>
                 <p className="text-3xl font-bold text-selery-navy dark:text-white">{hero.emailsSent.toLocaleString()}</p>
               </div>
-              <div className="bg-gray-50 dark:bg-gray-800 rounded-2xl p-5 border border-gray-100 dark:border-gray-700 hover:border-selery-cyan/50 transition-colors">
-                <div className="flex items-center gap-2 mb-3">
+              <div className="bg-gray-50 dark:bg-gray-800 rounded-2xl p-4 border border-gray-100 dark:border-gray-700 hover:border-selery-cyan/50 transition-colors">
+                <div className="flex items-center gap-2 mb-2">
                   <Users className="h-4 w-4 text-selery-cyan" />
                   <span className="text-gray-500 dark:text-gray-400 text-xs font-medium uppercase">Contacted</span>
                 </div>
                 <p className="text-3xl font-bold text-selery-navy dark:text-white">{hero.leadsContacted.toLocaleString()}</p>
               </div>
-              <div className="bg-gray-50 dark:bg-gray-800 rounded-2xl p-5 border border-gray-100 dark:border-gray-700 hover:border-selery-cyan/50 transition-colors">
-                <div className="flex items-center gap-2 mb-3">
+              <div className="bg-gray-50 dark:bg-gray-800 rounded-2xl p-4 border border-gray-100 dark:border-gray-700 hover:border-selery-cyan/50 transition-colors">
+                <div className="flex items-center gap-2 mb-2">
                   <MessageSquare className="h-4 w-4 text-selery-cyan" />
                   <span className="text-gray-500 dark:text-gray-400 text-xs font-medium uppercase">Reply Rate</span>
                 </div>
                 <p className="text-3xl font-bold text-selery-navy dark:text-white">{hero.avgReplyRate}%</p>
               </div>
-              <div className="bg-selery-gold/10 dark:bg-selery-gold/20 rounded-2xl p-5 border border-selery-gold/30 hover:border-selery-gold/60 transition-colors">
-                <div className="flex items-center gap-2 mb-3">
+              <div className="bg-selery-gold/10 dark:bg-selery-gold/20 rounded-2xl p-4 border border-selery-gold/30 hover:border-selery-gold/60 transition-colors">
+                <div className="flex items-center gap-2 mb-2">
                   <TrendingUp className="h-4 w-4 text-selery-gold" />
                   <span className="text-selery-gold/80 text-xs font-medium uppercase">Interested</span>
                 </div>
                 <p className="text-3xl font-bold text-selery-gold">{hero.totalInterested}</p>
               </div>
-              <div className="bg-selery-gold/10 dark:bg-selery-gold/20 rounded-2xl p-5 border border-selery-gold/30 hover:border-selery-gold/60 transition-colors">
-                <div className="flex items-center gap-2 mb-3">
+              <div className="bg-selery-gold/10 dark:bg-selery-gold/20 rounded-2xl p-4 border border-selery-gold/30 hover:border-selery-gold/60 transition-colors">
+                <div className="flex items-center gap-2 mb-2">
                   <Target className="h-4 w-4 text-selery-gold" />
                   <span className="text-selery-gold/80 text-xs font-medium uppercase">Interest Rate</span>
                 </div>
@@ -1220,8 +1338,11 @@ export default function AnalyticsPage() {
         {/* ── PHASE 1: Campaign Comparison ──────────────────────── */}
         {filteredFastData && <CampaignComparison campaigns={filteredFastData.campaignComparison} />}
 
-        {/* ── PHASE 1: Sequence Step Performance ──────────────── */}
-        {fastData && <SequenceStepAnalysis steps={fastData.sequenceStepPerformance} />}
+        {/* ── PHASE 1: Sequence Step + Sender side-by-side ──────── */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {fastData && <SequenceStepAnalysis steps={fastData.sequenceStepPerformance} />}
+          {senderData && <SenderPerformance data={senderData} />}
+        </div>
 
         {/* ── Copy Analysis (Phase 3) ─────────────────────────── */}
         {phase3Loading ? (
@@ -1243,7 +1364,7 @@ export default function AnalyticsPage() {
               </p>
             </div>
             <div className="p-6 space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div className="bg-gray-50 dark:bg-gray-800 p-5 rounded-xl border border-gray-100 dark:border-gray-700">
                   <div className="flex items-center gap-2 mb-3">
                     <div className="w-8 h-8 bg-selery-cyan/10 rounded-lg flex items-center justify-center">
@@ -1309,7 +1430,7 @@ export default function AnalyticsPage() {
         {phase2Loading ? (
           <Phase2Skeleton />
         ) : phase2Error ? (
-          <div className="rounded-lg border bg-card shadow-sm p-6 text-center">
+          <div className="rounded-lg border bg-card shadow-sm p-8 text-center">
             <AlertTriangle className="h-8 w-8 mx-auto mb-2 text-muted-foreground opacity-50" />
             <p className="text-sm text-muted-foreground">Reply analysis unavailable</p>
             <p className="text-xs text-muted-foreground mt-1">{phase2Error}</p>
@@ -1326,11 +1447,11 @@ export default function AnalyticsPage() {
               </h2>
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <div className="rounded-2xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-sm p-6">
-                  <h3 className="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-5">Sentiment Breakdown</h3>
+                  <h3 className="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-4">Sentiment Breakdown</h3>
                   <SentimentOverview breakdown={filteredReport.sentimentBreakdown} total={filteredReport.totalAnalyzed} />
                 </div>
                 <div className="rounded-2xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-sm p-6">
-                  <h3 className="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-5">Top Themes</h3>
+                  <h3 className="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-4">Top Themes</h3>
                   {filteredReport.topThemes.length > 0 ? (
                     <div className="space-y-3">
                       {filteredReport.topThemes.map((t) => (
@@ -1344,7 +1465,7 @@ export default function AnalyticsPage() {
                 </div>
                 {filteredReport.topBuyingSignals.length > 0 && (
                   <div className="rounded-2xl border border-selery-gold/30 bg-selery-gold/5 dark:bg-selery-gold/10 shadow-sm p-6">
-                    <h3 className="text-sm font-semibold text-selery-gold uppercase tracking-wider mb-5 flex items-center gap-2">
+                    <h3 className="text-sm font-semibold text-selery-gold uppercase tracking-wider mb-4 flex items-center gap-2">
                       <Sparkles className="h-4 w-4" /> Buying Signals
                     </h3>
                     <div className="space-y-3">
@@ -1359,7 +1480,7 @@ export default function AnalyticsPage() {
                 )}
                 {filteredReport.topObjections.length > 0 && (
                   <div className="rounded-2xl border border-red-200 dark:border-red-900/50 bg-red-50 dark:bg-red-950/30 shadow-sm p-6">
-                    <h3 className="text-sm font-semibold text-red-600 dark:text-red-400 uppercase tracking-wider mb-5 flex items-center gap-2">
+                    <h3 className="text-sm font-semibold text-red-600 dark:text-red-400 uppercase tracking-wider mb-4 flex items-center gap-2">
                       <AlertTriangle className="h-4 w-4" /> Common Objections
                     </h3>
                     <div className="space-y-3">
@@ -1385,13 +1506,13 @@ export default function AnalyticsPage() {
               </h2>
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <div className="rounded-2xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-sm p-6">
-                  <h3 className="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-5 flex items-center gap-2">
+                  <h3 className="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-4 flex items-center gap-2">
                     <Building2 className="h-4 w-4 text-selery-cyan" /> Industry Distribution
                   </h3>
                   <HorizontalBarChart data={filteredReport.industryDistribution} colorClass="bg-selery-cyan" showInterested />
                 </div>
                 <div className="rounded-2xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-sm p-6">
-                  <h3 className="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-5 flex items-center gap-2">
+                  <h3 className="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-4 flex items-center gap-2">
                     <Briefcase className="h-4 w-4 text-selery-navy dark:text-selery-cyan" /> Title Seniority
                   </h3>
                   <HorizontalBarChart data={filteredReport.seniorityDistribution} colorClass="bg-selery-navy dark:bg-selery-cyan" showInterested />
