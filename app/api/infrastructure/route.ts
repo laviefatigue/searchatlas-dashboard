@@ -6,6 +6,41 @@ import type { SenderEmail } from '@/lib/types/emailbison';
 const WORKSPACE_ID = parseInt(process.env.WORKSPACE_ID || '0', 10);
 const WORKSPACE_NAME = process.env.WORKSPACE_NAME || 'Dashboard';
 
+// Kill trigger tag patterns (priority order)
+const KILL_TRIGGER_PATTERNS = [
+  'spam_complaint',           // ≥1 spam complaint (instant kill)
+  'provider_block_',          // ≥1 provider block (instant, ESP-specific)
+  'hard_blocked_24h',         // ≥1 hard block in 24h (instant)
+  'hard_unknown_24h',         // ≥3 hard unknowns in 24h (instant)
+  'hard_bounces_24h',         // ≥2 hard bounces in 24h (fallback)
+  'hard_bounce_rate_7d',      // >0.5% rate (min 20 sends)
+  'bounce_rate_all_7d',       // >5% rate (min 20 sends)
+  'fresh_inbox_bounce',       // Any bounce on inbox <14 days old
+  'disconnected_timeout',     // 21+ days disconnected
+];
+
+function hasKillTrigger(inbox: SenderEmail): boolean {
+  const tags = inbox.tags || [];
+  const tagNames = tags.map(t => t.name.toLowerCase());
+
+  return tagNames.some(tagName =>
+    KILL_TRIGGER_PATTERNS.some(pattern => tagName.includes(pattern.toLowerCase()))
+  );
+}
+
+function getKillTriggerTag(inbox: SenderEmail): string | null {
+  const tags = inbox.tags || [];
+  for (const tag of tags) {
+    const tagName = tag.name.toLowerCase();
+    for (const pattern of KILL_TRIGGER_PATTERNS) {
+      if (tagName.includes(pattern.toLowerCase())) {
+        return tag.name;
+      }
+    }
+  }
+  return null;
+}
+
 function categorizeProvider(inbox: SenderEmail): string {
   // 1. Check the `type` field first (most reliable — set by OAuth connection)
   const inboxType = (inbox.type || '').toLowerCase();
@@ -87,9 +122,17 @@ export async function GET() {
     }
 
     // Calculate infrastructure metrics
-    const liveInboxes = inboxes.filter((i: SenderEmail) => i.status === 'Connected');
-    const deadInboxes = inboxes.filter((i: SenderEmail) => i.status !== 'Connected');
-    const warmingInboxes = inboxes.filter((i: SenderEmail) => i.warmup_enabled);
+    // Dead = has kill trigger tag (spam complaint, bounces, blocks, etc.)
+    // Disconnected = status !== 'Connected' but no kill trigger
+    // Live = status === 'Connected' and no kill trigger
+    const deadInboxes = inboxes.filter((i: SenderEmail) => hasKillTrigger(i));
+    const disconnectedInboxes = inboxes.filter((i: SenderEmail) =>
+      i.status !== 'Connected' && !hasKillTrigger(i)
+    );
+    const liveInboxes = inboxes.filter((i: SenderEmail) =>
+      i.status === 'Connected' && !hasKillTrigger(i)
+    );
+    const warmingInboxes = inboxes.filter((i: SenderEmail) => i.warmup_enabled && !hasKillTrigger(i));
 
     // Calculate health scores
     const healthScores = liveInboxes.map(calculateHealthScore);
@@ -141,12 +184,16 @@ export async function GET() {
       existing.total_replied += inbox.total_replied_count || 0;
       existing.total_bounced += inbox.bounced_count || 0;
 
-      if (inbox.status === 'Connected') {
+      const isDead = hasKillTrigger(inbox);
+      const isConnected = inbox.status === 'Connected';
+
+      if (isDead) {
+        existing.dead_count++;
+      } else if (isConnected) {
         existing.live_count++;
         existing.connected_count++;
         existing.health_scores.push(calculateHealthScore(inbox));
       } else {
-        existing.dead_count++;
         existing.disconnected_count++;
       }
 
@@ -181,11 +228,11 @@ export async function GET() {
       total_inboxes: inboxes.length,
       live_inboxes: liveInboxes.length,
       dead_inboxes: deadInboxes.length,
+      disconnected_inboxes: disconnectedInboxes.length,
       avg_health_score: avgHealthScore,
       flagged_domains: 0,
       clean_domains: domains.size,
       connected_inboxes: liveInboxes.length,
-      disconnected_inboxes: deadInboxes.length,
       operational_capacity: operationalCapacity,
       potential_capacity: inboxes.length * 40,
       health_distribution: healthDistribution,
