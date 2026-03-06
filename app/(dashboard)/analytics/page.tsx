@@ -1118,19 +1118,6 @@ export default function AnalyticsPage() {
 
   return (
     <PageContainer className="space-y-8 pb-12">
-      {/* Export Buttons */}
-      <div className="flex items-center justify-end gap-3 hide-on-export">
-        <button onClick={handleExportCSV} disabled={!filteredReport}
-          className="inline-flex items-center gap-2 px-4 py-2.5 text-sm font-medium rounded-xl border border-border bg-card hover:bg-secondary text-foreground transition-colors disabled:opacity-50 shadow-sm">
-          <FileSpreadsheet className="h-4 w-4 text-searchatlas-purple" /> Download CSV
-        </button>
-        <button onClick={handleExportPDF} disabled={exporting}
-          className="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-semibold rounded-xl bg-searchatlas-purple hover:bg-searchatlas-purple/90 text-white transition-colors disabled:opacity-50 shadow-sm">
-          {exporting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Download className="h-4 w-4" />}
-          {exporting ? 'Generating...' : 'Export PDF'}
-        </button>
-      </div>
-
       <div ref={contentRef} className="space-y-8">
 
         {/* ── Cycle Tabs ──────────────────────────────────────────── */}
@@ -1165,17 +1152,22 @@ export default function AnalyticsPage() {
         {/* ── PHASE 1: Hero Section ─────────────────────────────── */}
         {hero && (
           <div className="bg-card rounded-3xl p-6 shadow-lg border border-border">
-            <div className="flex items-center gap-5 mb-8">
-              <div className="flex items-center gap-3">
-                <div className="w-12 h-12 rounded-xl bg-searchatlas-purple flex items-center justify-center">
-                  <span className="text-white font-bold text-lg">SA</span>
-                </div>
-                <span className="text-2xl font-bold text-foreground">SearchAtlas</span>
-              </div>
-              <div className="h-10 w-px bg-border" />
+            <div className="flex items-center justify-between mb-8">
               <div>
                 <span className="text-searchatlas-purple font-semibold text-sm uppercase tracking-wider">OUTBOUND ANALYTICS</span>
                 <h1 className="text-3xl font-bold text-foreground">{activeCycle !== null ? `Cycle ${activeCycle}` : 'All Cycles'}</h1>
+              </div>
+              {/* Export Buttons */}
+              <div className="flex items-center gap-3 hide-on-export">
+                <button onClick={handleExportCSV} disabled={!filteredReport}
+                  className="inline-flex items-center gap-2 px-4 py-2.5 text-sm font-medium rounded-xl border border-border bg-card hover:bg-secondary text-foreground transition-colors disabled:opacity-50 shadow-sm">
+                  <FileSpreadsheet className="h-4 w-4 text-searchatlas-purple" /> Download CSV
+                </button>
+                <button onClick={handleExportPDF} disabled={exporting}
+                  className="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-semibold rounded-xl bg-searchatlas-purple hover:bg-searchatlas-purple/90 text-white transition-colors disabled:opacity-50 shadow-sm">
+                  {exporting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Download className="h-4 w-4" />}
+                  {exporting ? 'Generating...' : 'Export PDF'}
+                </button>
               </div>
             </div>
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-5">
