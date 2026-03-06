@@ -78,31 +78,60 @@ function categorizeProvider(inbox: SenderEmail): string {
 }
 
 function calculateHealthScore(inbox: SenderEmail): number {
-  let score = 60; // Base score
+  // Connected inboxes start at 100, disconnected at 50
+  let score = inbox.status === 'Connected' ? 100 : 50;
 
-  // Connection status (most important)
-  if (inbox.status === 'Connected') score += 20;
-
-  // Warmup enabled
-  if (inbox.warmup_enabled) score += 5;
-
-  // Activity level
-  if (inbox.emails_sent_count > 100) score += 5;
-  if (inbox.emails_sent_count > 500) score += 5;
-
-  // Reply rate (positive signal)
-  if (inbox.total_leads_contacted_count > 0) {
-    const replyRate = inbox.total_replied_count / inbox.total_leads_contacted_count;
-    if (replyRate > 0.05) score += 5;
-    if (replyRate > 0.10) score += 5;
-  }
-
-  // Bounce penalty
-  if (inbox.emails_sent_count > 0) {
+  // Bounce rate penalty (significant for email health)
+  if (inbox.emails_sent_count > 20) {
     const bounceRate = inbox.bounced_count / inbox.emails_sent_count;
-    if (bounceRate > 0.05) score -= 10;
-    if (bounceRate > 0.10) score -= 15;
+    if (bounceRate > 0.10) score -= 30;      // >10% bounce = severe
+    else if (bounceRate > 0.05) score -= 15; // >5% bounce = warning
+    else if (bounceRate > 0.02) score -= 5;  // >2% bounce = minor
   }
+
+  // Reply rate bonus (healthy engagement)
+  if (inbox.total_leads_contacted_count > 10) {
+    const replyRate = inbox.total_replied_count / inbox.total_leads_contacted_count;
+    if (replyRate > 0.10) score += 5;  // >10% reply = excellent
+    else if (replyRate > 0.05) score += 3; // >5% reply = good
+  }
+
+  // Warmup bonus (proactive health maintenance)
+  if (inbox.warmup_enabled && inbox.status === 'Connected') score += 2;
+
+  return Math.max(0, Math.min(100, score));
+}
+
+// Calculate provider-level health based on availability and performance
+function calculateProviderHealth(
+  liveCount: number,
+  disconnectedCount: number,
+  deadCount: number,
+  totalBounced: number,
+  totalSent: number
+): number {
+  const totalNonDead = liveCount + disconnectedCount;
+  if (totalNonDead === 0) return 0;
+
+  // Availability: what % of non-dead inboxes are live?
+  const availability = liveCount / totalNonDead;
+
+  // Start with availability-based score (0-100)
+  let score = Math.round(availability * 100);
+
+  // Bounce rate penalty at provider level
+  if (totalSent > 100) {
+    const bounceRate = totalBounced / totalSent;
+    if (bounceRate > 0.10) score -= 20;
+    else if (bounceRate > 0.05) score -= 10;
+    else if (bounceRate > 0.02) score -= 5;
+  }
+
+  // Dead inbox penalty (shows infrastructure problems)
+  const deadRatio = deadCount / (totalNonDead + deadCount);
+  if (deadRatio > 0.20) score -= 15;
+  else if (deadRatio > 0.10) score -= 10;
+  else if (deadRatio > 0.05) score -= 5;
 
   return Math.max(0, Math.min(100, score));
 }
@@ -134,18 +163,26 @@ export async function GET() {
     );
     const warmingInboxes = inboxes.filter((i: SenderEmail) => i.warmup_enabled && !hasKillTrigger(i));
 
-    // Calculate health scores
+    // Calculate overall health based on availability and performance
+    const totalBounced = inboxes.reduce((sum, i) => sum + (i.bounced_count || 0), 0);
+    const totalSentForHealth = inboxes.reduce((sum, i) => sum + (i.emails_sent_count || 0), 0);
+    const avgHealthScore = calculateProviderHealth(
+      liveInboxes.length,
+      disconnectedInboxes.length,
+      deadInboxes.length,
+      totalBounced,
+      totalSentForHealth
+    );
+
+    // Individual inbox scores for distribution
     const healthScores = liveInboxes.map(calculateHealthScore);
-    const avgHealthScore = healthScores.length > 0
-      ? Math.round(healthScores.reduce((a, b) => a + b, 0) / healthScores.length)
-      : 0;
 
     // Health distribution
     const healthDistribution = {
-      healthy: healthScores.filter(s => s >= 80).length,
-      good: healthScores.filter(s => s >= 60 && s < 80).length,
-      warning: healthScores.filter(s => s >= 40 && s < 60).length,
-      critical: healthScores.filter(s => s < 40).length,
+      healthy: healthScores.filter(s => s >= 90).length,
+      good: healthScores.filter(s => s >= 70 && s < 90).length,
+      warning: healthScores.filter(s => s >= 50 && s < 70).length,
+      critical: healthScores.filter(s => s < 50).length,
       total: liveInboxes.length,
     };
 
@@ -249,9 +286,14 @@ export async function GET() {
       name,
       live_count: data.live_count,
       dead_count: data.dead_count,
-      avg_health_score: data.health_scores.length > 0
-        ? Math.round(data.health_scores.reduce((a, b) => a + b, 0) / data.health_scores.length)
-        : 0,
+      // Use provider-level health calculation based on availability and performance
+      avg_health_score: calculateProviderHealth(
+        data.live_count,
+        data.disconnected_count,
+        data.dead_count,
+        data.total_bounced,
+        data.total_sent
+      ),
       connected_count: data.connected_count,
       disconnected_count: data.disconnected_count,
       // Set breakdown (Live = A Set, Reserve = B Set)
