@@ -149,9 +149,14 @@ export async function GET() {
       total: liveInboxes.length,
     };
 
-    // Calculate capacity
+    // Calculate capacity from real daily_limit values
     const operationalCapacity = liveInboxes.reduce(
-      (sum: number, inbox: SenderEmail) => sum + (inbox.daily_limit || 40),
+      (sum: number, inbox: SenderEmail) => sum + (inbox.daily_limit || 0),
+      0
+    );
+    // Potential capacity = all non-dead inboxes at their current limits
+    const potentialCapacity = [...liveInboxes, ...disconnectedInboxes].reduce(
+      (sum: number, inbox: SenderEmail) => sum + (inbox.daily_limit || 0),
       0
     );
 
@@ -234,7 +239,7 @@ export async function GET() {
       clean_domains: domains.size,
       connected_inboxes: liveInboxes.length,
       operational_capacity: operationalCapacity,
-      potential_capacity: inboxes.length * 40,
+      potential_capacity: potentialCapacity,
       health_distribution: healthDistribution,
       providers,
       // Overall performance
