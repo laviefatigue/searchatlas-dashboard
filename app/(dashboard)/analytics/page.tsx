@@ -132,8 +132,8 @@ function SentimentOverview({
 }) {
   const items = [
     { key: 'positive' as const, label: 'Positive', color: 'bg-searchatlas-cyan', count: breakdown.positive },
-    { key: 'neutral' as const, label: 'Neutral', color: 'bg-gray-400', count: breakdown.neutral },
-    { key: 'negative' as const, label: 'Negative', color: 'bg-red-500', count: breakdown.negative },
+    { key: 'neutral' as const, label: 'Neutral', color: 'bg-searchatlas-pink', count: breakdown.neutral },
+    { key: 'negative' as const, label: 'Negative', color: 'bg-red-400', count: breakdown.negative },
   ];
   return (
     <div className="grid grid-cols-2 md:grid-cols-4 gap-5">
@@ -155,10 +155,10 @@ function SentimentOverview({
 
 function ConversionFunnel({ funnel }: { funnel: FastAnalytics['funnel'] }) {
   const steps = [
-    { label: 'Total Leads', value: funnel.totalLeads, color: 'from-gray-500 to-gray-600' },
-    { label: 'Contacted', value: funnel.contacted, color: 'from-searchatlas-purple to-searchatlas-purple' },
-    { label: 'Replied', value: funnel.replied, color: 'from-searchatlas-dark to-searchatlas-dark' },
-    { label: 'Interested', value: funnel.interested, color: 'from-searchatlas-cyan to-searchatlas-cyan' },
+    { label: 'Total Leads', value: funnel.totalLeads, color: 'from-searchatlas-purple/60 to-searchatlas-purple/40' },
+    { label: 'Contacted', value: funnel.contacted, color: 'from-searchatlas-purple to-searchatlas-purple/80' },
+    { label: 'Replied', value: funnel.replied, color: 'from-searchatlas-pink to-searchatlas-pink/80' },
+    { label: 'Interested', value: funnel.interested, color: 'from-searchatlas-cyan to-searchatlas-cyan/80' },
   ];
 
   return (
@@ -278,7 +278,7 @@ function CampaignComparison({ campaigns }: { campaigns: CampaignComparisonItem[]
                   </td>
                   <td className="py-3 px-4">
                     <div className="flex items-center gap-2">
-                      <span className={`w-2 h-2 rounded-full flex-shrink-0 ${c.status === 'Active' ? 'bg-searchatlas-cyan' : 'bg-gray-400'}`} />
+                      <span className={`w-2 h-2 rounded-full flex-shrink-0 ${c.status === 'Active' ? 'bg-searchatlas-cyan' : 'bg-muted-foreground'}`} />
                       <span className="font-medium text-foreground truncate max-w-[200px]" title={c.name}>
                         {c.name.replace(/^Cycle \d+:\s*/, '').replace(/^Campaign \d+,\s*/, '')}
                       </span>
@@ -683,7 +683,7 @@ function LeadDeepDive({
       <div className="p-4 bg-gradient-to-r from-searchatlas-purple/10 to-searchatlas-purple/5  border-b space-y-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 bg-searchatlas-dark rounded-lg flex items-center justify-center">
+            <div className="w-8 h-8 bg-searchatlas-purple rounded-lg flex items-center justify-center">
               <Users className="h-4 w-4 text-white" />
             </div>
             <h3 className="text-lg font-bold">
