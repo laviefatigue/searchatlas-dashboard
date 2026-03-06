@@ -9,7 +9,8 @@ import type {
   CTAType,
 } from '@/lib/types/emailbison';
 
-const SELERY_WORKSPACE_ID = 22;
+// Environment-driven workspace configuration
+const WORKSPACE_ID = parseInt(process.env.WORKSPACE_ID || '0', 10);
 
 interface CampaignWithSubject {
   campaign: Campaign;
@@ -549,7 +550,9 @@ function buildCopyAnalysis(campaignDetails: CampaignWithSubject[]): CopyAnalysis
 
 export async function GET() {
   try {
-    await switchWorkspace(SELERY_WORKSPACE_ID).catch(() => {});
+    if (WORKSPACE_ID > 0) {
+      await switchWorkspace(WORKSPACE_ID).catch(() => {});
+    }
 
     const { data: campaigns } = await getCampaigns();
     const activeCampaigns = campaigns.filter(c =>

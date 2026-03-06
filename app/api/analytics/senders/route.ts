@@ -9,7 +9,8 @@ import type {
   SenderAnalytics,
 } from '@/lib/types/emailbison';
 
-const SELERY_WORKSPACE_ID = 22;
+// Environment-driven workspace configuration
+const WORKSPACE_ID = parseInt(process.env.WORKSPACE_ID || '0', 10);
 
 function detectProvider(sender: SenderEmail): EmailProvider {
   const type = sender.type?.toLowerCase() || '';
@@ -27,7 +28,9 @@ function rate(num: number, denom: number): number {
 
 export async function GET() {
   try {
-    await switchWorkspace(SELERY_WORKSPACE_ID).catch(() => {});
+    if (WORKSPACE_ID > 0) {
+      await switchWorkspace(WORKSPACE_ID).catch(() => {});
+    }
 
     const senders = await getAllSenderEmails();
 

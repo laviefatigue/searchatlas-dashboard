@@ -6,15 +6,24 @@ import type {
   SequenceStepPerformance,
 } from '@/lib/types/emailbison';
 
-const SELERY_WORKSPACE_ID = 22;
+// Environment-driven workspace configuration
+const WORKSPACE_ID = parseInt(process.env.WORKSPACE_ID || '0', 10);
+const WORKSPACE_NAME = process.env.WORKSPACE_NAME || 'Dashboard';
 
 export async function GET() {
   try {
     // Switch workspace
-    await switchWorkspace(SELERY_WORKSPACE_ID).catch(() => {});
+    if (WORKSPACE_ID > 0) {
+      await switchWorkspace(WORKSPACE_ID).catch(() => {});
+    }
 
     // Fetch campaign list
     const { data: campaigns } = await getCampaigns();
+
+    // All campaigns with leads loaded (including drafts)
+    const allCampaignsWithLeads = campaigns.filter(c => c.total_leads > 0);
+
+    // Only campaigns that have actually sent emails
     const activeCampaigns = campaigns.filter(c => c.emails_sent > 0);
 
     // Fetch stats for all active campaigns in parallel
@@ -35,20 +44,21 @@ export async function GET() {
 
     const statsMap = new Map(statsResults.map(r => [r.campaignId, r.stats]));
 
-    // Build hero metrics from campaign list objects
-    const totalLeads = campaigns.reduce((s, c) => s + c.total_leads, 0);
+    // Build hero metrics - totalLeads from active campaigns only
+    const totalLeads = activeCampaigns.reduce((s, c) => s + c.total_leads, 0);
     const leadsContacted = activeCampaigns.reduce((s, c) => s + c.total_leads_contacted, 0);
     const emailsSent = activeCampaigns.reduce((s, c) => s + c.emails_sent, 0);
     const totalReplies = activeCampaigns.reduce((s, c) => s + c.unique_replies, 0);
     const totalInterested = activeCampaigns.reduce((s, c) => s + c.interested, 0);
     const totalBounced = activeCampaigns.reduce((s, c) => s + c.bounced, 0);
 
-    // Campaign comparison
-    const campaignComparison: CampaignComparisonItem[] = activeCampaigns
+    // Campaign comparison - include ALL campaigns with leads (drafts too)
+    const campaignComparison: CampaignComparisonItem[] = allCampaignsWithLeads
       .map(c => ({
         id: c.id,
         name: c.name,
         status: c.status,
+        totalLeads: c.total_leads,
         leadsContacted: c.total_leads_contacted,
         emailsSent: c.emails_sent,
         uniqueReplies: c.unique_replies,
@@ -117,9 +127,11 @@ export async function GET() {
       );
 
     const report: FastAnalytics = {
-      workspaceName: 'SearchAtlas',
+      workspaceName: WORKSPACE_NAME,
       heroMetrics: {
-        totalCampaigns: campaigns.length,
+        // totalCampaigns = all campaigns with leads (including drafts)
+        totalCampaigns: allCampaignsWithLeads.length,
+        // activeCampaigns = only campaigns that have sent emails
         activeCampaigns: activeCampaigns.length,
         totalLeads,
         leadsContacted,
@@ -144,8 +156,9 @@ export async function GET() {
       },
       campaignComparison,
       sequenceStepPerformance,
+      // Available cycles from campaigns with leads (not just active)
       availableCycles: [...new Set(
-        activeCampaigns
+        allCampaignsWithLeads
           .map(c => {
             const match = c.name.match(/^Cycle\s+(\d+)/i);
             return match ? parseInt(match[1], 10) : null;

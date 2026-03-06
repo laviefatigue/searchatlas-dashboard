@@ -258,6 +258,7 @@ function CampaignComparison({ campaigns }: { campaigns: CampaignComparisonItem[]
             <tr className="border-b bg-muted/30">
               <th className="h-10 px-4 text-left font-medium text-muted-foreground text-xs uppercase tracking-wider w-8"></th>
               <th className="h-10 px-4 text-left font-medium text-muted-foreground text-xs uppercase tracking-wider">Campaign</th>
+              <th className="h-10 px-4 text-right font-medium text-muted-foreground text-xs uppercase tracking-wider">Leads</th>
               <th className="h-10 px-4 text-right font-medium text-muted-foreground text-xs uppercase tracking-wider">Sent</th>
               <th className="h-10 px-4 text-right font-medium text-muted-foreground text-xs uppercase tracking-wider">Contacted</th>
               <th className="h-10 px-4 text-right font-medium text-muted-foreground text-xs uppercase tracking-wider">Reply %</th>
@@ -278,12 +279,16 @@ function CampaignComparison({ campaigns }: { campaigns: CampaignComparisonItem[]
                   </td>
                   <td className="py-3 px-4">
                     <div className="flex items-center gap-2">
-                      <span className={`w-2 h-2 rounded-full flex-shrink-0 ${c.status === 'Active' ? 'bg-searchatlas-cyan' : 'bg-muted-foreground'}`} />
-                      <span className="font-medium text-foreground truncate max-w-[200px]" title={c.name}>
+                      <span className={`w-2 h-2 rounded-full flex-shrink-0 ${c.status === 'Active' ? 'bg-searchatlas-cyan' : c.status?.toLowerCase() === 'draft' ? 'bg-gray-400' : 'bg-muted-foreground'}`} />
+                      <span className={`font-medium truncate max-w-[200px] ${c.status?.toLowerCase() === 'draft' ? 'text-muted-foreground' : 'text-foreground'}`} title={c.name}>
                         {c.name.replace(/^Cycle \d+:\s*/, '').replace(/^Campaign \d+,\s*/, '')}
                       </span>
+                      {c.status?.toLowerCase() === 'draft' && (
+                        <span className="text-xs bg-muted text-muted-foreground px-1.5 py-0.5 rounded">Draft</span>
+                      )}
                     </div>
                   </td>
+                  <td className="py-3 px-4 text-right text-muted-foreground">{c.totalLeads?.toLocaleString() || "-"}</td>
                   <td className="py-3 px-4 text-right text-muted-foreground">{c.emailsSent.toLocaleString()}</td>
                   <td className="py-3 px-4 text-right text-muted-foreground">{c.leadsContacted.toLocaleString()}</td>
                   <td className="py-3 px-4 text-right">
@@ -316,7 +321,7 @@ function CampaignComparison({ campaigns }: { campaigns: CampaignComparisonItem[]
                 </tr>
                 {expandedId === c.id && (
                   <tr className="bg-muted/30">
-                    <td colSpan={8} className="p-8">
+                    <td colSpan={9} className="p-8">
                       <div className="space-y-6">
                         {/* Stats Grid */}
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-5">
@@ -748,6 +753,7 @@ function LeadDeepDive({
               <th className="h-10 px-4 text-left font-medium text-muted-foreground text-xs uppercase tracking-wider">Sentiment</th>
               <th className="h-10 px-4 text-left font-medium text-muted-foreground text-xs uppercase tracking-wider">Intent</th>
               <th className="h-10 px-4 text-left font-medium text-muted-foreground text-xs uppercase tracking-wider">Campaign</th>
+              <th className="h-10 px-4 text-right font-medium text-muted-foreground text-xs uppercase tracking-wider">Leads</th>
               <th className="h-10 px-4 text-left font-medium text-muted-foreground text-xs uppercase tracking-wider">Summary</th>
             </tr>
           </thead>
@@ -1178,7 +1184,8 @@ export default function AnalyticsPage() {
                   <BarChart3 className="h-4 w-4 text-searchatlas-purple" />
                   <span className="text-muted-foreground text-xs font-medium uppercase">Campaigns</span>
                 </div>
-                <p className="text-3xl font-bold text-foreground">{hero.activeCampaigns}</p>
+                <p className="text-3xl font-bold text-foreground">{hero.totalCampaigns}</p>
+                <p className="text-xs text-muted-foreground">{hero.activeCampaigns} sending</p>
               </div>
               <div className="bg-secondary rounded-2xl p-5 border border-border hover:border-searchatlas-purple/50 transition-colors">
                 <div className="flex items-center gap-2 mb-3">

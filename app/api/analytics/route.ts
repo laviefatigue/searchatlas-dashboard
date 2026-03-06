@@ -13,7 +13,9 @@ const EMAILBISON_API_URL = process.env.EMAILBISON_API_URL || 'https://spellcast.
 const EMAILBISON_API_TOKEN = process.env.EMAILBISON_API_TOKEN || '';
 const ANTHROPIC_API_KEY = process.env.ANTHROPIC_API_KEY || '';
 
-const SELERY_WORKSPACE_ID = 22;
+// Environment-driven workspace configuration
+const WORKSPACE_ID = parseInt(process.env.WORKSPACE_ID || '0', 10);
+const WORKSPACE_NAME = process.env.WORKSPACE_NAME || 'Dashboard';
 
 interface EBReply {
   id: number;
@@ -465,7 +467,7 @@ export async function GET(request: Request) {
   try {
     const url = new URL(request.url);
     const workspaceId = url.searchParams.get('workspace_id');
-    const targetWorkspaceId = workspaceId ? parseInt(workspaceId) : SELERY_WORKSPACE_ID;
+    const targetWorkspaceId = workspaceId ? parseInt(workspaceId) : WORKSPACE_ID;
 
     // Switch workspace
     try {
@@ -480,7 +482,7 @@ export async function GET(request: Request) {
     type UserData = { data: { workspace?: { name: string }; team?: { name: string } } };
     const [userResult, campaignsResult, allReplies] = await Promise.all([
       fetchApi<UserData>('/api/users')
-        .catch((): UserData => ({ data: { workspace: { name: 'SearchAtlas' } } })),
+        .catch((): UserData => ({ data: { workspace: { name: WORKSPACE_NAME } } })),
       fetchApi<{ data: EBCampaign[] }>('/api/campaigns'),
       fetchAllReplies(),
     ]);
