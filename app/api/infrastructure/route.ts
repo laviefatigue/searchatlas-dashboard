@@ -314,10 +314,9 @@ export async function GET() {
     // Get unique domains
     const domains = new Set(inboxes.map((i: SenderEmail) => i.email.split('@')[1]));
 
-    // Calculate totals
+    // Calculate totals (totalBounced already calculated above for health score)
     const totalSent = inboxes.reduce((sum, i) => sum + (i.emails_sent_count || 0), 0);
     const totalReplied = inboxes.reduce((sum, i) => sum + (i.total_replied_count || 0), 0);
-    const totalBounced = inboxes.reduce((sum, i) => sum + (i.bounced_count || 0), 0);
 
     // Build infrastructure response
     const infrastructure = {
