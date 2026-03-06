@@ -53,9 +53,9 @@ const toTitleCase = (s: string) => s.replace(/\b\w/g, c => c.toUpperCase());
 
 function SentimentBadge({ sentiment }: { sentiment: ReplySentiment }) {
   const config = {
-    positive: { label: 'Positive', bg: 'bg-searchatlas-cyan/10 dark:bg-searchatlas-cyan/20', text: 'text-searchatlas-cyan dark:text-searchatlas-cyan', icon: ThumbsUp },
-    negative: { label: 'Negative', bg: 'bg-red-100 dark:bg-red-950/30', text: 'text-red-700 dark:text-red-400', icon: ThumbsDown },
-    neutral: { label: 'Neutral', bg: 'bg-gray-100 dark:bg-gray-800', text: 'text-gray-700 dark:text-gray-400', icon: Minus },
+    positive: { label: 'Positive', bg: 'bg-searchatlas-cyan/20', text: 'text-searchatlas-cyan', icon: ThumbsUp },
+    negative: { label: 'Negative', bg: 'bg-red-950/30', text: 'text-red-400', icon: ThumbsDown },
+    neutral: { label: 'Neutral', bg: 'bg-secondary', text: 'text-muted-foreground', icon: Minus },
   }[sentiment];
   const Icon = config.icon;
   return (
@@ -68,12 +68,12 @@ function SentimentBadge({ sentiment }: { sentiment: ReplySentiment }) {
 
 function IntentBadge({ intent }: { intent: string }) {
   const colors: Record<string, string> = {
-    'interested': 'bg-searchatlas-cyan/10 text-searchatlas-cyan dark:bg-searchatlas-cyan/20 dark:text-searchatlas-cyan',
-    'not-interested': 'bg-red-100 text-red-700 dark:bg-red-950/30 dark:text-red-400',
-    'needs-info': 'bg-searchatlas-purple/10 text-searchatlas-purple dark:bg-searchatlas-purple/20 dark:text-searchatlas-purple',
-    'referral': 'bg-searchatlas-dark/10 text-searchatlas-dark dark:bg-searchatlas-dark/20 dark:text-searchatlas-purple',
-    'out-of-office': 'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400',
-    'unsubscribe': 'bg-red-100 text-red-700 dark:bg-red-950/30 dark:text-red-400',
+    'interested': 'bg-searchatlas-cyan/20 text-searchatlas-cyan',
+    'not-interested': 'bg-red-950/30 text-red-400',
+    'needs-info': 'bg-searchatlas-purple/20 text-searchatlas-purple',
+    'referral': 'bg-searchatlas-purple/20 text-searchatlas-purple',
+    'out-of-office': 'bg-secondary text-muted-foreground',
+    'unsubscribe': 'bg-red-950/30 text-red-400',
   };
   return (
     <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${colors[intent] || colors['needs-info']}`}>
@@ -245,7 +245,7 @@ function CampaignComparison({ campaigns }: { campaigns: CampaignComparisonItem[]
 
   return (
     <div className="rounded-lg border bg-card shadow-sm overflow-hidden">
-      <div className="p-4 bg-gradient-to-r from-searchatlas-purple/5 to-searchatlas-dark/5 dark:from-searchatlas-purple/10 dark:to-searchatlas-dark/10 border-b">
+      <div className="p-4 bg-gradient-to-r from-searchatlas-purple/10 to-searchatlas-purple/5  border-b">
         <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-2">
           <BarChart3 className="h-4 w-4" />
           Campaign Comparison
@@ -340,10 +340,10 @@ function CampaignComparison({ campaigns }: { campaigns: CampaignComparisonItem[]
 
                         {/* Email Sequence */}
                         <div className="bg-card rounded-lg border overflow-hidden">
-                          <div className="bg-gradient-to-r from-searchatlas-purple/5 to-searchatlas-dark/5 dark:from-searchatlas-purple/10 dark:to-searchatlas-dark/10 px-4 py-3 border-b">
+                          <div className="bg-gradient-to-r from-searchatlas-purple/10 to-searchatlas-purple/5  px-4 py-3 border-b">
                             <div className="flex items-center gap-2">
                               <Mail className="h-4 w-4 text-searchatlas-purple" />
-                              <p className="text-sm font-semibold text-searchatlas-dark dark:text-searchatlas-purple">Email Sequence</p>
+                              <p className="text-sm font-semibold text-searchatlas-purple">Email Sequence</p>
                             </div>
                           </div>
                           <div className="p-4">
@@ -358,17 +358,17 @@ function CampaignComparison({ campaigns }: { campaigns: CampaignComparisonItem[]
                                   <div key={step.id || idx} className="border rounded-lg overflow-hidden">
                                     <div className="bg-muted/50 px-4 py-2 flex items-center justify-between">
                                       <div className="flex items-center gap-2">
-                                        <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-searchatlas-purple/10 dark:bg-searchatlas-purple/20 text-searchatlas-dark dark:text-searchatlas-purple text-xs font-bold">
+                                        <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-searchatlas-purple/20 text-searchatlas-purple text-xs font-bold">
                                           {idx + 1}
                                         </span>
                                         <span className="text-sm font-medium">Step {idx + 1}</span>
                                         {step.is_variant && (
-                                          <span className="text-xs bg-searchatlas-dark/10 dark:bg-searchatlas-dark/20 text-searchatlas-dark dark:text-searchatlas-purple px-2 py-0.5 rounded">
+                                          <span className="text-xs bg-searchatlas-purple/20 text-searchatlas-purple px-2 py-0.5 rounded">
                                             Variant {step.variant_letter || ''}
                                           </span>
                                         )}
                                         {step.is_thread_reply && (
-                                          <span className="text-xs bg-searchatlas-purple/10 dark:bg-searchatlas-purple/20 text-searchatlas-purple dark:text-searchatlas-purple px-2 py-0.5 rounded">
+                                          <span className="text-xs bg-searchatlas-purple/20 text-searchatlas-purple px-2 py-0.5 rounded">
                                             Thread Reply
                                           </span>
                                         )}
@@ -424,7 +424,7 @@ function CampaignComparison({ campaigns }: { campaigns: CampaignComparisonItem[]
                         </div>
 
                         {/* Performance Summary */}
-                        <div className="bg-gradient-to-r from-searchatlas-purple/5 to-searchatlas-dark/5 dark:from-searchatlas-purple/10 dark:to-searchatlas-dark/10 rounded-lg p-4 border border-searchatlas-purple/10">
+                        <div className="bg-gradient-to-r from-searchatlas-purple/10 to-searchatlas-purple/5  rounded-lg p-4 border border-searchatlas-purple/10">
                           <div className="flex items-center gap-2 mb-2">
                             <Target className="h-4 w-4 text-searchatlas-purple" />
                             <p className="text-xs text-searchatlas-purple uppercase tracking-wider font-semibold">Performance Summary</p>
@@ -584,14 +584,14 @@ function PipelineCompanies({
           const enrichData = latestReply?.email ? enriched[latestReply.email] : null;
           const hasEnrichment = enrichData && (enrichData.linkedinUrl || enrichData.phone || enrichData.location);
           return (
-            <div key={c.label} className="p-3 rounded-lg bg-searchatlas-cyan/5 dark:bg-searchatlas-cyan/10 border border-searchatlas-cyan/20 dark:border-searchatlas-cyan/20">
+            <div key={c.label} className="p-3 rounded-lg bg-searchatlas-cyan/10 border border-searchatlas-cyan/20 ">
               <div className="flex items-center justify-between mb-1">
                 {domain ? (
                   <a href={`https://${domain}`} target="_blank" rel="noopener noreferrer" className="font-medium text-sm truncate max-w-[180px] text-searchatlas-purple hover:underline" title={c.label}>{c.label}</a>
                 ) : (
                   <span className="font-medium text-sm truncate max-w-[180px]" title={c.label}>{c.label}</span>
                 )}
-                <span className="text-xs bg-searchatlas-cyan/10 dark:bg-searchatlas-cyan/20 text-searchatlas-cyan dark:text-searchatlas-cyan px-1.5 py-0.5 rounded font-medium">
+                <span className="text-xs bg-searchatlas-cyan/20 text-searchatlas-cyan px-1.5 py-0.5 rounded font-medium">
                   {c.interestedCount} interested
                 </span>
               </div>
@@ -680,7 +680,7 @@ function LeadDeepDive({
 
   return (
     <div className="rounded-lg border bg-card shadow-sm overflow-hidden">
-      <div className="p-4 bg-gradient-to-r from-searchatlas-purple/5 to-searchatlas-dark/5 dark:from-searchatlas-purple/10 dark:to-searchatlas-dark/10 border-b space-y-3">
+      <div className="p-4 bg-gradient-to-r from-searchatlas-purple/10 to-searchatlas-purple/5  border-b space-y-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 bg-searchatlas-dark rounded-lg flex items-center justify-center">
@@ -695,7 +695,7 @@ function LeadDeepDive({
             <button
               onClick={() => setShowFilters(!showFilters)}
               className={`flex items-center gap-1 px-3 py-1.5 text-xs font-medium rounded-lg border transition-colors ${
-                showFilters ? 'bg-searchatlas-purple text-white border-searchatlas-purple' : 'bg-white dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700'
+                showFilters ? 'bg-searchatlas-purple text-white border-searchatlas-purple' : 'bg-card hover:bg-secondary border-border text-foreground'
               }`}
             >
               <Filter className="h-3 w-3" />
@@ -730,7 +730,7 @@ function LeadDeepDive({
               {campaigns.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
             </select>
             {(sentimentFilter || industryFilter || campaignFilter) && (
-              <button onClick={() => { setSentimentFilter(''); setIndustryFilter(''); setCampaignFilter(''); }} className="h-8 px-3 text-xs rounded-lg border bg-gray-100 text-gray-600 hover:bg-gray-200">
+              <button onClick={() => { setSentimentFilter(''); setIndustryFilter(''); setCampaignFilter(''); }} className="h-8 px-3 text-xs rounded-lg border bg-secondary text-muted-foreground hover:bg-muted">
                 Clear filters
               </button>
             )}
@@ -794,30 +794,30 @@ function LeadDeepDive({
                         </div>
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
                           {reply.buyingSignals.length > 0 && (
-                            <div className="bg-searchatlas-cyan/5 dark:bg-searchatlas-cyan/10 rounded-lg p-3 border border-searchatlas-cyan/20">
+                            <div className="bg-searchatlas-cyan/10 rounded-lg p-3 border border-searchatlas-cyan/20">
                               <div className="flex items-center gap-1 mb-2">
                                 <Sparkles className="h-3 w-3 text-searchatlas-cyan" />
-                                <p className="text-xs font-semibold text-searchatlas-cyan dark:text-searchatlas-cyan uppercase">Buying Signals</p>
+                                <p className="text-xs font-semibold text-searchatlas-cyan uppercase">Buying Signals</p>
                               </div>
                               <ul className="space-y-1">{reply.buyingSignals.map((s, i) => <li key={i} className="text-xs text-searchatlas-cyan">{s}</li>)}</ul>
                             </div>
                           )}
                           {reply.objections.length > 0 && (
-                            <div className="bg-red-50 dark:bg-red-950/20 rounded-lg p-3 border border-red-500/20">
+                            <div className="bg-red-950/20 rounded-lg p-3 border border-red-500/20">
                               <div className="flex items-center gap-1 mb-2">
                                 <AlertTriangle className="h-3 w-3 text-red-600" />
-                                <p className="text-xs font-semibold text-red-700 dark:text-red-400 uppercase">Objections</p>
+                                <p className="text-xs font-semibold text-red-400 uppercase">Objections</p>
                               </div>
                               <ul className="space-y-1">{reply.objections.map((o, i) => <li key={i} className="text-xs text-red-600">{o}</li>)}</ul>
                             </div>
                           )}
                           {reply.themes.length > 0 && (
-                            <div className="bg-searchatlas-purple/5 dark:bg-searchatlas-purple/10 rounded-lg p-3 border border-searchatlas-purple/20">
+                            <div className="bg-searchatlas-purple/10 rounded-lg p-3 border border-searchatlas-purple/20">
                               <div className="flex items-center gap-1 mb-2">
                                 <MessageSquare className="h-3 w-3 text-searchatlas-purple" />
-                                <p className="text-xs font-semibold text-searchatlas-dark dark:text-searchatlas-purple uppercase">Themes</p>
+                                <p className="text-xs font-semibold text-searchatlas-purple uppercase">Themes</p>
                               </div>
-                              <div className="flex flex-wrap gap-1">{reply.themes.map((t, i) => <span key={i} className="text-xs bg-searchatlas-purple/10 dark:bg-searchatlas-purple/20 text-searchatlas-dark dark:text-searchatlas-purple px-2 py-0.5 rounded">{t}</span>)}</div>
+                              <div className="flex flex-wrap gap-1">{reply.themes.map((t, i) => <span key={i} className="text-xs bg-searchatlas-purple/20 text-searchatlas-purple px-2 py-0.5 rounded">{t}</span>)}</div>
                             </div>
                           )}
                         </div>
@@ -1115,7 +1115,7 @@ export default function AnalyticsPage() {
       {/* Export Buttons */}
       <div className="flex items-center justify-end gap-3 hide-on-export">
         <button onClick={handleExportCSV} disabled={!filteredReport}
-          className="inline-flex items-center gap-2 px-4 py-2.5 text-sm font-medium rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 text-searchatlas-dark dark:text-white transition-colors disabled:opacity-50 shadow-sm">
+          className="inline-flex items-center gap-2 px-4 py-2.5 text-sm font-medium rounded-xl border border-border bg-card hover:bg-secondary text-foreground transition-colors disabled:opacity-50 shadow-sm">
           <FileSpreadsheet className="h-4 w-4 text-searchatlas-purple" /> Download CSV
         </button>
         <button onClick={handleExportPDF} disabled={exporting}
@@ -1135,7 +1135,7 @@ export default function AnalyticsPage() {
               className={`px-5 py-2.5 text-sm font-semibold rounded-xl border-2 transition-all whitespace-nowrap ${
                 activeCycle === null
                   ? 'bg-searchatlas-purple text-white border-searchatlas-purple shadow-lg shadow-searchatlas-purple/20'
-                  : 'bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 border-gray-200 dark:border-gray-700 text-searchatlas-dark dark:text-white'
+                  : 'bg-card hover:bg-secondary border-border text-foreground'
               }`}
             >
               All Cycles
@@ -1147,7 +1147,7 @@ export default function AnalyticsPage() {
                 className={`px-5 py-2.5 text-sm font-semibold rounded-xl border-2 transition-all whitespace-nowrap ${
                   activeCycle === cycle
                     ? 'bg-searchatlas-purple text-white border-searchatlas-purple shadow-lg shadow-searchatlas-purple/20'
-                    : 'bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 border-gray-200 dark:border-gray-700 text-searchatlas-dark dark:text-white'
+                    : 'bg-card hover:bg-secondary border-border text-foreground'
                 }`}
               >
                 Cycle {cycle}
@@ -1158,52 +1158,57 @@ export default function AnalyticsPage() {
 
         {/* ── PHASE 1: Hero Section ─────────────────────────────── */}
         {hero && (
-          <div className="bg-white dark:bg-gray-900 rounded-3xl p-6 shadow-lg border border-gray-100 dark:border-gray-800">
+          <div className="bg-card rounded-3xl p-6 shadow-lg border border-border">
             <div className="flex items-center gap-5 mb-8">
-              <img src="/selery-logo.png" alt="SearchAtlas" className="h-12 object-contain" />
-              <div className="h-10 w-px bg-gray-200 dark:bg-gray-700" />
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 rounded-xl bg-searchatlas-purple flex items-center justify-center">
+                  <span className="text-white font-bold text-lg">SA</span>
+                </div>
+                <span className="text-2xl font-bold text-foreground">SearchAtlas</span>
+              </div>
+              <div className="h-10 w-px bg-border" />
               <div>
                 <span className="text-searchatlas-purple font-semibold text-sm uppercase tracking-wider">OUTBOUND ANALYTICS</span>
-                <h1 className="text-3xl font-bold text-searchatlas-dark dark:text-white">{activeCycle !== null ? `Cycle ${activeCycle}` : 'All Cycles'}</h1>
+                <h1 className="text-3xl font-bold text-foreground">{activeCycle !== null ? `Cycle ${activeCycle}` : 'All Cycles'}</h1>
               </div>
             </div>
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-5">
-              <div className="bg-gray-50 dark:bg-gray-800 rounded-2xl p-5 border border-gray-100 dark:border-gray-700 hover:border-searchatlas-purple/50 transition-colors">
+              <div className="bg-secondary rounded-2xl p-5 border border-border hover:border-searchatlas-purple/50 transition-colors">
                 <div className="flex items-center gap-2 mb-3">
                   <BarChart3 className="h-4 w-4 text-searchatlas-purple" />
-                  <span className="text-gray-500 dark:text-gray-400 text-xs font-medium uppercase">Campaigns</span>
+                  <span className="text-muted-foreground text-xs font-medium uppercase">Campaigns</span>
                 </div>
-                <p className="text-3xl font-bold text-searchatlas-dark dark:text-white">{hero.activeCampaigns}</p>
+                <p className="text-3xl font-bold text-foreground">{hero.activeCampaigns}</p>
               </div>
-              <div className="bg-gray-50 dark:bg-gray-800 rounded-2xl p-5 border border-gray-100 dark:border-gray-700 hover:border-searchatlas-purple/50 transition-colors">
+              <div className="bg-secondary rounded-2xl p-5 border border-border hover:border-searchatlas-purple/50 transition-colors">
                 <div className="flex items-center gap-2 mb-3">
                   <Mail className="h-4 w-4 text-searchatlas-purple" />
-                  <span className="text-gray-500 dark:text-gray-400 text-xs font-medium uppercase">Emails Sent</span>
+                  <span className="text-muted-foreground text-xs font-medium uppercase">Emails Sent</span>
                 </div>
-                <p className="text-3xl font-bold text-searchatlas-dark dark:text-white">{hero.emailsSent.toLocaleString()}</p>
+                <p className="text-3xl font-bold text-foreground">{hero.emailsSent.toLocaleString()}</p>
               </div>
-              <div className="bg-gray-50 dark:bg-gray-800 rounded-2xl p-5 border border-gray-100 dark:border-gray-700 hover:border-searchatlas-purple/50 transition-colors">
+              <div className="bg-secondary rounded-2xl p-5 border border-border hover:border-searchatlas-purple/50 transition-colors">
                 <div className="flex items-center gap-2 mb-3">
                   <Users className="h-4 w-4 text-searchatlas-purple" />
-                  <span className="text-gray-500 dark:text-gray-400 text-xs font-medium uppercase">Contacted</span>
+                  <span className="text-muted-foreground text-xs font-medium uppercase">Contacted</span>
                 </div>
-                <p className="text-3xl font-bold text-searchatlas-dark dark:text-white">{hero.leadsContacted.toLocaleString()}</p>
+                <p className="text-3xl font-bold text-foreground">{hero.leadsContacted.toLocaleString()}</p>
               </div>
-              <div className="bg-gray-50 dark:bg-gray-800 rounded-2xl p-5 border border-gray-100 dark:border-gray-700 hover:border-searchatlas-purple/50 transition-colors">
+              <div className="bg-secondary rounded-2xl p-5 border border-border hover:border-searchatlas-purple/50 transition-colors">
                 <div className="flex items-center gap-2 mb-3">
                   <MessageSquare className="h-4 w-4 text-searchatlas-purple" />
-                  <span className="text-gray-500 dark:text-gray-400 text-xs font-medium uppercase">Reply Rate</span>
+                  <span className="text-muted-foreground text-xs font-medium uppercase">Reply Rate</span>
                 </div>
-                <p className="text-3xl font-bold text-searchatlas-dark dark:text-white">{hero.avgReplyRate}%</p>
+                <p className="text-3xl font-bold text-foreground">{hero.avgReplyRate}%</p>
               </div>
-              <div className="bg-searchatlas-cyan/10 dark:bg-searchatlas-cyan/20 rounded-2xl p-5 border border-searchatlas-cyan/30 hover:border-searchatlas-cyan/60 transition-colors">
+              <div className="bg-searchatlas-cyan/20 rounded-2xl p-5 border border-searchatlas-cyan/30 hover:border-searchatlas-cyan/60 transition-colors">
                 <div className="flex items-center gap-2 mb-3">
                   <TrendingUp className="h-4 w-4 text-searchatlas-cyan" />
                   <span className="text-searchatlas-cyan/80 text-xs font-medium uppercase">Interested</span>
                 </div>
                 <p className="text-3xl font-bold text-searchatlas-cyan">{hero.totalInterested}</p>
               </div>
-              <div className="bg-searchatlas-cyan/10 dark:bg-searchatlas-cyan/20 rounded-2xl p-5 border border-searchatlas-cyan/30 hover:border-searchatlas-cyan/60 transition-colors">
+              <div className="bg-searchatlas-cyan/20 rounded-2xl p-5 border border-searchatlas-cyan/30 hover:border-searchatlas-cyan/60 transition-colors">
                 <div className="flex items-center gap-2 mb-3">
                   <Target className="h-4 w-4 text-searchatlas-cyan" />
                   <span className="text-searchatlas-cyan/80 text-xs font-medium uppercase">Interest Rate</span>
@@ -1230,53 +1235,53 @@ export default function AnalyticsPage() {
             <span className="text-sm">Analyzing email copy...</span>
           </div>
         ) : copyData?.subjects?.analysis ? (
-          <div className="rounded-2xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-sm overflow-hidden">
-            <div className="flex flex-col space-y-1.5 p-6 border-b border-gray-100 dark:border-gray-800">
-              <h2 className="flex items-center gap-3 text-xl font-bold text-searchatlas-dark dark:text-white">
+          <div className="rounded-2xl border border-border bg-card shadow-sm overflow-hidden">
+            <div className="flex flex-col space-y-1.5 p-6 border-b border-border">
+              <h2 className="flex items-center gap-3 text-xl font-bold text-foreground">
                 <div className="w-10 h-10 bg-searchatlas-purple/10 rounded-xl flex items-center justify-center">
                   <CheckCircle className="h-5 w-5 text-searchatlas-purple" />
                 </div>
                 Copy Analysis
               </h2>
-              <p className="text-gray-500 dark:text-gray-400">
+              <p className="text-muted-foreground">
                 Insights from {copyData.summary.totalCampaignsAnalyzed} campaigns
               </p>
             </div>
             <div className="p-6 space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-                <div className="bg-gray-50 dark:bg-gray-800 p-5 rounded-xl border border-gray-100 dark:border-gray-700">
+                <div className="bg-secondary p-5 rounded-xl border border-border">
                   <div className="flex items-center gap-2 mb-3">
                     <div className="w-8 h-8 bg-searchatlas-purple/10 rounded-lg flex items-center justify-center">
                       <MessageSquare className="h-4 w-4 text-searchatlas-purple" />
                     </div>
-                    <h4 className="font-semibold text-searchatlas-dark dark:text-white text-sm">Subject Lines</h4>
+                    <h4 className="font-semibold text-foreground text-sm">Subject Lines</h4>
                   </div>
-                  <p className="text-sm text-gray-600 dark:text-gray-300">
+                  <p className="text-sm text-muted-foreground">
                     {copyData.subjects.analysis.keyInsight}
                   </p>
                 </div>
                 {copyData.body?.analysis && (
-                  <div className="bg-gray-50 dark:bg-gray-800 p-5 rounded-xl border border-gray-100 dark:border-gray-700">
+                  <div className="bg-secondary p-5 rounded-xl border border-border">
                     <div className="flex items-center gap-2 mb-3">
                       <div className="w-8 h-8 bg-searchatlas-purple/10 rounded-lg flex items-center justify-center">
                         <Target className="h-4 w-4 text-searchatlas-purple" />
                       </div>
-                      <h4 className="font-semibold text-searchatlas-dark dark:text-white text-sm">Opening Hooks</h4>
+                      <h4 className="font-semibold text-foreground text-sm">Opening Hooks</h4>
                     </div>
-                    <p className="text-sm text-gray-600 dark:text-gray-300">
+                    <p className="text-sm text-muted-foreground">
                       {copyData.body.analysis.contrast}
                     </p>
                   </div>
                 )}
                 {copyData.cta?.analysis && (
-                  <div className="bg-gray-50 dark:bg-gray-800 p-5 rounded-xl border border-gray-100 dark:border-gray-700">
+                  <div className="bg-secondary p-5 rounded-xl border border-border">
                     <div className="flex items-center gap-2 mb-3">
                       <div className="w-8 h-8 bg-searchatlas-purple/10 rounded-lg flex items-center justify-center">
                         <Mail className="h-4 w-4 text-searchatlas-purple" />
                       </div>
-                      <h4 className="font-semibold text-searchatlas-dark dark:text-white text-sm">CTAs</h4>
+                      <h4 className="font-semibold text-foreground text-sm">CTAs</h4>
                     </div>
-                    <p className="text-sm text-gray-600 dark:text-gray-300">
+                    <p className="text-sm text-muted-foreground">
                       {copyData.cta.analysis.commitmentAnalysis}
                     </p>
                   </div>
@@ -1318,32 +1323,32 @@ export default function AnalyticsPage() {
           <>
             {/* Response Intelligence */}
             <div>
-              <h2 className="text-2xl font-bold text-searchatlas-dark dark:text-white mb-6 flex items-center gap-3">
+              <h2 className="text-2xl font-bold text-foreground mb-6 flex items-center gap-3">
                 <div className="w-10 h-10 bg-searchatlas-purple/10 rounded-xl flex items-center justify-center">
                   <Brain className="h-5 w-5 text-searchatlas-purple" />
                 </div>
                 Response Intelligence
               </h2>
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <div className="rounded-2xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-sm p-6">
-                  <h3 className="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-5">Sentiment Breakdown</h3>
+                <div className="rounded-2xl border border-border bg-card shadow-sm p-6">
+                  <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-5">Sentiment Breakdown</h3>
                   <SentimentOverview breakdown={filteredReport.sentimentBreakdown} total={filteredReport.totalAnalyzed} />
                 </div>
-                <div className="rounded-2xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-sm p-6">
-                  <h3 className="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-5">Top Themes</h3>
+                <div className="rounded-2xl border border-border bg-card shadow-sm p-6">
+                  <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-5">Top Themes</h3>
                   {filteredReport.topThemes.length > 0 ? (
                     <div className="space-y-3">
                       {filteredReport.topThemes.map((t) => (
                         <div key={t.theme} className="flex items-center justify-between py-1">
-                          <span className="text-sm font-medium text-searchatlas-dark dark:text-white">{toTitleCase(t.theme)}</span>
-                          <span className="text-sm text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-800 px-2 py-0.5 rounded-full">{t.count} replies</span>
+                          <span className="text-sm font-medium text-foreground">{toTitleCase(t.theme)}</span>
+                          <span className="text-sm text-muted-foreground bg-secondary px-2 py-0.5 rounded-full">{t.count} replies</span>
                         </div>
                       ))}
                     </div>
-                  ) : <p className="text-sm text-gray-500 dark:text-gray-400">No themes extracted yet</p>}
+                  ) : <p className="text-sm text-muted-foreground">No themes extracted yet</p>}
                 </div>
                 {filteredReport.topBuyingSignals.length > 0 && (
-                  <div className="rounded-2xl border border-searchatlas-cyan/30 bg-searchatlas-cyan/5 dark:bg-searchatlas-cyan/10 shadow-sm p-6">
+                  <div className="rounded-2xl border border-searchatlas-cyan/30 bg-searchatlas-cyan/10 shadow-sm p-6">
                     <h3 className="text-sm font-semibold text-searchatlas-cyan uppercase tracking-wider mb-5 flex items-center gap-2">
                       <Sparkles className="h-4 w-4" /> Buying Signals
                     </h3>
@@ -1358,15 +1363,15 @@ export default function AnalyticsPage() {
                   </div>
                 )}
                 {filteredReport.topObjections.length > 0 && (
-                  <div className="rounded-2xl border border-red-200 dark:border-red-900/50 bg-red-50 dark:bg-red-950/30 shadow-sm p-6">
-                    <h3 className="text-sm font-semibold text-red-600 dark:text-red-400 uppercase tracking-wider mb-5 flex items-center gap-2">
+                  <div className="rounded-2xl border border-red-900/50 bg-red-950/30 shadow-sm p-6">
+                    <h3 className="text-sm font-semibold text-red-400 uppercase tracking-wider mb-5 flex items-center gap-2">
                       <AlertTriangle className="h-4 w-4" /> Common Objections
                     </h3>
                     <div className="space-y-3">
                       {filteredReport.topObjections.map((o) => (
                         <div key={o.objection} className="flex items-center justify-between py-1">
-                          <span className="text-sm font-medium text-red-700 dark:text-red-400">{toTitleCase(o.objection)}</span>
-                          <span className="text-sm text-red-600/80 bg-red-100 dark:bg-red-900/50 px-2 py-0.5 rounded-full font-medium">{o.count}x</span>
+                          <span className="text-sm font-medium text-red-400">{toTitleCase(o.objection)}</span>
+                          <span className="text-sm text-red-600/80 bg-red-900/50 px-2 py-0.5 rounded-full font-medium">{o.count}x</span>
                         </div>
                       ))}
                     </div>
@@ -1377,24 +1382,24 @@ export default function AnalyticsPage() {
 
             {/* Who's Responding */}
             <div>
-              <h2 className="text-2xl font-bold text-searchatlas-dark dark:text-white mb-6 flex items-center gap-3">
+              <h2 className="text-2xl font-bold text-foreground mb-6 flex items-center gap-3">
                 <div className="w-10 h-10 bg-searchatlas-purple/10 rounded-xl flex items-center justify-center">
                   <BarChart3 className="h-5 w-5 text-searchatlas-purple" />
                 </div>
                 Who&apos;s Responding
               </h2>
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <div className="rounded-2xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-sm p-6">
-                  <h3 className="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-5 flex items-center gap-2">
+                <div className="rounded-2xl border border-border bg-card shadow-sm p-6">
+                  <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-5 flex items-center gap-2">
                     <Building2 className="h-4 w-4 text-searchatlas-purple" /> Industry Distribution
                   </h3>
                   <HorizontalBarChart data={filteredReport.industryDistribution} colorClass="bg-searchatlas-purple" showInterested />
                 </div>
-                <div className="rounded-2xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-sm p-6">
-                  <h3 className="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-5 flex items-center gap-2">
-                    <Briefcase className="h-4 w-4 text-searchatlas-dark dark:text-searchatlas-purple" /> Title Seniority
+                <div className="rounded-2xl border border-border bg-card shadow-sm p-6">
+                  <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-5 flex items-center gap-2">
+                    <Briefcase className="h-4 w-4 text-searchatlas-purple" /> Title Seniority
                   </h3>
-                  <HorizontalBarChart data={filteredReport.seniorityDistribution} colorClass="bg-searchatlas-dark dark:bg-searchatlas-purple" showInterested />
+                  <HorizontalBarChart data={filteredReport.seniorityDistribution} colorClass="bg-searchatlas-purple" showInterested />
                 </div>
 
                 {/* Pipeline Companies (replaces Top Responding Companies) */}
@@ -1409,7 +1414,7 @@ export default function AnalyticsPage() {
 
             {/* Lead Deep-Dive */}
             <div>
-              <h2 className="text-2xl font-bold text-searchatlas-dark dark:text-white mb-6 flex items-center gap-3">
+              <h2 className="text-2xl font-bold text-foreground mb-6 flex items-center gap-3">
                 <div className="w-10 h-10 bg-searchatlas-cyan/10 rounded-xl flex items-center justify-center">
                   <Users className="h-5 w-5 text-searchatlas-cyan" />
                 </div>
