@@ -45,11 +45,20 @@ interface ProviderMetrics {
 }
 
 interface Infrastructure {
+  total_inboxes: number;
   avg_health_score: number;
   live_inboxes: number;
+  dead_inboxes: number;
+  disconnected_inboxes: number;
   connected_inboxes: number;
   operational_capacity: number;
+  potential_capacity: number;
   clean_domains: number;
+  total_emails_sent: number;
+  total_replies: number;
+  total_bounces: number;
+  overall_reply_rate: number;
+  overall_bounce_rate: number;
   sync_source: string;
   providers?: ProviderMetrics[];
 }
@@ -411,9 +420,12 @@ export default function InfrastructurePage() {
   const { infrastructure, volumeHistory } = data;
   const packageInfo = data.package;
 
-  const availabilityPercent = infrastructure.live_inboxes > 0
-    ? Math.round((infrastructure.connected_inboxes / infrastructure.live_inboxes) * 100)
+  // Availability: live inboxes out of total (excluding dead)
+  const healthyTotal = infrastructure.total_inboxes - infrastructure.dead_inboxes;
+  const availabilityPercent = healthyTotal > 0
+    ? Math.round((infrastructure.live_inboxes / healthyTotal) * 100)
     : 100;
+  // Package fulfillment: live inboxes vs target
   const packagePercent = packageInfo
     ? Math.round((infrastructure.live_inboxes / packageInfo.inbox_target) * 100)
     : 100;
@@ -480,7 +492,7 @@ export default function InfrastructurePage() {
               <div>
                 <p className="text-2xl font-bold text-white">{packageInfo?.name || 'Custom'}</p>
                 <p className="text-sm text-gray-400">
-                  {infrastructure.live_inboxes} of {packageInfo?.inbox_target || infrastructure.live_inboxes} inboxes
+                  {infrastructure.live_inboxes} of {packageInfo?.inbox_target || infrastructure.total_inboxes} inboxes
                 </p>
               </div>
               <div className="text-right">
@@ -497,11 +509,25 @@ export default function InfrastructurePage() {
                 }}
               />
             </div>
-            {packageInfo && infrastructure.live_inboxes < packageInfo.inbox_target && (
+            {/* Show provisioning or issues */}
+            {infrastructure.disconnected_inboxes > 0 || infrastructure.dead_inboxes > 0 ? (
+              <div className="flex items-center gap-3 mt-2 text-xs">
+                {infrastructure.disconnected_inboxes > 0 && (
+                  <span className="text-[#F9A8D4]">
+                    +{infrastructure.disconnected_inboxes} inboxes being provisioned
+                  </span>
+                )}
+                {infrastructure.dead_inboxes > 0 && (
+                  <span className="text-red-400">
+                    {infrastructure.dead_inboxes} killed
+                  </span>
+                )}
+              </div>
+            ) : packageInfo && infrastructure.live_inboxes < packageInfo.inbox_target ? (
               <p className="text-xs text-gray-400 mt-2">
                 +{packageInfo.inbox_target - infrastructure.live_inboxes} inboxes being provisioned
               </p>
-            )}
+            ) : null}
           </div>
         </div>
 
