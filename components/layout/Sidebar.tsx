@@ -30,12 +30,12 @@ export function Sidebar() {
     <div className="flex h-screen w-64 flex-col border-r border-sidebar-border bg-sidebar">
       {/* SearchAtlas Logo */}
       <div className="flex h-16 items-center border-b border-sidebar-border px-6">
-        <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-lg bg-[#A57BEA] flex items-center justify-center">
-            <span className="text-white font-bold text-sm">SA</span>
-          </div>
-          <span className="text-lg font-bold text-white">SearchAtlas</span>
-        </div>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src="https://searchatlas.com/wp-content/uploads/2023/12/white.svg"
+          alt="SearchAtlas"
+          className="h-7 w-auto"
+        />
       </div>
 
       {/* Navigation */}
