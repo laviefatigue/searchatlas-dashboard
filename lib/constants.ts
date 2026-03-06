@@ -35,10 +35,10 @@ export const STATUS_COLORS: Record<string, { bg: string; text: string }> = {
 };
 
 export const CHART_COLORS = {
-  sent: '#936BDA',      // SearchAtlas Purple
-  opens: '#9CFFAC',     // SearchAtlas Green
-  replies: '#88C2FF',   // SearchAtlas Cyan
-  bounced: '#ef4444',   // Red
-  interested: '#FFADDB', // SearchAtlas Pink
-  unsubscribed: '#6b7280', // Gray
+  sent: '#A57BEA',      // SearchAtlas Purple (brighter)
+  opens: '#86EFAC',     // SearchAtlas Green (brighter)
+  replies: '#93C5FD',   // SearchAtlas Cyan (brighter)
+  bounced: '#F87171',   // Red (brighter)
+  interested: '#F9A8D4', // SearchAtlas Pink (brighter)
+  unsubscribed: '#9CA3AF', // Gray (brighter)
 };

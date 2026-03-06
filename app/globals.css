@@ -9,6 +9,7 @@
   --color-searchatlas-cyan: #88C2FF;
   --color-searchatlas-green: #9CFFAC;
   --color-searchatlas-pink: #FFADDB;
+  --color-searchatlas-dark: #1D1E22;
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
@@ -54,99 +55,99 @@
 }
 
 :root {
-  /* SearchAtlas Dashboard Design System - Dark Theme */
+  /* SearchAtlas Dashboard - IMPROVED READABILITY */
   --radius: 0.5rem;
 
-  /* Backgrounds - Dark like SearchAtlas website */
-  --background: #0F0F11;
-  --foreground: #ffffff;
+  /* Backgrounds - Softer dark, not pure black */
+  --background: #14151A;
+  --foreground: #F5F5F7;
 
-  /* Cards */
-  --card: #1D1E22;
-  --card-foreground: #ffffff;
+  /* Cards - Elevated with visible borders */
+  --card: #1D1E24;
+  --card-foreground: #F5F5F7;
 
   /* Popovers */
-  --popover: #1D1E22;
-  --popover-foreground: #ffffff;
+  --popover: #1D1E24;
+  --popover-foreground: #F5F5F7;
 
-  /* Primary - SearchAtlas Purple */
-  --primary: #936BDA;
+  /* Primary - SearchAtlas Purple (brighter for visibility) */
+  --primary: #A57BEA;
   --primary-foreground: #ffffff;
 
-  /* Secondary */
-  --secondary: #2a2b30;
-  --secondary-foreground: #ffffff;
+  /* Secondary - Slightly lighter for contrast */
+  --secondary: #282A32;
+  --secondary-foreground: #F5F5F7;
 
-  /* Muted */
-  --muted: #2a2b30;
-  --muted-foreground: #9ca3af;
+  /* Muted - Better contrast for readability */
+  --muted: #282A32;
+  --muted-foreground: #A1A1AA;
 
   /* Accent */
-  --accent: #2a2b30;
-  --accent-foreground: #ffffff;
+  --accent: #282A32;
+  --accent-foreground: #F5F5F7;
 
-  /* Status Colors */
-  --destructive: #ef4444;
-  --success: #9CFFAC;
-  --warning: #FFADDB;
+  /* Status Colors - Brighter for dark backgrounds */
+  --destructive: #F87171;
+  --success: #86EFAC;
+  --warning: #FCD34D;
 
-  /* Borders */
-  --border: #2a2b30;
-  --input: #2a2b30;
-  --ring: #936BDA;
+  /* Borders - More visible */
+  --border: #3A3C47;
+  --input: #3A3C47;
+  --ring: #A57BEA;
 
-  /* Charts - Campaign Metrics */
-  --chart-1: #936BDA; /* Sent - SearchAtlas Purple */
-  --chart-2: #88C2FF; /* Opens - SearchAtlas Cyan */
-  --chart-3: #9CFFAC; /* Replies - SearchAtlas Green */
-  --chart-4: #ef4444; /* Bounced - Red */
-  --chart-5: #FFADDB; /* Interested - SearchAtlas Pink */
+  /* Charts - Vibrant colors for dark background */
+  --chart-1: #A57BEA; /* Purple - brighter */
+  --chart-2: #93C5FD; /* Cyan - brighter */
+  --chart-3: #86EFAC; /* Green - brighter */
+  --chart-4: #F87171; /* Red - brighter */
+  --chart-5: #F9A8D4; /* Pink - brighter */
 
-  /* Sidebar — SearchAtlas Dark */
-  --sidebar: #0F0F11;
-  --sidebar-foreground: #ffffff;
-  --sidebar-primary: #936BDA;
+  /* Sidebar */
+  --sidebar: #0F1014;
+  --sidebar-foreground: #F5F5F7;
+  --sidebar-primary: #A57BEA;
   --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: rgba(147, 107, 218, 0.15);
-  --sidebar-accent-foreground: #ffffff;
-  --sidebar-border: rgba(255, 255, 255, 0.1);
-  --sidebar-ring: #936BDA;
+  --sidebar-accent: rgba(165, 123, 234, 0.15);
+  --sidebar-accent-foreground: #F5F5F7;
+  --sidebar-border: #3A3C47;
+  --sidebar-ring: #A57BEA;
 }
 
 .dark {
-  --background: #0F0F11;
-  --foreground: #ffffff;
-  --card: #1D1E22;
-  --card-foreground: #ffffff;
-  --popover: #1D1E22;
-  --popover-foreground: #ffffff;
-  --primary: #936BDA;
+  --background: #14151A;
+  --foreground: #F5F5F7;
+  --card: #1D1E24;
+  --card-foreground: #F5F5F7;
+  --popover: #1D1E24;
+  --popover-foreground: #F5F5F7;
+  --primary: #A57BEA;
   --primary-foreground: #ffffff;
-  --secondary: #2a2b30;
-  --secondary-foreground: #ffffff;
-  --muted: #2a2b30;
-  --muted-foreground: #9ca3af;
-  --accent: #2a2b30;
-  --accent-foreground: #ffffff;
-  --destructive: #ef4444;
-  --success: #9CFFAC;
-  --warning: #FFADDB;
-  --border: #2a2b30;
-  --input: #2a2b30;
-  --ring: #936BDA;
-  --chart-1: #936BDA;
-  --chart-2: #88C2FF;
-  --chart-3: #9CFFAC;
-  --chart-4: #f87171;
-  --chart-5: #FFADDB;
-  --sidebar: #0F0F11;
-  --sidebar-foreground: #ffffff;
-  --sidebar-primary: #936BDA;
+  --secondary: #282A32;
+  --secondary-foreground: #F5F5F7;
+  --muted: #282A32;
+  --muted-foreground: #A1A1AA;
+  --accent: #282A32;
+  --accent-foreground: #F5F5F7;
+  --destructive: #F87171;
+  --success: #86EFAC;
+  --warning: #FCD34D;
+  --border: #3A3C47;
+  --input: #3A3C47;
+  --ring: #A57BEA;
+  --chart-1: #A57BEA;
+  --chart-2: #93C5FD;
+  --chart-3: #86EFAC;
+  --chart-4: #F87171;
+  --chart-5: #F9A8D4;
+  --sidebar: #0F1014;
+  --sidebar-foreground: #F5F5F7;
+  --sidebar-primary: #A57BEA;
   --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: rgba(147, 107, 218, 0.15);
-  --sidebar-accent-foreground: #ffffff;
-  --sidebar-border: rgba(255, 255, 255, 0.1);
-  --sidebar-ring: #936BDA;
+  --sidebar-accent: rgba(165, 123, 234, 0.15);
+  --sidebar-accent-foreground: #F5F5F7;
+  --sidebar-border: #3A3C47;
+  --sidebar-ring: #A57BEA;
 }
 
 @layer base {
@@ -199,20 +200,21 @@
   }
 }
 
-/* Custom scrollbar */
+/* Custom scrollbar for dark theme */
 @layer utilities {
   .custom-scrollbar::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
+    width: 8px;
+    height: 8px;
   }
 
   .custom-scrollbar::-webkit-scrollbar-track {
-    background: transparent;
+    background: var(--muted);
+    border-radius: 4px;
   }
 
   .custom-scrollbar::-webkit-scrollbar-thumb {
     background: var(--border);
-    border-radius: 3px;
+    border-radius: 4px;
   }
 
   .custom-scrollbar::-webkit-scrollbar-thumb:hover {
@@ -236,7 +238,7 @@
   animation: fade-in 0.3s ease-out forwards;
 }
 
-/* PDF export mode — hide interactive elements and force clean output */
+/* PDF export mode */
 body.exporting-pdf .hide-on-export,
 body.exporting-pdf button,
 body.exporting-pdf select,
@@ -261,8 +263,8 @@ body.exporting-pdf .sticky {
 }
 
 body.exporting-pdf {
-  background: #0F0F11 !important;
-  color: #ffffff !important;
+  background: #14151A !important;
+  color: #F5F5F7 !important;
 }
 
 body.exporting-pdf * {

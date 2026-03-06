@@ -31,7 +31,7 @@ export function Sidebar() {
       {/* SearchAtlas Logo */}
       <div className="flex h-16 items-center border-b border-sidebar-border px-6">
         <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-lg bg-[#936BDA] flex items-center justify-center">
+          <div className="w-8 h-8 rounded-lg bg-[#A57BEA] flex items-center justify-center">
             <span className="text-white font-bold text-sm">SA</span>
           </div>
           <span className="text-lg font-bold text-white">SearchAtlas</span>
@@ -66,7 +66,7 @@ export function Sidebar() {
       <div className="border-t border-sidebar-border p-4 space-y-4">
         <div className="flex items-center gap-3">
           <Avatar className="h-8 w-8">
-            <AvatarFallback className="bg-[#936BDA] text-white text-xs">
+            <AvatarFallback className="bg-[#A57BEA] text-white text-xs">
               {user?.name ? getInitials(user.name) : 'U'}
             </AvatarFallback>
           </Avatar>

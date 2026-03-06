@@ -16,11 +16,11 @@ import {
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// SEARCHATLAS BRAND COLORS
-// Primary: Purple #936BDA
-// Secondary: Cyan #88C2FF
-// Accent: Green #9CFFAC, Pink #FFADDB
-// Background: Dark #1D1E22 / Light #0F0F11
+// SEARCHATLAS BRAND COLORS - IMPROVED READABILITY
+// Primary: Purple #A57BEA (brighter)
+// Secondary: Cyan #93C5FD (brighter)
+// Accent: Green #86EFAC, Pink #F9A8D4
+// Background: Dark #14151A / Card #1D1E24
 // ═══════════════════════════════════════════════════════════════════════════════
 
 // Types
@@ -111,9 +111,9 @@ function HealthScoreGauge({ score, size = 'md' }: { score: number; size?: 'sm' |
   const strokeDashoffset = circumference - (score / 100) * circumference;
 
   const getStrokeColor = (score: number) => {
-    if (score >= 80) return '#9CFFAC'; // SearchAtlas green
-    if (score >= 60) return '#936BDA'; // SearchAtlas purple
-    if (score >= 40) return '#FFADDB'; // SearchAtlas pink
+    if (score >= 80) return '#86EFAC'; // SearchAtlas green
+    if (score >= 60) return '#A57BEA'; // SearchAtlas purple
+    if (score >= 40) return '#F9A8D4'; // SearchAtlas pink
     return '#ef4444';
   };
 
@@ -144,7 +144,7 @@ function HealthScoreGauge({ score, size = 'md' }: { score: number; size?: 'sm' |
           className="transform -rotate-90 relative"
         >
           <circle
-            stroke="#2a2b30"
+            stroke="#3A3C47"
             fill="transparent"
             strokeWidth={stroke}
             r={normalizedRadius}
@@ -199,44 +199,44 @@ function VolumeHistoryChart({ data }: { data: VolumeHistory }) {
         <AreaChart data={chartData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
           <defs>
             <linearGradient id="gradientSent" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="#936BDA" stopOpacity={0.4} />
-              <stop offset="100%" stopColor="#936BDA" stopOpacity={0.02} />
+              <stop offset="0%" stopColor="#A57BEA" stopOpacity={0.4} />
+              <stop offset="100%" stopColor="#A57BEA" stopOpacity={0.02} />
             </linearGradient>
             <linearGradient id="gradientCapacity" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="#88C2FF" stopOpacity={0.4} />
-              <stop offset="100%" stopColor="#88C2FF" stopOpacity={0.02} />
+              <stop offset="0%" stopColor="#93C5FD" stopOpacity={0.4} />
+              <stop offset="100%" stopColor="#93C5FD" stopOpacity={0.02} />
             </linearGradient>
           </defs>
-          <CartesianGrid strokeDasharray="3 3" stroke="#2a2b30" vertical={false} />
+          <CartesianGrid strokeDasharray="3 3" stroke="#3A3C47" vertical={false} />
           <XAxis
             dataKey="date"
             tick={{ fontSize: 11, fill: '#9ca3af' }}
-            stroke="#2a2b30"
+            stroke="#3A3C47"
             tickLine={false}
             axisLine={false}
           />
           <YAxis
             tick={{ fontSize: 11, fill: '#9ca3af' }}
-            stroke="#2a2b30"
+            stroke="#3A3C47"
             tickLine={false}
             axisLine={false}
             tickFormatter={(value) => value >= 1000 ? `${(value / 1000).toFixed(0)}k` : value}
           />
           <Tooltip
             contentStyle={{
-              backgroundColor: '#1D1E22',
-              border: '1px solid #2a2b30',
+              backgroundColor: '#1D1E24',
+              border: '1px solid #3A3C47',
               borderRadius: '12px',
               boxShadow: '0 4px 16px rgba(0, 0, 0, 0.4)',
             }}
             labelStyle={{ color: '#ffffff', fontWeight: 500, marginBottom: 4 }}
-            itemStyle={{ color: '#936BDA' }}
+            itemStyle={{ color: '#A57BEA' }}
           />
           <Legend wrapperStyle={{ fontSize: '12px', paddingTop: '12px' }} iconType="circle" />
           <Area
             type="monotone"
             dataKey="Emails Sent"
-            stroke="#936BDA"
+            stroke="#A57BEA"
             strokeWidth={2}
             fillOpacity={1}
             fill="url(#gradientSent)"
@@ -244,7 +244,7 @@ function VolumeHistoryChart({ data }: { data: VolumeHistory }) {
           <Area
             type="monotone"
             dataKey="Capacity"
-            stroke="#88C2FF"
+            stroke="#93C5FD"
             strokeWidth={2}
             fillOpacity={1}
             fill="url(#gradientCapacity)"
@@ -259,27 +259,27 @@ function VolumeHistoryChart({ data }: { data: VolumeHistory }) {
 function ProviderHealthWidget({ providers }: { providers: ProviderMetrics[] }) {
   const getProviderIcon = (name: string) => {
     if (name.toLowerCase().includes('microsoft') || name.toLowerCase().includes('entra')) {
-      return <Cloud className="h-5 w-5 text-[#88C2FF]" />;
+      return <Cloud className="h-5 w-5 text-[#93C5FD]" />;
     }
     if (name.toLowerCase().includes('google') || name.toLowerCase().includes('gmail')) {
-      return <Mail className="h-5 w-5 text-[#FFADDB]" />;
+      return <Mail className="h-5 w-5 text-[#F9A8D4]" />;
     }
     return <Server className="h-5 w-5 text-gray-400" />;
   };
 
   const getHealthColor = (score: number) => {
-    if (score >= 80) return 'text-[#9CFFAC]';
-    if (score >= 60) return 'text-[#936BDA]';
-    if (score >= 40) return 'text-[#FFADDB]';
+    if (score >= 80) return 'text-[#86EFAC]';
+    if (score >= 60) return 'text-[#A57BEA]';
+    if (score >= 40) return 'text-[#F9A8D4]';
     return 'text-red-400';
   };
 
   const maxLive = Math.max(...providers.map(p => p.live_count), 1);
 
   return (
-    <div className="bg-[#1D1E22] border border-[#2a2b30] rounded-2xl p-6 hover:border-[#936BDA]/50 transition-colors">
+    <div className="bg-[#1D1E24] border border-[#3A3C47] rounded-2xl p-6 hover:border-[#A57BEA]/50 transition-colors">
       <div className="flex items-center gap-2 mb-4">
-        <Server className="h-4 w-4 text-[#936BDA]" />
+        <Server className="h-4 w-4 text-[#A57BEA]" />
         <span className="text-xs font-medium text-gray-400 uppercase tracking-wide">Provider Health</span>
       </div>
 
@@ -302,7 +302,7 @@ function ProviderHealthWidget({ providers }: { providers: ProviderMetrics[] }) {
 
               <div className="grid grid-cols-3 gap-2 text-xs mb-2">
                 <div className="flex items-center gap-1.5">
-                  <div className="w-2 h-2 rounded-full bg-[#9CFFAC]" />
+                  <div className="w-2 h-2 rounded-full bg-[#86EFAC]" />
                   <span className="text-gray-400">Live</span>
                   <span className="font-medium text-white ml-auto">{provider.live_count}</span>
                 </div>
@@ -313,23 +313,23 @@ function ProviderHealthWidget({ providers }: { providers: ProviderMetrics[] }) {
                 </div>
                 <div className="flex items-center gap-1.5">
                   {provider.disconnected_count > 0 ? (
-                    <WifiOff className="h-3 w-3 text-[#FFADDB]" />
+                    <WifiOff className="h-3 w-3 text-[#F9A8D4]" />
                   ) : (
-                    <Wifi className="h-3 w-3 text-[#9CFFAC]" />
+                    <Wifi className="h-3 w-3 text-[#86EFAC]" />
                   )}
                   <span className="text-gray-400">Disc.</span>
-                  <span className={`font-medium ml-auto ${provider.disconnected_count > 0 ? 'text-[#FFADDB]' : 'text-[#9CFFAC]'}`}>
+                  <span className={`font-medium ml-auto ${provider.disconnected_count > 0 ? 'text-[#F9A8D4]' : 'text-[#86EFAC]'}`}>
                     {provider.disconnected_count}
                   </span>
                 </div>
               </div>
 
-              <div className="h-2 bg-[#0F0F11] rounded-full overflow-hidden">
+              <div className="h-2 bg-[#14151A] rounded-full overflow-hidden">
                 <div
                   className="h-full rounded-full transition-all duration-700"
                   style={{
                     width: `${barWidth}%`,
-                    background: 'linear-gradient(90deg, #936BDA, #C2A5FF)'
+                    background: 'linear-gradient(90deg, #A57BEA, #C4B5FD)'
                   }}
                 />
               </div>
@@ -381,9 +381,9 @@ export default function InfrastructurePage() {
 
   if (loading && !data) {
     return (
-      <div className="min-h-screen bg-[#0F0F11] flex items-center justify-center">
+      <div className="min-h-screen bg-[#14151A] flex items-center justify-center">
         <div className="flex items-center gap-3 text-gray-400">
-          <Loader2 className="h-5 w-5 animate-spin text-[#936BDA]" />
+          <Loader2 className="h-5 w-5 animate-spin text-[#A57BEA]" />
           <span>Loading dashboard...</span>
         </div>
       </div>
@@ -392,12 +392,12 @@ export default function InfrastructurePage() {
 
   if (error && !data) {
     return (
-      <div className="min-h-screen bg-[#0F0F11] flex items-center justify-center">
+      <div className="min-h-screen bg-[#14151A] flex items-center justify-center">
         <div className="text-center">
           <p className="text-gray-400 mb-4">{error}</p>
           <button
             onClick={fetchData}
-            className="px-4 py-2 rounded-lg bg-[#936BDA] text-white hover:bg-[#a57de6] transition-colors"
+            className="px-4 py-2 rounded-lg bg-[#A57BEA] text-white hover:bg-[#a57de6] transition-colors"
           >
             Retry
           </button>
@@ -424,16 +424,16 @@ export default function InfrastructurePage() {
     : 0;
 
   const getStatusMessage = () => {
-    if (infrastructure.avg_health_score >= 85) return { text: 'All systems operational', icon: CheckCircle2, color: 'text-[#9CFFAC]' };
-    if (infrastructure.avg_health_score >= 70) return { text: 'Systems operational with minor issues', icon: CheckCircle2, color: 'text-[#936BDA]' };
-    return { text: 'Some systems need attention', icon: Activity, color: 'text-[#FFADDB]' };
+    if (infrastructure.avg_health_score >= 85) return { text: 'All systems operational', icon: CheckCircle2, color: 'text-[#86EFAC]' };
+    if (infrastructure.avg_health_score >= 70) return { text: 'Systems operational with minor issues', icon: CheckCircle2, color: 'text-[#A57BEA]' };
+    return { text: 'Some systems need attention', icon: Activity, color: 'text-[#F9A8D4]' };
   };
 
   const status = getStatusMessage();
   const StatusIcon = status.icon;
 
   return (
-    <div className="min-h-screen bg-[#0F0F11]">
+    <div className="min-h-screen bg-[#14151A]">
       <main className="max-w-5xl mx-auto px-6 py-8">
         {/* Header */}
         <header className="mb-8">
@@ -449,7 +449,7 @@ export default function InfrastructurePage() {
         {/* Hero - Health + Package */}
         <div className="grid grid-cols-2 gap-6 mb-6">
           {/* Health Score */}
-          <div className="bg-[#1D1E22] border border-[#2a2b30] rounded-2xl p-6 hover:border-[#936BDA]/50 transition-colors">
+          <div className="bg-[#1D1E24] border border-[#3A3C47] rounded-2xl p-6 hover:border-[#A57BEA]/50 transition-colors">
             <div className="flex items-center justify-between">
               <div className="flex-1">
                 <p className="text-xs font-medium text-gray-400 uppercase tracking-wide mb-6">
@@ -460,7 +460,7 @@ export default function InfrastructurePage() {
                     {infrastructure.avg_health_score}
                   </div>
                   <div className="pb-2">
-                    <p className="text-lg font-medium text-[#9CFFAC]">Healthy</p>
+                    <p className="text-lg font-medium text-[#86EFAC]">Healthy</p>
                     <p className="text-sm text-gray-400">{availabilityPercent}% available</p>
                   </div>
                 </div>
@@ -472,7 +472,7 @@ export default function InfrastructurePage() {
           </div>
 
           {/* Package Status */}
-          <div className="bg-[#1D1E22] border border-[#2a2b30] rounded-2xl p-6 hover:border-[#936BDA]/50 transition-colors">
+          <div className="bg-[#1D1E24] border border-[#3A3C47] rounded-2xl p-6 hover:border-[#A57BEA]/50 transition-colors">
             <p className="text-xs font-medium text-gray-400 uppercase tracking-wide mb-4">
               Your Package
             </p>
@@ -484,16 +484,16 @@ export default function InfrastructurePage() {
                 </p>
               </div>
               <div className="text-right">
-                <p className="text-3xl font-bold text-[#936BDA]">{Math.min(100, packagePercent)}%</p>
+                <p className="text-3xl font-bold text-[#A57BEA]">{Math.min(100, packagePercent)}%</p>
                 <p className="text-xs text-gray-400">fulfilled</p>
               </div>
             </div>
-            <div className="h-3 bg-[#0F0F11] rounded-full overflow-hidden">
+            <div className="h-3 bg-[#14151A] rounded-full overflow-hidden">
               <div
                 className="h-full rounded-full transition-all duration-700"
                 style={{
                   width: `${Math.min(100, packagePercent)}%`,
-                  background: 'linear-gradient(90deg, #936BDA, #C2A5FF)'
+                  background: 'linear-gradient(90deg, #A57BEA, #C4B5FD)'
                 }}
               />
             </div>
@@ -508,10 +508,10 @@ export default function InfrastructurePage() {
         {/* Key Metrics Row */}
         <div className="grid grid-cols-3 gap-4 mb-6">
           {/* Daily Capacity */}
-          <div className="bg-[#1D1E22] border border-[#2a2b30] rounded-2xl p-5 hover:border-[#936BDA]/50 transition-colors">
+          <div className="bg-[#1D1E24] border border-[#3A3C47] rounded-2xl p-5 hover:border-[#A57BEA]/50 transition-colors">
             <div className="flex items-center gap-2 mb-3">
-              <div className="w-8 h-8 rounded-lg bg-[#936BDA]/20 flex items-center justify-center">
-                <Zap className="h-4 w-4 text-[#936BDA]" />
+              <div className="w-8 h-8 rounded-lg bg-[#A57BEA]/20 flex items-center justify-center">
+                <Zap className="h-4 w-4 text-[#A57BEA]" />
               </div>
               <span className="text-xs font-medium text-gray-400 uppercase tracking-wide">Daily Capacity</span>
             </div>
@@ -522,10 +522,10 @@ export default function InfrastructurePage() {
           </div>
 
           {/* Avg Daily Volume */}
-          <div className="bg-[#1D1E22] border border-[#2a2b30] rounded-2xl p-5 hover:border-[#936BDA]/50 transition-colors">
+          <div className="bg-[#1D1E24] border border-[#3A3C47] rounded-2xl p-5 hover:border-[#A57BEA]/50 transition-colors">
             <div className="flex items-center gap-2 mb-3">
-              <div className="w-8 h-8 rounded-lg bg-[#88C2FF]/20 flex items-center justify-center">
-                <Mail className="h-4 w-4 text-[#88C2FF]" />
+              <div className="w-8 h-8 rounded-lg bg-[#93C5FD]/20 flex items-center justify-center">
+                <Mail className="h-4 w-4 text-[#93C5FD]" />
               </div>
               <span className="text-xs font-medium text-gray-400 uppercase tracking-wide">Avg. Daily Sent</span>
             </div>
@@ -536,10 +536,10 @@ export default function InfrastructurePage() {
           </div>
 
           {/* Domains */}
-          <div className="bg-[#1D1E22] border border-[#2a2b30] rounded-2xl p-5 hover:border-[#936BDA]/50 transition-colors">
+          <div className="bg-[#1D1E24] border border-[#3A3C47] rounded-2xl p-5 hover:border-[#A57BEA]/50 transition-colors">
             <div className="flex items-center gap-2 mb-3">
-              <div className="w-8 h-8 rounded-lg bg-[#9CFFAC]/20 flex items-center justify-center">
-                <Server className="h-4 w-4 text-[#9CFFAC]" />
+              <div className="w-8 h-8 rounded-lg bg-[#86EFAC]/20 flex items-center justify-center">
+                <Server className="h-4 w-4 text-[#86EFAC]" />
               </div>
               <span className="text-xs font-medium text-gray-400 uppercase tracking-wide">Active Domains</span>
             </div>
@@ -559,10 +559,10 @@ export default function InfrastructurePage() {
 
         {/* Volume Chart */}
         {volumeHistory && (
-          <div className="bg-[#1D1E22] border border-[#2a2b30] rounded-2xl p-6 mb-6 hover:border-[#936BDA]/50 transition-colors">
+          <div className="bg-[#1D1E24] border border-[#3A3C47] rounded-2xl p-6 mb-6 hover:border-[#A57BEA]/50 transition-colors">
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-2">
-                <TrendingUp className="h-4 w-4 text-[#936BDA]" />
+                <TrendingUp className="h-4 w-4 text-[#A57BEA]" />
                 <span className="text-xs font-medium text-gray-400 uppercase tracking-wide">
                   Sending Volume
                 </span>
@@ -574,10 +574,10 @@ export default function InfrastructurePage() {
         )}
 
         {/* Footer */}
-        <footer className="mt-10 pt-6 border-t border-[#2a2b30] text-center">
+        <footer className="mt-10 pt-6 border-t border-[#3A3C47] text-center">
           <p className="text-xs text-gray-400 flex items-center justify-center gap-2">
             <span className="flex items-center gap-1.5">
-              <div className="w-1.5 h-1.5 rounded-full bg-[#9CFFAC] animate-pulse" />
+              <div className="w-1.5 h-1.5 rounded-full bg-[#86EFAC] animate-pulse" />
               Live
             </span>
             <span className="text-gray-600">·</span>
