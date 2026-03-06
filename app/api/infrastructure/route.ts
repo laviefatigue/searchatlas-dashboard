@@ -160,7 +160,18 @@ export async function GET() {
       0
     );
 
-    // Provider breakdown
+    // Helper to detect A/B set from tags
+    function getInboxSet(inbox: SenderEmail): 'A' | 'B' | null {
+      const tags = inbox.tags || [];
+      for (const tag of tags) {
+        const name = tag.name.toLowerCase();
+        if (name === 'a set' || name.includes('a set')) return 'A';
+        if (name === 'b set' || name.includes('b set')) return 'B';
+      }
+      return null;
+    }
+
+    // Provider breakdown with set counts
     const providerMap = new Map<string, {
       live_count: number;
       dead_count: number;
@@ -170,6 +181,10 @@ export async function GET() {
       total_sent: number;
       total_replied: number;
       total_bounced: number;
+      daily_capacity: number;
+      warming_count: number;
+      a_set_count: number;
+      b_set_count: number;
     }>();
 
     inboxes.forEach((inbox: SenderEmail) => {
@@ -183,6 +198,10 @@ export async function GET() {
         total_sent: 0,
         total_replied: 0,
         total_bounced: 0,
+        daily_capacity: 0,
+        warming_count: 0,
+        a_set_count: 0,
+        b_set_count: 0,
       };
 
       existing.total_sent += inbox.emails_sent_count || 0;
@@ -192,12 +211,21 @@ export async function GET() {
       const isDead = hasKillTrigger(inbox);
       const isConnected = inbox.status === 'Connected';
 
+      // Count A/B sets (only for live inboxes)
+      if (!isDead) {
+        const set = getInboxSet(inbox);
+        if (set === 'A') existing.a_set_count++;
+        if (set === 'B') existing.b_set_count++;
+      }
+
       if (isDead) {
         existing.dead_count++;
       } else if (isConnected) {
         existing.live_count++;
         existing.connected_count++;
         existing.health_scores.push(calculateHealthScore(inbox));
+        existing.daily_capacity += inbox.daily_limit || 0;
+        if (inbox.warmup_enabled) existing.warming_count++;
       } else {
         existing.disconnected_count++;
       }
@@ -214,7 +242,14 @@ export async function GET() {
         : 0,
       connected_count: data.connected_count,
       disconnected_count: data.disconnected_count,
+      // Set breakdown
+      a_set_count: data.a_set_count,
+      b_set_count: data.b_set_count,
+      // Capacity & warming
+      daily_capacity: data.daily_capacity,
+      warming_count: data.warming_count,
       // Performance metrics
+      total_sent: data.total_sent,
       reply_rate: data.total_sent > 0 ? Math.round((data.total_replied / data.total_sent) * 1000) / 10 : 0,
       bounce_rate: data.total_sent > 0 ? Math.round((data.total_bounced / data.total_sent) * 1000) / 10 : 0,
       replied_count: data.total_replied,

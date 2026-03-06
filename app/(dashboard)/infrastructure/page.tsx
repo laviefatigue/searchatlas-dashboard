@@ -42,6 +42,17 @@ interface ProviderMetrics {
   avg_health_score: number;
   connected_count: number;
   disconnected_count: number;
+  // Set breakdown
+  a_set_count: number;
+  b_set_count: number;
+  // Capacity & warming
+  daily_capacity: number;
+  warming_count: number;
+  // Performance
+  total_sent: number;
+  reply_rate: number;
+  bounce_rate: number;
+  replied_count: number;
 }
 
 interface Infrastructure {
@@ -283,8 +294,6 @@ function ProviderHealthWidget({ providers }: { providers: ProviderMetrics[] }) {
     return 'text-red-400';
   };
 
-  const maxLive = Math.max(...providers.map(p => p.live_count), 1);
-
   return (
     <div className="bg-[#1D1E24] border border-[#3A3C47] rounded-2xl p-6 hover:border-[#A57BEA]/50 transition-colors">
       <div className="flex items-center gap-2 mb-4">
@@ -292,56 +301,85 @@ function ProviderHealthWidget({ providers }: { providers: ProviderMetrics[] }) {
         <span className="text-xs font-medium text-gray-400 uppercase tracking-wide">Provider Health</span>
       </div>
 
-      <div className="space-y-4">
+      <div className="space-y-6">
         {providers.map((provider, index) => {
-          const barWidth = (provider.live_count / maxLive) * 100;
           const healthColor = getHealthColor(provider.avg_health_score);
 
           return (
             <div key={provider.name} style={{ animationDelay: `${index * 100}ms` }}>
-              <div className="flex items-center justify-between mb-2">
+              {/* Provider Header */}
+              <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center gap-2">
                   {getProviderIcon(provider.name)}
-                  <span className="text-sm font-medium text-white">{provider.name}</span>
+                  <span className="text-base font-semibold text-white">{provider.name}</span>
                 </div>
-                <span className={`text-xl font-bold ${healthColor}`}>
-                  {Math.round(provider.avg_health_score)}
-                </span>
-              </div>
-
-              <div className="grid grid-cols-3 gap-2 text-xs mb-2">
-                <div className="flex items-center gap-1.5">
-                  <div className="w-2 h-2 rounded-full bg-[#86EFAC]" />
-                  <span className="text-gray-400">Live</span>
-                  <span className="font-medium text-white ml-auto">{provider.live_count}</span>
-                </div>
-                <div className="flex items-center gap-1.5">
-                  <div className="w-2 h-2 rounded-full bg-red-400" />
-                  <span className="text-gray-400">Dead</span>
-                  <span className="font-medium text-white ml-auto">{provider.dead_count}</span>
-                </div>
-                <div className="flex items-center gap-1.5">
-                  {provider.disconnected_count > 0 ? (
-                    <WifiOff className="h-3 w-3 text-[#F9A8D4]" />
-                  ) : (
-                    <Wifi className="h-3 w-3 text-[#86EFAC]" />
-                  )}
-                  <span className="text-gray-400">Disc.</span>
-                  <span className={`font-medium ml-auto ${provider.disconnected_count > 0 ? 'text-[#F9A8D4]' : 'text-[#86EFAC]'}`}>
-                    {provider.disconnected_count}
+                <div className="flex items-center gap-3">
+                  <span className="text-sm text-gray-400">Health</span>
+                  <span className={`text-2xl font-bold ${healthColor}`}>
+                    {Math.round(provider.avg_health_score)}
                   </span>
                 </div>
               </div>
 
-              <div className="h-2 bg-[#14151A] rounded-full overflow-hidden">
-                <div
-                  className="h-full rounded-full transition-all duration-700"
-                  style={{
-                    width: `${barWidth}%`,
-                    background: 'linear-gradient(90deg, #A57BEA, #C4B5FD)'
-                  }}
-                />
+              {/* Metrics Grid */}
+              <div className="grid grid-cols-4 gap-3 mb-3">
+                {/* Live / Dead / Disc */}
+                <div className="bg-[#14151A] rounded-lg p-3">
+                  <div className="flex items-center gap-1.5 mb-1">
+                    <div className="w-2 h-2 rounded-full bg-[#86EFAC]" />
+                    <span className="text-xs text-gray-400">Live</span>
+                  </div>
+                  <span className="text-lg font-bold text-white">{provider.live_count}</span>
+                </div>
+                <div className="bg-[#14151A] rounded-lg p-3">
+                  <div className="flex items-center gap-1.5 mb-1">
+                    <div className="w-2 h-2 rounded-full bg-red-400" />
+                    <span className="text-xs text-gray-400">Dead</span>
+                  </div>
+                  <span className="text-lg font-bold text-white">{provider.dead_count}</span>
+                </div>
+                <div className="bg-[#14151A] rounded-lg p-3">
+                  <div className="flex items-center gap-1.5 mb-1">
+                    <WifiOff className="h-3 w-3 text-[#F9A8D4]" />
+                    <span className="text-xs text-gray-400">Disc.</span>
+                  </div>
+                  <span className={`text-lg font-bold ${provider.disconnected_count > 0 ? 'text-[#F9A8D4]' : 'text-white'}`}>
+                    {provider.disconnected_count}
+                  </span>
+                </div>
+                <div className="bg-[#14151A] rounded-lg p-3">
+                  <div className="flex items-center gap-1.5 mb-1">
+                    <Zap className="h-3 w-3 text-[#A57BEA]" />
+                    <span className="text-xs text-gray-400">Capacity</span>
+                  </div>
+                  <span className="text-lg font-bold text-white">{provider.daily_capacity.toLocaleString()}</span>
+                </div>
               </div>
+
+              {/* A/B Set Breakdown */}
+              <div className="grid grid-cols-4 gap-3">
+                <div className="bg-[#14151A] rounded-lg p-3">
+                  <div className="text-xs text-gray-400 mb-1">A Set</div>
+                  <span className="text-lg font-bold text-[#86EFAC]">{provider.a_set_count}</span>
+                </div>
+                <div className="bg-[#14151A] rounded-lg p-3">
+                  <div className="text-xs text-gray-400 mb-1">B Set</div>
+                  <span className="text-lg font-bold text-[#93C5FD]">{provider.b_set_count}</span>
+                </div>
+                <div className="bg-[#14151A] rounded-lg p-3">
+                  <div className="text-xs text-gray-400 mb-1">Warming</div>
+                  <span className="text-lg font-bold text-[#F9A8D4]">{provider.warming_count}</span>
+                </div>
+                <div className="bg-[#14151A] rounded-lg p-3">
+                  <div className="text-xs text-gray-400 mb-1">Sent</div>
+                  <span className="text-lg font-bold text-white">{provider.total_sent.toLocaleString()}</span>
+                </div>
+              </div>
+
+              {/* Divider between providers */}
+              {index < providers.length - 1 && (
+                <div className="border-t border-[#3A3C47] mt-6" />
+              )}
             </div>
           );
         })}
