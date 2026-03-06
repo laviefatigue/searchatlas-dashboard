@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { switchWorkspace, getAllSenderEmails } from '@/lib/api/emailbison';
+import { switchWorkspace, getAllSenderEmails, getCampaigns, getCampaignChartStats } from '@/lib/api/emailbison';
 import type { SenderEmail } from '@/lib/types/emailbison';
 
 // Environment-driven workspace configuration
@@ -61,7 +61,7 @@ function categorizeProvider(inbox: SenderEmail): string {
   if (tagNames.some(t => t.includes('google') || t.includes('gmail'))) {
     return 'Google';
   }
-  if (tagNames.some(t => t.includes('microsoft') || t.includes('outlook') || t.includes('entra'))) {
+  if (tagNames.some(t => t.includes('microsoft') || t.includes('outlook') || t.includes('entra') || t.includes('azure'))) {
     return 'Microsoft';
   }
 
@@ -247,18 +247,51 @@ export async function GET() {
       sync_source: 'EmailBison API',
     };
 
-    // Generate volume history (last 10 days estimate based on capacity)
+    // Fetch real volume history from campaign chart stats
+    const now = new Date();
+    const startDate = new Date(now);
+    startDate.setDate(startDate.getDate() - 9);
+    const startDateStr = startDate.toISOString().split('T')[0];
+    const endDateStr = now.toISOString().split('T')[0];
+
+    // Get campaigns and fetch chart stats for active ones
+    let dailySendsMap = new Map<string, number>();
+    try {
+      const { data: campaigns } = await getCampaigns();
+      const activeCampaigns = campaigns.filter(c => c.emails_sent > 0);
+
+      // Fetch chart stats in parallel (limit to first 10 to avoid too many requests)
+      const chartPromises = activeCampaigns.slice(0, 10).map(async (c) => {
+        try {
+          const { data: chartData } = await getCampaignChartStats(c.id, startDateStr, endDateStr);
+          // Find the "Emails sent" series
+          const sentSeries = chartData?.find(s => s.label.toLowerCase().includes('sent'));
+          if (sentSeries?.dates) {
+            for (const [dateStr, count] of sentSeries.dates) {
+              const existing = dailySendsMap.get(dateStr) || 0;
+              dailySendsMap.set(dateStr, existing + count);
+            }
+          }
+        } catch {
+          // Skip failed campaign stats
+        }
+      });
+      await Promise.all(chartPromises);
+    } catch {
+      // Fall back to empty map if campaigns fetch fails
+    }
+
+    // Build volume history with real data where available
     const volumeHistory = {
       snapshots: Array.from({ length: 10 }, (_, i) => {
         const date = new Date();
         date.setDate(date.getDate() - (9 - i));
-        const dayOfWeek = date.getDay();
-        const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
-        const utilization = isWeekend ? 0.5 + Math.random() * 0.2 : 0.7 + Math.random() * 0.2;
+        const dateStr = date.toISOString().split('T')[0];
+        const actualSends = dailySendsMap.get(dateStr) || 0;
 
         return {
-          date: date.toISOString().split('T')[0],
-          emails_sent: Math.round(operationalCapacity * utilization),
+          date: dateStr,
+          emails_sent: actualSends,
           daily_capacity_available: operationalCapacity,
           live_inboxes: liveInboxes.length,
         };
