@@ -21,7 +21,10 @@ export async function GET() {
     const { data: campaigns } = await getCampaigns();
 
     // All campaigns with leads loaded (including drafts)
-    const allCampaignsWithLeads = campaigns.filter(c => c.total_leads > 0);
+    // Include campaigns with leads OR draft campaigns (to show them in table)
+    const allCampaignsWithLeads = campaigns.filter(c => 
+      c.total_leads > 0 || c.status.toLowerCase() === 'draft'
+    );
 
     // Only campaigns that have actually sent emails
     const activeCampaigns = campaigns.filter(c => c.emails_sent > 0);
