@@ -42,7 +42,7 @@ function addFooter(pdf: jsPDF, page: number, totalPages: number, margin: number,
   pdf.setFontSize(7);
   pdf.setTextColor(156, 163, 175);
   pdf.text(
-    'Selery Fulfillment  |  Outbound Analytics Report',
+    'SearchAtlas Fulfillment  |  Outbound Analytics Report',
     margin,
     pageHeight - margin + 1
   );

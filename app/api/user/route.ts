@@ -6,7 +6,7 @@ const SELERY_WORKSPACE_ID = 22;
 
 export async function GET() {
   try {
-    // Always switch to Selery workspace first
+    // Always switch to SearchAtlas workspace first
     await fetch(`${EMAILBISON_API_URL}/api/workspaces/switch-workspace`, {
       method: 'POST',
       headers: {

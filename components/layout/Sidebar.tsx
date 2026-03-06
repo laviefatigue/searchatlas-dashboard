@@ -28,9 +28,14 @@ export function Sidebar() {
 
   return (
     <div className="flex h-screen w-64 flex-col border-r border-sidebar-border bg-sidebar">
-      {/* Selery Logo */}
+      {/* SearchAtlas Logo */}
       <div className="flex h-16 items-center border-b border-sidebar-border px-6">
-        <Image src="/selery-logo.png" alt="Selery" width={140} height={36} className="h-9 w-auto object-contain" priority />
+        <div className="flex items-center gap-2">
+          <div className="w-8 h-8 rounded-lg bg-[#936BDA] flex items-center justify-center">
+            <span className="text-white font-bold text-sm">SA</span>
+          </div>
+          <span className="text-lg font-bold text-white">SearchAtlas</span>
+        </div>
       </div>
 
       {/* Navigation */}
@@ -61,7 +66,7 @@ export function Sidebar() {
       <div className="border-t border-sidebar-border p-4 space-y-4">
         <div className="flex items-center gap-3">
           <Avatar className="h-8 w-8">
-            <AvatarFallback className="bg-selery-cyan text-white text-xs">
+            <AvatarFallback className="bg-[#936BDA] text-white text-xs">
               {user?.name ? getInitials(user.name) : 'U'}
             </AvatarFallback>
           </Avatar>

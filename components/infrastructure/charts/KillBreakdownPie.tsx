@@ -7,11 +7,11 @@ interface KillBreakdownPieProps {
   data: KillBreakdown;
 }
 
-// Selery-themed chart colors
+// SearchAtlas-themed chart colors
 const COLORS = [
-  '#28BFFC', // cyan
-  '#1C2655', // navy
-  '#F9B416', // gold
+  '#936BDA', // cyan
+  '#0F0F11', // navy
+  '#88C2FF', // gold
   '#ef4444', // red
   '#22c55e', // green
 ];

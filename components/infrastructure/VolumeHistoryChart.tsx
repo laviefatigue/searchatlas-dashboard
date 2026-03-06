@@ -20,12 +20,12 @@ export function VolumeHistoryChart({ data }: VolumeHistoryChartProps) {
         <AreaChart data={chartData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
           <defs>
             <linearGradient id="gradientSent" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="#28BFFC" stopOpacity={0.4} />
-              <stop offset="100%" stopColor="#28BFFC" stopOpacity={0.02} />
+              <stop offset="0%" stopColor="#936BDA" stopOpacity={0.4} />
+              <stop offset="100%" stopColor="#936BDA" stopOpacity={0.02} />
             </linearGradient>
             <linearGradient id="gradientCapacity" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="#F9B416" stopOpacity={0.4} />
-              <stop offset="100%" stopColor="#F9B416" stopOpacity={0.02} />
+              <stop offset="0%" stopColor="#88C2FF" stopOpacity={0.4} />
+              <stop offset="100%" stopColor="#88C2FF" stopOpacity={0.02} />
             </linearGradient>
           </defs>
           <CartesianGrid
@@ -54,8 +54,8 @@ export function VolumeHistoryChart({ data }: VolumeHistoryChartProps) {
               borderRadius: '12px',
               boxShadow: '0 4px 16px rgba(0, 0, 0, 0.1)',
             }}
-            labelStyle={{ color: '#1C2655', fontWeight: 500, marginBottom: 4 }}
-            itemStyle={{ color: '#28BFFC' }}
+            labelStyle={{ color: '#0F0F11', fontWeight: 500, marginBottom: 4 }}
+            itemStyle={{ color: '#936BDA' }}
           />
           <Legend
             wrapperStyle={{ fontSize: '12px', paddingTop: '12px' }}
@@ -64,7 +64,7 @@ export function VolumeHistoryChart({ data }: VolumeHistoryChartProps) {
           <Area
             type="monotone"
             dataKey="Emails Sent"
-            stroke="#28BFFC"
+            stroke="#936BDA"
             strokeWidth={2}
             fillOpacity={1}
             fill="url(#gradientSent)"
@@ -72,7 +72,7 @@ export function VolumeHistoryChart({ data }: VolumeHistoryChartProps) {
           <Area
             type="monotone"
             dataKey="Capacity"
-            stroke="#F9B416"
+            stroke="#88C2FF"
             strokeWidth={2}
             fillOpacity={1}
             fill="url(#gradientCapacity)"

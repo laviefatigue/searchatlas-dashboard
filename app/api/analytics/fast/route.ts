@@ -117,7 +117,7 @@ export async function GET() {
       );
 
     const report: FastAnalytics = {
-      workspaceName: 'Selery',
+      workspaceName: 'SearchAtlas',
       heroMetrics: {
         totalCampaigns: campaigns.length,
         activeCampaigns: activeCampaigns.length,

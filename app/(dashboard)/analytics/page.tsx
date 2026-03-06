@@ -53,7 +53,7 @@ const toTitleCase = (s: string) => s.replace(/\b\w/g, c => c.toUpperCase());
 
 function SentimentBadge({ sentiment }: { sentiment: ReplySentiment }) {
   const config = {
-    positive: { label: 'Positive', bg: 'bg-selery-gold/10 dark:bg-selery-gold/20', text: 'text-selery-gold dark:text-selery-gold', icon: ThumbsUp },
+    positive: { label: 'Positive', bg: 'bg-searchatlas-cyan/10 dark:bg-searchatlas-cyan/20', text: 'text-searchatlas-cyan dark:text-searchatlas-cyan', icon: ThumbsUp },
     negative: { label: 'Negative', bg: 'bg-red-100 dark:bg-red-950/30', text: 'text-red-700 dark:text-red-400', icon: ThumbsDown },
     neutral: { label: 'Neutral', bg: 'bg-gray-100 dark:bg-gray-800', text: 'text-gray-700 dark:text-gray-400', icon: Minus },
   }[sentiment];
@@ -68,10 +68,10 @@ function SentimentBadge({ sentiment }: { sentiment: ReplySentiment }) {
 
 function IntentBadge({ intent }: { intent: string }) {
   const colors: Record<string, string> = {
-    'interested': 'bg-selery-gold/10 text-selery-gold dark:bg-selery-gold/20 dark:text-selery-gold',
+    'interested': 'bg-searchatlas-cyan/10 text-searchatlas-cyan dark:bg-searchatlas-cyan/20 dark:text-searchatlas-cyan',
     'not-interested': 'bg-red-100 text-red-700 dark:bg-red-950/30 dark:text-red-400',
-    'needs-info': 'bg-selery-cyan/10 text-selery-cyan dark:bg-selery-cyan/20 dark:text-selery-cyan',
-    'referral': 'bg-selery-navy/10 text-selery-navy dark:bg-selery-navy/20 dark:text-selery-cyan',
+    'needs-info': 'bg-searchatlas-purple/10 text-searchatlas-purple dark:bg-searchatlas-purple/20 dark:text-searchatlas-purple',
+    'referral': 'bg-searchatlas-dark/10 text-searchatlas-dark dark:bg-searchatlas-dark/20 dark:text-searchatlas-purple',
     'out-of-office': 'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400',
     'unsubscribe': 'bg-red-100 text-red-700 dark:bg-red-950/30 dark:text-red-400',
   };
@@ -84,7 +84,7 @@ function IntentBadge({ intent }: { intent: string }) {
 
 function HorizontalBarChart({
   data,
-  colorClass = 'bg-selery-cyan',
+  colorClass = 'bg-searchatlas-purple',
   showInterested = false,
 }: {
   data: DemographicDistribution[];
@@ -102,7 +102,7 @@ function HorizontalBarChart({
             </span>
             <div className="flex items-center gap-3">
               {showInterested && item.interestedCount > 0 && (
-                <span className="text-xs text-selery-gold font-medium">
+                <span className="text-xs text-searchatlas-cyan font-medium">
                   {item.interestedCount} interested
                 </span>
               )}
@@ -131,7 +131,7 @@ function SentimentOverview({
   total: number;
 }) {
   const items = [
-    { key: 'positive' as const, label: 'Positive', color: 'bg-selery-gold', count: breakdown.positive },
+    { key: 'positive' as const, label: 'Positive', color: 'bg-searchatlas-cyan', count: breakdown.positive },
     { key: 'neutral' as const, label: 'Neutral', color: 'bg-gray-400', count: breakdown.neutral },
     { key: 'negative' as const, label: 'Negative', color: 'bg-red-500', count: breakdown.negative },
   ];
@@ -156,9 +156,9 @@ function SentimentOverview({
 function ConversionFunnel({ funnel }: { funnel: FastAnalytics['funnel'] }) {
   const steps = [
     { label: 'Total Leads', value: funnel.totalLeads, color: 'from-gray-500 to-gray-600' },
-    { label: 'Contacted', value: funnel.contacted, color: 'from-selery-cyan to-selery-cyan' },
-    { label: 'Replied', value: funnel.replied, color: 'from-selery-navy to-selery-navy' },
-    { label: 'Interested', value: funnel.interested, color: 'from-selery-gold to-selery-gold' },
+    { label: 'Contacted', value: funnel.contacted, color: 'from-searchatlas-purple to-searchatlas-purple' },
+    { label: 'Replied', value: funnel.replied, color: 'from-searchatlas-dark to-searchatlas-dark' },
+    { label: 'Interested', value: funnel.interested, color: 'from-searchatlas-cyan to-searchatlas-cyan' },
   ];
 
   return (
@@ -245,7 +245,7 @@ function CampaignComparison({ campaigns }: { campaigns: CampaignComparisonItem[]
 
   return (
     <div className="rounded-lg border bg-card shadow-sm overflow-hidden">
-      <div className="p-4 bg-gradient-to-r from-selery-cyan/5 to-selery-navy/5 dark:from-selery-cyan/10 dark:to-selery-navy/10 border-b">
+      <div className="p-4 bg-gradient-to-r from-searchatlas-purple/5 to-searchatlas-dark/5 dark:from-searchatlas-purple/10 dark:to-searchatlas-dark/10 border-b">
         <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-2">
           <BarChart3 className="h-4 w-4" />
           Campaign Comparison
@@ -278,7 +278,7 @@ function CampaignComparison({ campaigns }: { campaigns: CampaignComparisonItem[]
                   </td>
                   <td className="py-3 px-4">
                     <div className="flex items-center gap-2">
-                      <span className={`w-2 h-2 rounded-full flex-shrink-0 ${c.status === 'Active' ? 'bg-selery-gold' : 'bg-gray-400'}`} />
+                      <span className={`w-2 h-2 rounded-full flex-shrink-0 ${c.status === 'Active' ? 'bg-searchatlas-cyan' : 'bg-gray-400'}`} />
                       <span className="font-medium text-foreground truncate max-w-[200px]" title={c.name}>
                         {c.name.replace(/^Cycle \d+:\s*/, '').replace(/^Campaign \d+,\s*/, '')}
                       </span>
@@ -290,7 +290,7 @@ function CampaignComparison({ campaigns }: { campaigns: CampaignComparisonItem[]
                     <span className="font-medium">{c.replyRate}%</span>
                   </td>
                   <td className="py-3 px-4 text-right">
-                    <span className={`font-bold ${c.interestRate === bestInterest && c.interestRate > 0 ? 'text-selery-gold' : ''}`}>
+                    <span className={`font-bold ${c.interestRate === bestInterest && c.interestRate > 0 ? 'text-searchatlas-cyan' : ''}`}>
                       {c.interestRate}%
                     </span>
                     {c.interested > 0 && (
@@ -306,7 +306,7 @@ function CampaignComparison({ campaigns }: { campaigns: CampaignComparisonItem[]
                     <div className="flex items-center gap-2 justify-end">
                       <div className="w-16 h-1.5 bg-muted rounded-full overflow-hidden">
                         <div
-                          className="h-full bg-selery-cyan rounded-full"
+                          className="h-full bg-searchatlas-purple rounded-full"
                           style={{ width: `${Math.min(c.completionPct, 100)}%` }}
                         />
                       </div>
@@ -334,22 +334,22 @@ function CampaignComparison({ campaigns }: { campaigns: CampaignComparisonItem[]
                           </div>
                           <div className="bg-card rounded-xl p-4 border">
                             <p className="text-xs text-muted-foreground mb-1">Interested</p>
-                            <p className="font-bold text-xl text-selery-gold">{c.interested.toLocaleString()}</p>
+                            <p className="font-bold text-xl text-searchatlas-cyan">{c.interested.toLocaleString()}</p>
                           </div>
                         </div>
 
                         {/* Email Sequence */}
                         <div className="bg-card rounded-lg border overflow-hidden">
-                          <div className="bg-gradient-to-r from-selery-cyan/5 to-selery-navy/5 dark:from-selery-cyan/10 dark:to-selery-navy/10 px-4 py-3 border-b">
+                          <div className="bg-gradient-to-r from-searchatlas-purple/5 to-searchatlas-dark/5 dark:from-searchatlas-purple/10 dark:to-searchatlas-dark/10 px-4 py-3 border-b">
                             <div className="flex items-center gap-2">
-                              <Mail className="h-4 w-4 text-selery-cyan" />
-                              <p className="text-sm font-semibold text-selery-navy dark:text-selery-cyan">Email Sequence</p>
+                              <Mail className="h-4 w-4 text-searchatlas-purple" />
+                              <p className="text-sm font-semibold text-searchatlas-dark dark:text-searchatlas-purple">Email Sequence</p>
                             </div>
                           </div>
                           <div className="p-4">
                             {seqLoading === c.id ? (
                               <div className="flex items-center justify-center py-8">
-                                <Loader2 className="h-6 w-6 animate-spin text-selery-cyan" />
+                                <Loader2 className="h-6 w-6 animate-spin text-searchatlas-purple" />
                                 <span className="ml-2 text-sm text-muted-foreground">Loading...</span>
                               </div>
                             ) : sequenceData[c.id] && sequenceData[c.id].length > 0 ? (
@@ -358,24 +358,24 @@ function CampaignComparison({ campaigns }: { campaigns: CampaignComparisonItem[]
                                   <div key={step.id || idx} className="border rounded-lg overflow-hidden">
                                     <div className="bg-muted/50 px-4 py-2 flex items-center justify-between">
                                       <div className="flex items-center gap-2">
-                                        <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-selery-cyan/10 dark:bg-selery-cyan/20 text-selery-navy dark:text-selery-cyan text-xs font-bold">
+                                        <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-searchatlas-purple/10 dark:bg-searchatlas-purple/20 text-searchatlas-dark dark:text-searchatlas-purple text-xs font-bold">
                                           {idx + 1}
                                         </span>
                                         <span className="text-sm font-medium">Step {idx + 1}</span>
                                         {step.is_variant && (
-                                          <span className="text-xs bg-selery-navy/10 dark:bg-selery-navy/20 text-selery-navy dark:text-selery-cyan px-2 py-0.5 rounded">
+                                          <span className="text-xs bg-searchatlas-dark/10 dark:bg-searchatlas-dark/20 text-searchatlas-dark dark:text-searchatlas-purple px-2 py-0.5 rounded">
                                             Variant {step.variant_letter || ''}
                                           </span>
                                         )}
                                         {step.is_thread_reply && (
-                                          <span className="text-xs bg-selery-cyan/10 dark:bg-selery-cyan/20 text-selery-cyan dark:text-selery-cyan px-2 py-0.5 rounded">
+                                          <span className="text-xs bg-searchatlas-purple/10 dark:bg-searchatlas-purple/20 text-searchatlas-purple dark:text-searchatlas-purple px-2 py-0.5 rounded">
                                             Thread Reply
                                           </span>
                                         )}
                                       </div>
                                       <div className="flex items-center gap-3 text-xs text-muted-foreground">
                                         {step.sent !== undefined && <span>{step.sent?.toLocaleString()} sent</span>}
-                                        {step.reply_rate !== undefined && <span className="font-medium text-selery-cyan">{step.reply_rate}% reply</span>}
+                                        {step.reply_rate !== undefined && <span className="font-medium text-searchatlas-purple">{step.reply_rate}% reply</span>}
                                         {(step.delay_days || step.delay_hours) && (
                                           <span>{step.delay_days ? `${step.delay_days}d` : ''}{step.delay_hours ? `${step.delay_hours}h` : ''} delay</span>
                                         )}
@@ -400,10 +400,10 @@ function CampaignComparison({ campaigns }: { campaigns: CampaignComparisonItem[]
                                             <div><span className="text-muted-foreground">Sent: </span><span className="font-medium">{step.sent?.toLocaleString()}</span></div>
                                           )}
                                           {step.unique_replies !== undefined && (
-                                            <div><span className="text-muted-foreground">Replies: </span><span className="font-medium text-selery-cyan">{step.unique_replies}</span></div>
+                                            <div><span className="text-muted-foreground">Replies: </span><span className="font-medium text-searchatlas-purple">{step.unique_replies}</span></div>
                                           )}
                                           {step.interested !== undefined && (
-                                            <div><span className="text-muted-foreground">Interested: </span><span className="font-medium text-selery-gold">{step.interested}</span></div>
+                                            <div><span className="text-muted-foreground">Interested: </span><span className="font-medium text-searchatlas-cyan">{step.interested}</span></div>
                                           )}
                                           {step.bounced !== undefined && (
                                             <div><span className="text-muted-foreground">Bounced: </span><span className="font-medium text-red-500">{step.bounced}</span></div>
@@ -424,15 +424,15 @@ function CampaignComparison({ campaigns }: { campaigns: CampaignComparisonItem[]
                         </div>
 
                         {/* Performance Summary */}
-                        <div className="bg-gradient-to-r from-selery-cyan/5 to-selery-navy/5 dark:from-selery-cyan/10 dark:to-selery-navy/10 rounded-lg p-4 border border-selery-cyan/10">
+                        <div className="bg-gradient-to-r from-searchatlas-purple/5 to-searchatlas-dark/5 dark:from-searchatlas-purple/10 dark:to-searchatlas-dark/10 rounded-lg p-4 border border-searchatlas-purple/10">
                           <div className="flex items-center gap-2 mb-2">
-                            <Target className="h-4 w-4 text-selery-cyan" />
-                            <p className="text-xs text-selery-cyan uppercase tracking-wider font-semibold">Performance Summary</p>
+                            <Target className="h-4 w-4 text-searchatlas-purple" />
+                            <p className="text-xs text-searchatlas-purple uppercase tracking-wider font-semibold">Performance Summary</p>
                           </div>
                           <p className="text-sm text-muted-foreground">
                             Reached <span className="font-semibold text-foreground">{c.leadsContacted.toLocaleString()}</span> leads
                             {' '}&rarr; <span className="font-semibold text-foreground">{c.uniqueReplies.toLocaleString()}</span> replied ({c.replyRate}%)
-                            {' '}&rarr; <span className="font-semibold text-selery-gold">{c.interested.toLocaleString()}</span> interested ({c.interestRate}%)
+                            {' '}&rarr; <span className="font-semibold text-searchatlas-cyan">{c.interested.toLocaleString()}</span> interested ({c.interestRate}%)
                           </p>
                         </div>
                       </div>
@@ -469,19 +469,19 @@ function SequenceStepAnalysis({ steps }: { steps: SequenceStepPerformance[] }) {
                 <span className="text-xs text-muted-foreground">{step.totalSent.toLocaleString()} sent</span>
                 <span className="text-xs font-medium">{step.replyRate}% reply</span>
                 {step.totalInterested > 0 && (
-                  <span className="text-xs font-medium text-selery-gold">{step.interestRate}% interest ({step.totalInterested})</span>
+                  <span className="text-xs font-medium text-searchatlas-cyan">{step.interestRate}% interest ({step.totalInterested})</span>
                 )}
               </div>
             </div>
             <div className="h-3 bg-muted rounded-full overflow-hidden flex">
               <div
-                className="h-full bg-selery-cyan rounded-l-full transition-all duration-500"
+                className="h-full bg-searchatlas-purple rounded-l-full transition-all duration-500"
                 style={{ width: `${(step.replyRate / maxReplyRate) * 100}%` }}
                 title={`${step.replyRate}% reply rate`}
               />
               {step.interestRate > 0 && (
                 <div
-                  className="h-full bg-selery-gold transition-all duration-500"
+                  className="h-full bg-searchatlas-cyan transition-all duration-500"
                   style={{ width: `${(step.interestRate / maxReplyRate) * 100}%` }}
                   title={`${step.interestRate}% interest rate`}
                 />
@@ -491,8 +491,8 @@ function SequenceStepAnalysis({ steps }: { steps: SequenceStepPerformance[] }) {
         ))}
       </div>
       <div className="flex items-center gap-5 mt-5 text-xs text-muted-foreground">
-        <div className="flex items-center gap-1"><div className="w-3 h-3 bg-selery-cyan rounded" /> Reply rate</div>
-        <div className="flex items-center gap-1"><div className="w-3 h-3 bg-selery-gold rounded" /> Interest rate</div>
+        <div className="flex items-center gap-1"><div className="w-3 h-3 bg-searchatlas-purple rounded" /> Reply rate</div>
+        <div className="flex items-center gap-1"><div className="w-3 h-3 bg-searchatlas-cyan rounded" /> Interest rate</div>
       </div>
     </div>
   );
@@ -571,7 +571,7 @@ function PipelineCompanies({
   return (
     <div className="rounded-lg border bg-card shadow-sm p-6">
       <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-5 flex items-center gap-2">
-        <Building2 className="h-4 w-4 text-selery-gold" />
+        <Building2 className="h-4 w-4 text-searchatlas-cyan" />
         Pipeline Companies
         <span className="text-xs font-normal">({companies.length})</span>
         {enrichLoading && <Loader2 className="h-3 w-3 animate-spin text-muted-foreground" />}
@@ -584,14 +584,14 @@ function PipelineCompanies({
           const enrichData = latestReply?.email ? enriched[latestReply.email] : null;
           const hasEnrichment = enrichData && (enrichData.linkedinUrl || enrichData.phone || enrichData.location);
           return (
-            <div key={c.label} className="p-3 rounded-lg bg-selery-gold/5 dark:bg-selery-gold/10 border border-selery-gold/20 dark:border-selery-gold/20">
+            <div key={c.label} className="p-3 rounded-lg bg-searchatlas-cyan/5 dark:bg-searchatlas-cyan/10 border border-searchatlas-cyan/20 dark:border-searchatlas-cyan/20">
               <div className="flex items-center justify-between mb-1">
                 {domain ? (
-                  <a href={`https://${domain}`} target="_blank" rel="noopener noreferrer" className="font-medium text-sm truncate max-w-[180px] text-selery-cyan hover:underline" title={c.label}>{c.label}</a>
+                  <a href={`https://${domain}`} target="_blank" rel="noopener noreferrer" className="font-medium text-sm truncate max-w-[180px] text-searchatlas-purple hover:underline" title={c.label}>{c.label}</a>
                 ) : (
                   <span className="font-medium text-sm truncate max-w-[180px]" title={c.label}>{c.label}</span>
                 )}
-                <span className="text-xs bg-selery-gold/10 dark:bg-selery-gold/20 text-selery-gold dark:text-selery-gold px-1.5 py-0.5 rounded font-medium">
+                <span className="text-xs bg-searchatlas-cyan/10 dark:bg-searchatlas-cyan/20 text-searchatlas-cyan dark:text-searchatlas-cyan px-1.5 py-0.5 rounded font-medium">
                   {c.interestedCount} interested
                 </span>
               </div>
@@ -608,13 +608,13 @@ function PipelineCompanies({
               )}
               {/* Enriched contact details from AI-Ark */}
               {hasEnrichment && (
-                <div className="mt-2 pt-2 border-t border-selery-gold/10 flex flex-wrap items-center gap-2">
+                <div className="mt-2 pt-2 border-t border-searchatlas-cyan/10 flex flex-wrap items-center gap-2">
                   {enrichData.linkedinUrl && (
                     <a
                       href={enrichData.linkedinUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1 text-[11px] text-selery-cyan hover:underline"
+                      className="inline-flex items-center gap-1 text-[11px] text-searchatlas-purple hover:underline"
                     >
                       <Linkedin className="h-3 w-3" />
                       LinkedIn
@@ -623,7 +623,7 @@ function PipelineCompanies({
                   {enrichData.phone && (
                     <a
                       href={`tel:${enrichData.phone}`}
-                      className="inline-flex items-center gap-1 text-[11px] text-selery-cyan hover:underline"
+                      className="inline-flex items-center gap-1 text-[11px] text-searchatlas-purple hover:underline"
                     >
                       <Phone className="h-3 w-3" />
                       {enrichData.phone}
@@ -680,10 +680,10 @@ function LeadDeepDive({
 
   return (
     <div className="rounded-lg border bg-card shadow-sm overflow-hidden">
-      <div className="p-4 bg-gradient-to-r from-selery-cyan/5 to-selery-navy/5 dark:from-selery-cyan/10 dark:to-selery-navy/10 border-b space-y-3">
+      <div className="p-4 bg-gradient-to-r from-searchatlas-purple/5 to-searchatlas-dark/5 dark:from-searchatlas-purple/10 dark:to-searchatlas-dark/10 border-b space-y-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 bg-selery-navy rounded-lg flex items-center justify-center">
+            <div className="w-8 h-8 bg-searchatlas-dark rounded-lg flex items-center justify-center">
               <Users className="h-4 w-4 text-white" />
             </div>
             <h3 className="text-lg font-bold">
@@ -695,7 +695,7 @@ function LeadDeepDive({
             <button
               onClick={() => setShowFilters(!showFilters)}
               className={`flex items-center gap-1 px-3 py-1.5 text-xs font-medium rounded-lg border transition-colors ${
-                showFilters ? 'bg-selery-cyan text-white border-selery-cyan' : 'bg-white dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700'
+                showFilters ? 'bg-searchatlas-purple text-white border-searchatlas-purple' : 'bg-white dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700'
               }`}
             >
               <Filter className="h-3 w-3" />
@@ -708,7 +708,7 @@ function LeadDeepDive({
                 placeholder="Search..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-48 h-9 pl-9 pr-3 text-sm rounded-lg border bg-background focus:outline-none focus:ring-2 focus:ring-selery-cyan/20"
+                className="w-48 h-9 pl-9 pr-3 text-sm rounded-lg border bg-background focus:outline-none focus:ring-2 focus:ring-searchatlas-purple/20"
               />
             </div>
           </div>
@@ -764,7 +764,7 @@ function LeadDeepDive({
                   </td>
                   <td className="py-3 px-4">
                     <p className="font-medium text-foreground">{reply.name}</p>
-                    {reply.title && <p className="text-xs text-selery-cyan">{reply.title}</p>}
+                    {reply.title && <p className="text-xs text-searchatlas-purple">{reply.title}</p>}
                   </td>
                   <td className="py-3 px-4">
                     <p className="font-medium">{reply.company}</p>
@@ -794,12 +794,12 @@ function LeadDeepDive({
                         </div>
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
                           {reply.buyingSignals.length > 0 && (
-                            <div className="bg-selery-gold/5 dark:bg-selery-gold/10 rounded-lg p-3 border border-selery-gold/20">
+                            <div className="bg-searchatlas-cyan/5 dark:bg-searchatlas-cyan/10 rounded-lg p-3 border border-searchatlas-cyan/20">
                               <div className="flex items-center gap-1 mb-2">
-                                <Sparkles className="h-3 w-3 text-selery-gold" />
-                                <p className="text-xs font-semibold text-selery-gold dark:text-selery-gold uppercase">Buying Signals</p>
+                                <Sparkles className="h-3 w-3 text-searchatlas-cyan" />
+                                <p className="text-xs font-semibold text-searchatlas-cyan dark:text-searchatlas-cyan uppercase">Buying Signals</p>
                               </div>
-                              <ul className="space-y-1">{reply.buyingSignals.map((s, i) => <li key={i} className="text-xs text-selery-gold">{s}</li>)}</ul>
+                              <ul className="space-y-1">{reply.buyingSignals.map((s, i) => <li key={i} className="text-xs text-searchatlas-cyan">{s}</li>)}</ul>
                             </div>
                           )}
                           {reply.objections.length > 0 && (
@@ -812,12 +812,12 @@ function LeadDeepDive({
                             </div>
                           )}
                           {reply.themes.length > 0 && (
-                            <div className="bg-selery-cyan/5 dark:bg-selery-cyan/10 rounded-lg p-3 border border-selery-cyan/20">
+                            <div className="bg-searchatlas-purple/5 dark:bg-searchatlas-purple/10 rounded-lg p-3 border border-searchatlas-purple/20">
                               <div className="flex items-center gap-1 mb-2">
-                                <MessageSquare className="h-3 w-3 text-selery-cyan" />
-                                <p className="text-xs font-semibold text-selery-navy dark:text-selery-cyan uppercase">Themes</p>
+                                <MessageSquare className="h-3 w-3 text-searchatlas-purple" />
+                                <p className="text-xs font-semibold text-searchatlas-dark dark:text-searchatlas-purple uppercase">Themes</p>
                               </div>
-                              <div className="flex flex-wrap gap-1">{reply.themes.map((t, i) => <span key={i} className="text-xs bg-selery-cyan/10 dark:bg-selery-cyan/20 text-selery-navy dark:text-selery-cyan px-2 py-0.5 rounded">{t}</span>)}</div>
+                              <div className="flex flex-wrap gap-1">{reply.themes.map((t, i) => <span key={i} className="text-xs bg-searchatlas-purple/10 dark:bg-searchatlas-purple/20 text-searchatlas-dark dark:text-searchatlas-purple px-2 py-0.5 rounded">{t}</span>)}</div>
                             </div>
                           )}
                         </div>
@@ -825,7 +825,7 @@ function LeadDeepDive({
                           <span>Email: {reply.email}</span>
                           <span>Seniority: {reply.seniority}</span>
                           <span>Industry: {reply.industry}</span>
-                          {reply.isInterested && <span className="text-selery-gold font-medium">Marked Interested</span>}
+                          {reply.isInterested && <span className="text-searchatlas-cyan font-medium">Marked Interested</span>}
                         </div>
                       </div>
                     </td>
@@ -1058,9 +1058,9 @@ export default function AnalyticsPage() {
     setExporting(true);
     try {
       const date = new Date().toISOString().split('T')[0];
-      await exportPageToPDF(contentRef.current, `Selery-Analytics-Report-${date}.pdf`, {
+      await exportPageToPDF(contentRef.current, `SearchAtlas-Analytics-Report-${date}.pdf`, {
         title: 'Response Analytics',
-        subtitle: fastData?.workspaceName || 'Selery Fulfillment',
+        subtitle: fastData?.workspaceName || 'SearchAtlas Fulfillment',
       });
     } finally {
       setExporting(false);
@@ -1081,7 +1081,7 @@ export default function AnalyticsPage() {
       }));
     const cycleSuffix = activeCycle !== null ? `-Cycle${activeCycle}` : '';
     const date = new Date().toISOString().split('T')[0];
-    exportToCSV(rows, `Selery-Analyzed-Replies${cycleSuffix}-${date}.csv`);
+    exportToCSV(rows, `SearchAtlas-Analyzed-Replies${cycleSuffix}-${date}.csv`);
   }, [filteredReport, activeCycle]);
 
   // Full loading state (only if Phase 1 hasn't loaded yet)
@@ -1115,11 +1115,11 @@ export default function AnalyticsPage() {
       {/* Export Buttons */}
       <div className="flex items-center justify-end gap-3 hide-on-export">
         <button onClick={handleExportCSV} disabled={!filteredReport}
-          className="inline-flex items-center gap-2 px-4 py-2.5 text-sm font-medium rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 text-selery-navy dark:text-white transition-colors disabled:opacity-50 shadow-sm">
-          <FileSpreadsheet className="h-4 w-4 text-selery-cyan" /> Download CSV
+          className="inline-flex items-center gap-2 px-4 py-2.5 text-sm font-medium rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 text-searchatlas-dark dark:text-white transition-colors disabled:opacity-50 shadow-sm">
+          <FileSpreadsheet className="h-4 w-4 text-searchatlas-purple" /> Download CSV
         </button>
         <button onClick={handleExportPDF} disabled={exporting}
-          className="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-semibold rounded-xl bg-selery-cyan hover:bg-selery-cyan/90 text-white transition-colors disabled:opacity-50 shadow-sm">
+          className="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-semibold rounded-xl bg-searchatlas-purple hover:bg-searchatlas-purple/90 text-white transition-colors disabled:opacity-50 shadow-sm">
           {exporting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Download className="h-4 w-4" />}
           {exporting ? 'Generating...' : 'Export PDF'}
         </button>
@@ -1134,8 +1134,8 @@ export default function AnalyticsPage() {
               onClick={() => setActiveCycle(null)}
               className={`px-5 py-2.5 text-sm font-semibold rounded-xl border-2 transition-all whitespace-nowrap ${
                 activeCycle === null
-                  ? 'bg-selery-cyan text-white border-selery-cyan shadow-lg shadow-selery-cyan/20'
-                  : 'bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 border-gray-200 dark:border-gray-700 text-selery-navy dark:text-white'
+                  ? 'bg-searchatlas-purple text-white border-searchatlas-purple shadow-lg shadow-searchatlas-purple/20'
+                  : 'bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 border-gray-200 dark:border-gray-700 text-searchatlas-dark dark:text-white'
               }`}
             >
               All Cycles
@@ -1146,8 +1146,8 @@ export default function AnalyticsPage() {
                 onClick={() => setActiveCycle(cycle)}
                 className={`px-5 py-2.5 text-sm font-semibold rounded-xl border-2 transition-all whitespace-nowrap ${
                   activeCycle === cycle
-                    ? 'bg-selery-cyan text-white border-selery-cyan shadow-lg shadow-selery-cyan/20'
-                    : 'bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 border-gray-200 dark:border-gray-700 text-selery-navy dark:text-white'
+                    ? 'bg-searchatlas-purple text-white border-searchatlas-purple shadow-lg shadow-searchatlas-purple/20'
+                    : 'bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 border-gray-200 dark:border-gray-700 text-searchatlas-dark dark:text-white'
                 }`}
               >
                 Cycle {cycle}
@@ -1160,55 +1160,55 @@ export default function AnalyticsPage() {
         {hero && (
           <div className="bg-white dark:bg-gray-900 rounded-3xl p-6 shadow-lg border border-gray-100 dark:border-gray-800">
             <div className="flex items-center gap-5 mb-8">
-              <img src="/selery-logo.png" alt="Selery" className="h-12 object-contain" />
+              <img src="/selery-logo.png" alt="SearchAtlas" className="h-12 object-contain" />
               <div className="h-10 w-px bg-gray-200 dark:bg-gray-700" />
               <div>
-                <span className="text-selery-cyan font-semibold text-sm uppercase tracking-wider">OUTBOUND ANALYTICS</span>
-                <h1 className="text-3xl font-bold text-selery-navy dark:text-white">{activeCycle !== null ? `Cycle ${activeCycle}` : 'All Cycles'}</h1>
+                <span className="text-searchatlas-purple font-semibold text-sm uppercase tracking-wider">OUTBOUND ANALYTICS</span>
+                <h1 className="text-3xl font-bold text-searchatlas-dark dark:text-white">{activeCycle !== null ? `Cycle ${activeCycle}` : 'All Cycles'}</h1>
               </div>
             </div>
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-5">
-              <div className="bg-gray-50 dark:bg-gray-800 rounded-2xl p-5 border border-gray-100 dark:border-gray-700 hover:border-selery-cyan/50 transition-colors">
+              <div className="bg-gray-50 dark:bg-gray-800 rounded-2xl p-5 border border-gray-100 dark:border-gray-700 hover:border-searchatlas-purple/50 transition-colors">
                 <div className="flex items-center gap-2 mb-3">
-                  <BarChart3 className="h-4 w-4 text-selery-cyan" />
+                  <BarChart3 className="h-4 w-4 text-searchatlas-purple" />
                   <span className="text-gray-500 dark:text-gray-400 text-xs font-medium uppercase">Campaigns</span>
                 </div>
-                <p className="text-3xl font-bold text-selery-navy dark:text-white">{hero.activeCampaigns}</p>
+                <p className="text-3xl font-bold text-searchatlas-dark dark:text-white">{hero.activeCampaigns}</p>
               </div>
-              <div className="bg-gray-50 dark:bg-gray-800 rounded-2xl p-5 border border-gray-100 dark:border-gray-700 hover:border-selery-cyan/50 transition-colors">
+              <div className="bg-gray-50 dark:bg-gray-800 rounded-2xl p-5 border border-gray-100 dark:border-gray-700 hover:border-searchatlas-purple/50 transition-colors">
                 <div className="flex items-center gap-2 mb-3">
-                  <Mail className="h-4 w-4 text-selery-cyan" />
+                  <Mail className="h-4 w-4 text-searchatlas-purple" />
                   <span className="text-gray-500 dark:text-gray-400 text-xs font-medium uppercase">Emails Sent</span>
                 </div>
-                <p className="text-3xl font-bold text-selery-navy dark:text-white">{hero.emailsSent.toLocaleString()}</p>
+                <p className="text-3xl font-bold text-searchatlas-dark dark:text-white">{hero.emailsSent.toLocaleString()}</p>
               </div>
-              <div className="bg-gray-50 dark:bg-gray-800 rounded-2xl p-5 border border-gray-100 dark:border-gray-700 hover:border-selery-cyan/50 transition-colors">
+              <div className="bg-gray-50 dark:bg-gray-800 rounded-2xl p-5 border border-gray-100 dark:border-gray-700 hover:border-searchatlas-purple/50 transition-colors">
                 <div className="flex items-center gap-2 mb-3">
-                  <Users className="h-4 w-4 text-selery-cyan" />
+                  <Users className="h-4 w-4 text-searchatlas-purple" />
                   <span className="text-gray-500 dark:text-gray-400 text-xs font-medium uppercase">Contacted</span>
                 </div>
-                <p className="text-3xl font-bold text-selery-navy dark:text-white">{hero.leadsContacted.toLocaleString()}</p>
+                <p className="text-3xl font-bold text-searchatlas-dark dark:text-white">{hero.leadsContacted.toLocaleString()}</p>
               </div>
-              <div className="bg-gray-50 dark:bg-gray-800 rounded-2xl p-5 border border-gray-100 dark:border-gray-700 hover:border-selery-cyan/50 transition-colors">
+              <div className="bg-gray-50 dark:bg-gray-800 rounded-2xl p-5 border border-gray-100 dark:border-gray-700 hover:border-searchatlas-purple/50 transition-colors">
                 <div className="flex items-center gap-2 mb-3">
-                  <MessageSquare className="h-4 w-4 text-selery-cyan" />
+                  <MessageSquare className="h-4 w-4 text-searchatlas-purple" />
                   <span className="text-gray-500 dark:text-gray-400 text-xs font-medium uppercase">Reply Rate</span>
                 </div>
-                <p className="text-3xl font-bold text-selery-navy dark:text-white">{hero.avgReplyRate}%</p>
+                <p className="text-3xl font-bold text-searchatlas-dark dark:text-white">{hero.avgReplyRate}%</p>
               </div>
-              <div className="bg-selery-gold/10 dark:bg-selery-gold/20 rounded-2xl p-5 border border-selery-gold/30 hover:border-selery-gold/60 transition-colors">
+              <div className="bg-searchatlas-cyan/10 dark:bg-searchatlas-cyan/20 rounded-2xl p-5 border border-searchatlas-cyan/30 hover:border-searchatlas-cyan/60 transition-colors">
                 <div className="flex items-center gap-2 mb-3">
-                  <TrendingUp className="h-4 w-4 text-selery-gold" />
-                  <span className="text-selery-gold/80 text-xs font-medium uppercase">Interested</span>
+                  <TrendingUp className="h-4 w-4 text-searchatlas-cyan" />
+                  <span className="text-searchatlas-cyan/80 text-xs font-medium uppercase">Interested</span>
                 </div>
-                <p className="text-3xl font-bold text-selery-gold">{hero.totalInterested}</p>
+                <p className="text-3xl font-bold text-searchatlas-cyan">{hero.totalInterested}</p>
               </div>
-              <div className="bg-selery-gold/10 dark:bg-selery-gold/20 rounded-2xl p-5 border border-selery-gold/30 hover:border-selery-gold/60 transition-colors">
+              <div className="bg-searchatlas-cyan/10 dark:bg-searchatlas-cyan/20 rounded-2xl p-5 border border-searchatlas-cyan/30 hover:border-searchatlas-cyan/60 transition-colors">
                 <div className="flex items-center gap-2 mb-3">
-                  <Target className="h-4 w-4 text-selery-gold" />
-                  <span className="text-selery-gold/80 text-xs font-medium uppercase">Interest Rate</span>
+                  <Target className="h-4 w-4 text-searchatlas-cyan" />
+                  <span className="text-searchatlas-cyan/80 text-xs font-medium uppercase">Interest Rate</span>
                 </div>
-                <p className="text-3xl font-bold text-selery-gold">{hero.avgInterestRate}%</p>
+                <p className="text-3xl font-bold text-searchatlas-cyan">{hero.avgInterestRate}%</p>
               </div>
             </div>
           </div>
@@ -1232,9 +1232,9 @@ export default function AnalyticsPage() {
         ) : copyData?.subjects?.analysis ? (
           <div className="rounded-2xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-sm overflow-hidden">
             <div className="flex flex-col space-y-1.5 p-6 border-b border-gray-100 dark:border-gray-800">
-              <h2 className="flex items-center gap-3 text-xl font-bold text-selery-navy dark:text-white">
-                <div className="w-10 h-10 bg-selery-cyan/10 rounded-xl flex items-center justify-center">
-                  <CheckCircle className="h-5 w-5 text-selery-cyan" />
+              <h2 className="flex items-center gap-3 text-xl font-bold text-searchatlas-dark dark:text-white">
+                <div className="w-10 h-10 bg-searchatlas-purple/10 rounded-xl flex items-center justify-center">
+                  <CheckCircle className="h-5 w-5 text-searchatlas-purple" />
                 </div>
                 Copy Analysis
               </h2>
@@ -1246,10 +1246,10 @@ export default function AnalyticsPage() {
               <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
                 <div className="bg-gray-50 dark:bg-gray-800 p-5 rounded-xl border border-gray-100 dark:border-gray-700">
                   <div className="flex items-center gap-2 mb-3">
-                    <div className="w-8 h-8 bg-selery-cyan/10 rounded-lg flex items-center justify-center">
-                      <MessageSquare className="h-4 w-4 text-selery-cyan" />
+                    <div className="w-8 h-8 bg-searchatlas-purple/10 rounded-lg flex items-center justify-center">
+                      <MessageSquare className="h-4 w-4 text-searchatlas-purple" />
                     </div>
-                    <h4 className="font-semibold text-selery-navy dark:text-white text-sm">Subject Lines</h4>
+                    <h4 className="font-semibold text-searchatlas-dark dark:text-white text-sm">Subject Lines</h4>
                   </div>
                   <p className="text-sm text-gray-600 dark:text-gray-300">
                     {copyData.subjects.analysis.keyInsight}
@@ -1258,10 +1258,10 @@ export default function AnalyticsPage() {
                 {copyData.body?.analysis && (
                   <div className="bg-gray-50 dark:bg-gray-800 p-5 rounded-xl border border-gray-100 dark:border-gray-700">
                     <div className="flex items-center gap-2 mb-3">
-                      <div className="w-8 h-8 bg-selery-cyan/10 rounded-lg flex items-center justify-center">
-                        <Target className="h-4 w-4 text-selery-cyan" />
+                      <div className="w-8 h-8 bg-searchatlas-purple/10 rounded-lg flex items-center justify-center">
+                        <Target className="h-4 w-4 text-searchatlas-purple" />
                       </div>
-                      <h4 className="font-semibold text-selery-navy dark:text-white text-sm">Opening Hooks</h4>
+                      <h4 className="font-semibold text-searchatlas-dark dark:text-white text-sm">Opening Hooks</h4>
                     </div>
                     <p className="text-sm text-gray-600 dark:text-gray-300">
                       {copyData.body.analysis.contrast}
@@ -1271,10 +1271,10 @@ export default function AnalyticsPage() {
                 {copyData.cta?.analysis && (
                   <div className="bg-gray-50 dark:bg-gray-800 p-5 rounded-xl border border-gray-100 dark:border-gray-700">
                     <div className="flex items-center gap-2 mb-3">
-                      <div className="w-8 h-8 bg-selery-cyan/10 rounded-lg flex items-center justify-center">
-                        <Mail className="h-4 w-4 text-selery-cyan" />
+                      <div className="w-8 h-8 bg-searchatlas-purple/10 rounded-lg flex items-center justify-center">
+                        <Mail className="h-4 w-4 text-searchatlas-purple" />
                       </div>
-                      <h4 className="font-semibold text-selery-navy dark:text-white text-sm">CTAs</h4>
+                      <h4 className="font-semibold text-searchatlas-dark dark:text-white text-sm">CTAs</h4>
                     </div>
                     <p className="text-sm text-gray-600 dark:text-gray-300">
                       {copyData.cta.analysis.commitmentAnalysis}
@@ -1285,7 +1285,7 @@ export default function AnalyticsPage() {
 
               {/* Performance Highlight */}
               {filteredFastData && (
-                <div className="bg-gradient-to-r from-selery-cyan to-selery-cyan/80 p-6 rounded-xl text-white">
+                <div className="bg-gradient-to-r from-searchatlas-purple to-searchatlas-purple/80 p-6 rounded-xl text-white">
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-white/80 text-sm mb-1 font-medium">Performance Summary</p>
@@ -1318,9 +1318,9 @@ export default function AnalyticsPage() {
           <>
             {/* Response Intelligence */}
             <div>
-              <h2 className="text-2xl font-bold text-selery-navy dark:text-white mb-6 flex items-center gap-3">
-                <div className="w-10 h-10 bg-selery-cyan/10 rounded-xl flex items-center justify-center">
-                  <Brain className="h-5 w-5 text-selery-cyan" />
+              <h2 className="text-2xl font-bold text-searchatlas-dark dark:text-white mb-6 flex items-center gap-3">
+                <div className="w-10 h-10 bg-searchatlas-purple/10 rounded-xl flex items-center justify-center">
+                  <Brain className="h-5 w-5 text-searchatlas-purple" />
                 </div>
                 Response Intelligence
               </h2>
@@ -1335,7 +1335,7 @@ export default function AnalyticsPage() {
                     <div className="space-y-3">
                       {filteredReport.topThemes.map((t) => (
                         <div key={t.theme} className="flex items-center justify-between py-1">
-                          <span className="text-sm font-medium text-selery-navy dark:text-white">{toTitleCase(t.theme)}</span>
+                          <span className="text-sm font-medium text-searchatlas-dark dark:text-white">{toTitleCase(t.theme)}</span>
                           <span className="text-sm text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-800 px-2 py-0.5 rounded-full">{t.count} replies</span>
                         </div>
                       ))}
@@ -1343,15 +1343,15 @@ export default function AnalyticsPage() {
                   ) : <p className="text-sm text-gray-500 dark:text-gray-400">No themes extracted yet</p>}
                 </div>
                 {filteredReport.topBuyingSignals.length > 0 && (
-                  <div className="rounded-2xl border border-selery-gold/30 bg-selery-gold/5 dark:bg-selery-gold/10 shadow-sm p-6">
-                    <h3 className="text-sm font-semibold text-selery-gold uppercase tracking-wider mb-5 flex items-center gap-2">
+                  <div className="rounded-2xl border border-searchatlas-cyan/30 bg-searchatlas-cyan/5 dark:bg-searchatlas-cyan/10 shadow-sm p-6">
+                    <h3 className="text-sm font-semibold text-searchatlas-cyan uppercase tracking-wider mb-5 flex items-center gap-2">
                       <Sparkles className="h-4 w-4" /> Buying Signals
                     </h3>
                     <div className="space-y-3">
                       {filteredReport.topBuyingSignals.map((s) => (
                         <div key={s.signal} className="flex items-center justify-between py-1">
-                          <span className="text-sm font-medium text-selery-gold">{toTitleCase(s.signal)}</span>
-                          <span className="text-sm text-selery-gold/80 bg-selery-gold/20 px-2 py-0.5 rounded-full font-medium">{s.count}x</span>
+                          <span className="text-sm font-medium text-searchatlas-cyan">{toTitleCase(s.signal)}</span>
+                          <span className="text-sm text-searchatlas-cyan/80 bg-searchatlas-cyan/20 px-2 py-0.5 rounded-full font-medium">{s.count}x</span>
                         </div>
                       ))}
                     </div>
@@ -1377,24 +1377,24 @@ export default function AnalyticsPage() {
 
             {/* Who's Responding */}
             <div>
-              <h2 className="text-2xl font-bold text-selery-navy dark:text-white mb-6 flex items-center gap-3">
-                <div className="w-10 h-10 bg-selery-cyan/10 rounded-xl flex items-center justify-center">
-                  <BarChart3 className="h-5 w-5 text-selery-cyan" />
+              <h2 className="text-2xl font-bold text-searchatlas-dark dark:text-white mb-6 flex items-center gap-3">
+                <div className="w-10 h-10 bg-searchatlas-purple/10 rounded-xl flex items-center justify-center">
+                  <BarChart3 className="h-5 w-5 text-searchatlas-purple" />
                 </div>
                 Who&apos;s Responding
               </h2>
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <div className="rounded-2xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-sm p-6">
                   <h3 className="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-5 flex items-center gap-2">
-                    <Building2 className="h-4 w-4 text-selery-cyan" /> Industry Distribution
+                    <Building2 className="h-4 w-4 text-searchatlas-purple" /> Industry Distribution
                   </h3>
-                  <HorizontalBarChart data={filteredReport.industryDistribution} colorClass="bg-selery-cyan" showInterested />
+                  <HorizontalBarChart data={filteredReport.industryDistribution} colorClass="bg-searchatlas-purple" showInterested />
                 </div>
                 <div className="rounded-2xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-sm p-6">
                   <h3 className="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-5 flex items-center gap-2">
-                    <Briefcase className="h-4 w-4 text-selery-navy dark:text-selery-cyan" /> Title Seniority
+                    <Briefcase className="h-4 w-4 text-searchatlas-dark dark:text-searchatlas-purple" /> Title Seniority
                   </h3>
-                  <HorizontalBarChart data={filteredReport.seniorityDistribution} colorClass="bg-selery-navy dark:bg-selery-cyan" showInterested />
+                  <HorizontalBarChart data={filteredReport.seniorityDistribution} colorClass="bg-searchatlas-dark dark:bg-searchatlas-purple" showInterested />
                 </div>
 
                 {/* Pipeline Companies (replaces Top Responding Companies) */}
@@ -1409,9 +1409,9 @@ export default function AnalyticsPage() {
 
             {/* Lead Deep-Dive */}
             <div>
-              <h2 className="text-2xl font-bold text-selery-navy dark:text-white mb-6 flex items-center gap-3">
-                <div className="w-10 h-10 bg-selery-gold/10 rounded-xl flex items-center justify-center">
-                  <Users className="h-5 w-5 text-selery-gold" />
+              <h2 className="text-2xl font-bold text-searchatlas-dark dark:text-white mb-6 flex items-center gap-3">
+                <div className="w-10 h-10 bg-searchatlas-cyan/10 rounded-xl flex items-center justify-center">
+                  <Users className="h-5 w-5 text-searchatlas-cyan" />
                 </div>
                 Lead Deep-Dive
               </h2>

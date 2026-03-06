@@ -145,7 +145,7 @@ interface AIClassification {
   summary: string;
 }
 
-// ── AI Classification with Selery context ──────────────────────────────
+// ── AI Classification with SearchAtlas context ──────────────────────────────
 async function classifyRepliesWithAI(
   replies: Array<{ id: number; text: string; from: string; subject: string; interested: boolean }>
 ): Promise<Map<number, AIClassification>> {
@@ -179,7 +179,7 @@ async function classifyRepliesWithAI(
         max_tokens: 8192,
         messages: [{
           role: 'user',
-          content: `You are classifying replies to cold outbound emails sent by **Selery Fulfillment**, a 3PL (third-party logistics) company that handles warehousing, fulfillment, and shipping for e-commerce brands. The emails pitch Selery's fulfillment services to e-commerce brand owners and operators.
+          content: `You are classifying replies to cold outbound emails sent by **SearchAtlas Fulfillment**, a 3PL (third-party logistics) company that handles warehousing, fulfillment, and shipping for e-commerce brands. The emails pitch SearchAtlas's fulfillment services to e-commerce brand owners and operators.
 
 Classify each reply below. For each, return:
 - **sentiment**: "positive" | "negative" | "neutral"
@@ -191,7 +191,7 @@ Classify each reply below. For each, return:
 
 ### CLASSIFICATION RULES (follow strictly):
 
-**POSITIVE / INTERESTED** — The person explicitly expresses interest in Selery's services or wants to continue the conversation:
+**POSITIVE / INTERESTED** — The person explicitly expresses interest in SearchAtlas's services or wants to continue the conversation:
   - "Yes, let's set up a call"
   - "We're currently looking for a new 3PL"
   - "Can you send me a quote?"
@@ -480,12 +480,12 @@ export async function GET(request: Request) {
     type UserData = { data: { workspace?: { name: string }; team?: { name: string } } };
     const [userResult, campaignsResult, allReplies] = await Promise.all([
       fetchApi<UserData>('/api/users')
-        .catch((): UserData => ({ data: { workspace: { name: 'Selery' } } })),
+        .catch((): UserData => ({ data: { workspace: { name: 'SearchAtlas' } } })),
       fetchApi<{ data: EBCampaign[] }>('/api/campaigns'),
       fetchAllReplies(),
     ]);
 
-    const workspaceName = userResult.data.workspace?.name || userResult.data.team?.name || 'Selery';
+    const workspaceName = userResult.data.workspace?.name || userResult.data.team?.name || 'SearchAtlas';
     const campaigns = campaignsResult.data;
     const activeCampaigns = campaigns.filter(c => c.emails_sent > 0);
     const campaignMap = new Map(campaigns.map(c => [c.id, c]));

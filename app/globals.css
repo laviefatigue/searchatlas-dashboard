@@ -4,9 +4,11 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
-  --color-selery-navy: #1C2655;
-  --color-selery-cyan: #28BFFC;
-  --color-selery-gold: #F9B416;
+  /* SearchAtlas Brand Colors */
+  --color-searchatlas-purple: #936BDA;
+  --color-searchatlas-cyan: #88C2FF;
+  --color-searchatlas-green: #9CFFAC;
+  --color-searchatlas-pink: #FFADDB;
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
@@ -52,99 +54,99 @@
 }
 
 :root {
-  /* Selery Dashboard Design System */
+  /* SearchAtlas Dashboard Design System - Dark Theme */
   --radius: 0.5rem;
 
-  /* Backgrounds - Subtle warm white like Selery website */
-  --background: #FAFBFC;
-  --foreground: #1C2655;
+  /* Backgrounds - Dark like SearchAtlas website */
+  --background: #0F0F11;
+  --foreground: #ffffff;
 
   /* Cards */
-  --card: #ffffff;
-  --card-foreground: #1a1a1a;
+  --card: #1D1E22;
+  --card-foreground: #ffffff;
 
   /* Popovers */
-  --popover: #ffffff;
-  --popover-foreground: #1a1a1a;
+  --popover: #1D1E22;
+  --popover-foreground: #ffffff;
 
-  /* Primary - Selery Cyan */
-  --primary: #28BFFC;
-  --primary-foreground: #1C2655;
+  /* Primary - SearchAtlas Purple */
+  --primary: #936BDA;
+  --primary-foreground: #ffffff;
 
   /* Secondary */
-  --secondary: #f5f5f5;
-  --secondary-foreground: #1a1a1a;
+  --secondary: #2a2b30;
+  --secondary-foreground: #ffffff;
 
   /* Muted */
-  --muted: #f5f5f5;
-  --muted-foreground: #737373;
+  --muted: #2a2b30;
+  --muted-foreground: #9ca3af;
 
   /* Accent */
-  --accent: #f5f5f5;
-  --accent-foreground: #1a1a1a;
+  --accent: #2a2b30;
+  --accent-foreground: #ffffff;
 
   /* Status Colors */
   --destructive: #ef4444;
-  --success: #22c55e;
-  --warning: #f59e0b;
+  --success: #9CFFAC;
+  --warning: #FFADDB;
 
   /* Borders */
-  --border: #e5e5e5;
-  --input: #e5e5e5;
-  --ring: #28BFFC;
+  --border: #2a2b30;
+  --input: #2a2b30;
+  --ring: #936BDA;
 
   /* Charts - Campaign Metrics */
-  --chart-1: #28BFFC; /* Sent - Selery Cyan */
-  --chart-2: #F9B416; /* Opens - Selery Gold */
-  --chart-3: #1C2655; /* Replies - Selery Navy */
+  --chart-1: #936BDA; /* Sent - SearchAtlas Purple */
+  --chart-2: #88C2FF; /* Opens - SearchAtlas Cyan */
+  --chart-3: #9CFFAC; /* Replies - SearchAtlas Green */
   --chart-4: #ef4444; /* Bounced - Red */
-  --chart-5: #F9B416; /* Interested - Selery Gold */
+  --chart-5: #FFADDB; /* Interested - SearchAtlas Pink */
 
-  /* Sidebar — Selery navy */
-  --sidebar: #1C2655;
+  /* Sidebar — SearchAtlas Dark */
+  --sidebar: #0F0F11;
   --sidebar-foreground: #ffffff;
-  --sidebar-primary: #28BFFC;
+  --sidebar-primary: #936BDA;
   --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: rgba(40, 191, 252, 0.15);
+  --sidebar-accent: rgba(147, 107, 218, 0.15);
   --sidebar-accent-foreground: #ffffff;
   --sidebar-border: rgba(255, 255, 255, 0.1);
-  --sidebar-ring: #28BFFC;
+  --sidebar-ring: #936BDA;
 }
 
 .dark {
-  --background: #0a0a0a;
-  --foreground: #fafafa;
-  --card: #171717;
-  --card-foreground: #fafafa;
-  --popover: #171717;
-  --popover-foreground: #fafafa;
-  --primary: #28BFFC;
-  --primary-foreground: #1C2655;
-  --secondary: #262626;
-  --secondary-foreground: #fafafa;
-  --muted: #262626;
-  --muted-foreground: #a3a3a3;
-  --accent: #262626;
-  --accent-foreground: #fafafa;
+  --background: #0F0F11;
+  --foreground: #ffffff;
+  --card: #1D1E22;
+  --card-foreground: #ffffff;
+  --popover: #1D1E22;
+  --popover-foreground: #ffffff;
+  --primary: #936BDA;
+  --primary-foreground: #ffffff;
+  --secondary: #2a2b30;
+  --secondary-foreground: #ffffff;
+  --muted: #2a2b30;
+  --muted-foreground: #9ca3af;
+  --accent: #2a2b30;
+  --accent-foreground: #ffffff;
   --destructive: #ef4444;
-  --success: #22c55e;
-  --warning: #f59e0b;
-  --border: #262626;
-  --input: #262626;
-  --ring: #28BFFC;
-  --chart-1: #28BFFC;
-  --chart-2: #F9B416;
-  --chart-3: #4A5A8A;
+  --success: #9CFFAC;
+  --warning: #FFADDB;
+  --border: #2a2b30;
+  --input: #2a2b30;
+  --ring: #936BDA;
+  --chart-1: #936BDA;
+  --chart-2: #88C2FF;
+  --chart-3: #9CFFAC;
   --chart-4: #f87171;
-  --chart-5: #F9B416;
-  --sidebar: #121B3D;
+  --chart-5: #FFADDB;
+  --sidebar: #0F0F11;
   --sidebar-foreground: #ffffff;
-  --sidebar-primary: #28BFFC;
+  --sidebar-primary: #936BDA;
   --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: rgba(40, 191, 252, 0.15);
+  --sidebar-accent: rgba(147, 107, 218, 0.15);
   --sidebar-accent-foreground: #ffffff;
   --sidebar-border: rgba(255, 255, 255, 0.1);
-  --sidebar-ring: #28BFFC;
+  --sidebar-ring: #936BDA;
 }
 
 @layer base {
@@ -259,10 +261,10 @@ body.exporting-pdf .sticky {
 }
 
 body.exporting-pdf {
-  background: #ffffff !important;
-  color: #1a1a1a !important;
+  background: #0F0F11 !important;
+  color: #ffffff !important;
 }
 
 body.exporting-pdf * {
-  color-scheme: light !important;
+  color-scheme: dark !important;
 }

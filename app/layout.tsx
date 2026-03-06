@@ -14,8 +14,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Selery Dashboard",
-  description: "Monitor your email campaigns",
+  title: "SearchAtlas Dashboard",
+  description: "Monitor your email infrastructure",
 };
 
 export default function RootLayout({
