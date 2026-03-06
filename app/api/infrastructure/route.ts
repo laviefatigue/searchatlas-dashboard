@@ -171,7 +171,7 @@ export async function GET() {
       return null;
     }
 
-    // Provider breakdown with set counts
+    // Provider breakdown with set counts and capacity by set
     const providerMap = new Map<string, {
       live_count: number;
       dead_count: number;
@@ -183,8 +183,12 @@ export async function GET() {
       total_bounced: number;
       daily_capacity: number;
       warming_count: number;
-      a_set_count: number;
-      b_set_count: number;
+      // Live set (A) - primary sending
+      live_set_count: number;
+      live_set_capacity: number;
+      // Reserve set (B) - backup/rotation
+      reserve_set_count: number;
+      reserve_set_capacity: number;
     }>();
 
     inboxes.forEach((inbox: SenderEmail) => {
@@ -200,8 +204,10 @@ export async function GET() {
         total_bounced: 0,
         daily_capacity: 0,
         warming_count: 0,
-        a_set_count: 0,
-        b_set_count: 0,
+        live_set_count: 0,
+        live_set_capacity: 0,
+        reserve_set_count: 0,
+        reserve_set_capacity: 0,
       };
 
       existing.total_sent += inbox.emails_sent_count || 0;
@@ -210,12 +216,18 @@ export async function GET() {
 
       const isDead = hasKillTrigger(inbox);
       const isConnected = inbox.status === 'Connected';
+      const inboxCapacity = inbox.daily_limit || 0;
 
-      // Count A/B sets (only for live inboxes)
-      if (!isDead) {
+      // Count Live/Reserve sets with capacity (only for non-dead inboxes)
+      if (!isDead && isConnected) {
         const set = getInboxSet(inbox);
-        if (set === 'A') existing.a_set_count++;
-        if (set === 'B') existing.b_set_count++;
+        if (set === 'A') {
+          existing.live_set_count++;
+          existing.live_set_capacity += inboxCapacity;
+        } else if (set === 'B') {
+          existing.reserve_set_count++;
+          existing.reserve_set_capacity += inboxCapacity;
+        }
       }
 
       if (isDead) {
@@ -224,7 +236,7 @@ export async function GET() {
         existing.live_count++;
         existing.connected_count++;
         existing.health_scores.push(calculateHealthScore(inbox));
-        existing.daily_capacity += inbox.daily_limit || 0;
+        existing.daily_capacity += inboxCapacity;
         if (inbox.warmup_enabled) existing.warming_count++;
       } else {
         existing.disconnected_count++;
@@ -242,9 +254,11 @@ export async function GET() {
         : 0,
       connected_count: data.connected_count,
       disconnected_count: data.disconnected_count,
-      // Set breakdown
-      a_set_count: data.a_set_count,
-      b_set_count: data.b_set_count,
+      // Set breakdown (Live = A Set, Reserve = B Set)
+      live_set_count: data.live_set_count,
+      live_set_capacity: data.live_set_capacity,
+      reserve_set_count: data.reserve_set_count,
+      reserve_set_capacity: data.reserve_set_capacity,
       // Capacity & warming
       daily_capacity: data.daily_capacity,
       warming_count: data.warming_count,

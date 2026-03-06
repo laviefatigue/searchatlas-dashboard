@@ -42,9 +42,11 @@ interface ProviderMetrics {
   avg_health_score: number;
   connected_count: number;
   disconnected_count: number;
-  // Set breakdown
-  a_set_count: number;
-  b_set_count: number;
+  // Set breakdown (Live = A Set, Reserve = B Set)
+  live_set_count: number;
+  live_set_capacity: number;
+  reserve_set_count: number;
+  reserve_set_capacity: number;
   // Capacity & warming
   daily_capacity: number;
   warming_count: number;
@@ -356,15 +358,23 @@ function ProviderHealthWidget({ providers }: { providers: ProviderMetrics[] }) {
                 </div>
               </div>
 
-              {/* A/B Set Breakdown */}
+              {/* Live/Reserve Set Breakdown with Capacity */}
               <div className="grid grid-cols-4 gap-3">
                 <div className="bg-[#14151A] rounded-lg p-3">
-                  <div className="text-xs text-gray-400 mb-1">A Set</div>
-                  <span className="text-lg font-bold text-[#86EFAC]">{provider.a_set_count}</span>
+                  <div className="flex items-center gap-1.5 mb-1">
+                    <Wifi className="h-3 w-3 text-[#86EFAC]" />
+                    <span className="text-xs text-gray-400">Live</span>
+                  </div>
+                  <span className="text-lg font-bold text-[#86EFAC]">{provider.live_set_count}</span>
+                  <div className="text-xs text-gray-500">{provider.live_set_capacity.toLocaleString()} cap</div>
                 </div>
                 <div className="bg-[#14151A] rounded-lg p-3">
-                  <div className="text-xs text-gray-400 mb-1">B Set</div>
-                  <span className="text-lg font-bold text-[#93C5FD]">{provider.b_set_count}</span>
+                  <div className="flex items-center gap-1.5 mb-1">
+                    <Server className="h-3 w-3 text-[#93C5FD]" />
+                    <span className="text-xs text-gray-400">Reserve</span>
+                  </div>
+                  <span className="text-lg font-bold text-[#93C5FD]">{provider.reserve_set_count}</span>
+                  <div className="text-xs text-gray-500">{provider.reserve_set_capacity.toLocaleString()} cap</div>
                 </div>
                 <div className="bg-[#14151A] rounded-lg p-3">
                   <div className="text-xs text-gray-400 mb-1">Warming</div>
@@ -483,13 +493,19 @@ export default function InfrastructurePage() {
   const StatusIcon = status.icon;
 
   return (
-    <div className="min-h-screen bg-[#14151A]">
+    <div className="min-h-screen h-screen overflow-y-auto bg-[#14151A]">
       <main className="max-w-5xl mx-auto px-6 py-8">
-        {/* Header */}
+        {/* Header with Logo */}
         <header className="mb-8">
-          <h1 className="text-2xl font-bold text-white mb-1">
-            {data.client?.name || 'SearchAtlas'}
-          </h1>
+          <div className="flex items-center gap-4 mb-2">
+            {/* SearchAtlas Logo */}
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="https://searchatlas.com/wp-content/uploads/2023/12/white.svg"
+              alt="SearchAtlas"
+              className="h-8 w-auto"
+            />
+          </div>
           <p className="text-sm text-gray-400 flex items-center gap-2">
             <StatusIcon className={`h-4 w-4 ${status.color}`} />
             <span className={status.color}>{status.text}</span>
