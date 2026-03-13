@@ -7,16 +7,27 @@ const WORKSPACE_ID = parseInt(process.env.WORKSPACE_ID || '0', 10);
 const WORKSPACE_NAME = process.env.WORKSPACE_NAME || 'Dashboard';
 
 // Kill trigger tag patterns (priority order)
+// Matched via .includes() against lowercased tag names
 const KILL_TRIGGER_PATTERNS = [
-  'spam_complaint',           // ≥1 spam complaint (instant kill)
-  'provider_block_',          // ≥1 provider block (instant, ESP-specific)
-  'hard_blocked_24h',         // ≥1 hard block in 24h (instant)
-  'hard_unknown_24h',         // ≥3 hard unknowns in 24h (instant)
-  'hard_bounces_24h',         // ≥2 hard bounces in 24h (fallback)
-  'hard_bounce_rate_7d',      // >0.5% rate (min 20 sends)
-  'bounce_rate_all_7d',       // >5% rate (min 20 sends)
-  'fresh_inbox_bounce',       // Any bounce on inbox <14 days old
-  'disconnected_timeout',     // 21+ days disconnected
+  'spam_complaint',           // flagged_spam_complaint
+  'provider_block_',          // flagged_provider_block_microsoft, etc.
+  'hard_blocked_24h',         // flagged_hard_blocked_24h
+  'hard_unknown_24h',         // flagged_hard_unknown_24h
+  'hard_bounces_24h',         // flagged_hard_bounces_24h
+  'hard_bounce_rate_7d',      // flagged_hard_bounce_rate_7d
+  'bounce_rate_all_7d',       // flagged_bounce_rate_all_7d
+  'fresh_inbox_bounce',       // flagged_fresh_inbox_bounce
+  'fresh_inbox_blocked',      // flagged_fresh_inbox_blocked
+  'fresh_inbox_unknown',      // flagged_fresh_inbox_unknown
+  'order_cancelled',          // order_cancelled (subscription/billing kill)
+  'disconnected_timeout',     // disconnected_timeout
+];
+
+// Domain-killing triggers: burns the domain reputation (most severe)
+// From charm-email-os/sync_modules/kill_processor.py
+const DOMAIN_KILLING_PATTERNS = [
+  'spam_complaint',     // User reported spam = domain reputation burned
+  'provider_block_',    // ESP blocked the domain (Google, Microsoft, Yahoo)
 ];
 
 function hasKillTrigger(inbox: SenderEmail): boolean {
@@ -25,6 +36,15 @@ function hasKillTrigger(inbox: SenderEmail): boolean {
 
   return tagNames.some(tagName =>
     KILL_TRIGGER_PATTERNS.some(pattern => tagName.includes(pattern.toLowerCase()))
+  );
+}
+
+function isDomainKillingTrigger(inbox: SenderEmail): boolean {
+  const tags = inbox.tags || [];
+  const tagNames = tags.map(t => t.name.toLowerCase());
+
+  return tagNames.some(tagName =>
+    DOMAIN_KILLING_PATTERNS.some(pattern => tagName.includes(pattern.toLowerCase()))
   );
 }
 
@@ -197,13 +217,15 @@ export async function GET() {
       0
     );
 
-    // Helper to detect A/B set from tags
+    // Helper to detect Live/Reserve set from tags
+    // Live: "A Set", "live", "live set"
+    // Reserve: "B Set", "bset", "reserve", "reserve set"
     function getInboxSet(inbox: SenderEmail): 'A' | 'B' | null {
       const tags = inbox.tags || [];
       for (const tag of tags) {
         const name = tag.name.toLowerCase();
-        if (name === 'a set' || name.includes('a set')) return 'A';
-        if (name === 'b set' || name.includes('b set')) return 'B';
+        if (name === 'a set' || name.includes('a set') || name === 'live' || name.includes('live set')) return 'A';
+        if (name === 'b set' || name.includes('b set') || name === 'bset' || name === 'reserve' || name.includes('reserve set')) return 'B';
       }
       return null;
     }
@@ -212,6 +234,8 @@ export async function GET() {
     const providerMap = new Map<string, {
       live_count: number;
       dead_count: number;
+      domain_flagged_count: number;
+      inbox_flagged_count: number;
       health_scores: number[];
       connected_count: number;
       disconnected_count: number;
@@ -223,9 +247,11 @@ export async function GET() {
       // Live set (A) - primary sending
       live_set_count: number;
       live_set_capacity: number;
+      live_set_disconnected: number;
       // Reserve set (B) - backup/rotation
       reserve_set_count: number;
       reserve_set_capacity: number;
+      reserve_set_disconnected: number;
     }>();
 
     inboxes.forEach((inbox: SenderEmail) => {
@@ -233,6 +259,8 @@ export async function GET() {
       const existing = providerMap.get(provider) || {
         live_count: 0,
         dead_count: 0,
+        domain_flagged_count: 0,
+        inbox_flagged_count: 0,
         health_scores: [],
         connected_count: 0,
         disconnected_count: 0,
@@ -243,8 +271,10 @@ export async function GET() {
         warming_count: 0,
         live_set_count: 0,
         live_set_capacity: 0,
+        live_set_disconnected: 0,
         reserve_set_count: 0,
         reserve_set_capacity: 0,
+        reserve_set_disconnected: 0,
       };
 
       existing.total_sent += inbox.emails_sent_count || 0;
@@ -254,21 +284,35 @@ export async function GET() {
       const isDead = hasKillTrigger(inbox);
       const isConnected = inbox.status === 'Connected';
       const inboxCapacity = inbox.daily_limit || 0;
+      const set = getInboxSet(inbox);
 
-      // Count Live/Reserve sets with capacity (only for non-dead inboxes)
-      if (!isDead && isConnected) {
-        const set = getInboxSet(inbox);
-        if (set === 'A') {
-          existing.live_set_count++;
-          existing.live_set_capacity += inboxCapacity;
-        } else if (set === 'B') {
-          existing.reserve_set_count++;
-          existing.reserve_set_capacity += inboxCapacity;
+      // Count Live/Reserve sets with capacity (for non-dead inboxes)
+      if (!isDead) {
+        if (isConnected) {
+          if (set === 'A') {
+            existing.live_set_count++;
+            existing.live_set_capacity += inboxCapacity;
+          } else if (set === 'B') {
+            existing.reserve_set_count++;
+            existing.reserve_set_capacity += inboxCapacity;
+          }
+        } else {
+          // Track disconnected by set
+          if (set === 'A') {
+            existing.live_set_disconnected++;
+          } else if (set === 'B') {
+            existing.reserve_set_disconnected++;
+          }
         }
       }
 
       if (isDead) {
         existing.dead_count++;
+        if (isDomainKillingTrigger(inbox)) {
+          existing.domain_flagged_count++;
+        } else {
+          existing.inbox_flagged_count++;
+        }
       } else if (isConnected) {
         existing.live_count++;
         existing.connected_count++;
@@ -286,6 +330,8 @@ export async function GET() {
       name,
       live_count: data.live_count,
       dead_count: data.dead_count,
+      domain_flagged_count: data.domain_flagged_count,
+      inbox_flagged_count: data.inbox_flagged_count,
       // Use provider-level health calculation based on availability and performance
       avg_health_score: calculateProviderHealth(
         data.live_count,
@@ -299,8 +345,10 @@ export async function GET() {
       // Set breakdown (Live = A Set, Reserve = B Set)
       live_set_count: data.live_set_count,
       live_set_capacity: data.live_set_capacity,
+      live_set_disconnected: data.live_set_disconnected,
       reserve_set_count: data.reserve_set_count,
       reserve_set_capacity: data.reserve_set_capacity,
+      reserve_set_disconnected: data.reserve_set_disconnected,
       // Capacity & warming
       daily_capacity: data.daily_capacity,
       warming_count: data.warming_count,
@@ -343,52 +391,68 @@ export async function GET() {
     };
 
     // Fetch real volume history from campaign chart stats
+    // End at YESTERDAY to avoid showing today's incomplete/partial data
     const now = new Date();
-    const startDate = new Date(now);
+    const yesterday = new Date(now);
+    yesterday.setDate(yesterday.getDate() - 1);
+    const startDate = new Date(yesterday);
     startDate.setDate(startDate.getDate() - 9);
     const startDateStr = startDate.toISOString().split('T')[0];
-    const endDateStr = now.toISOString().split('T')[0];
+    const endDateStr = yesterday.toISOString().split('T')[0];
 
     // Get campaigns and fetch chart stats for active ones
-    let dailySendsMap = new Map<string, number>();
+    // Aggregate: sent, replied, bounced per day across all campaigns
+    const dailySendsMap = new Map<string, number>();
+    const dailyRepliedMap = new Map<string, number>();
+    const dailyBouncedMap = new Map<string, number>();
+
     try {
       const { data: campaigns } = await getCampaigns();
       const activeCampaigns = campaigns.filter(c => c.emails_sent > 0);
 
-      // Fetch chart stats in parallel (limit to first 10 to avoid too many requests)
       const chartPromises = activeCampaigns.slice(0, 10).map(async (c) => {
         try {
           const { data: chartData } = await getCampaignChartStats(c.id, startDateStr, endDateStr);
-          // Find the "Emails sent" series
-          const sentSeries = chartData?.find(s => s.label.toLowerCase().includes('sent'));
-          if (sentSeries?.dates) {
-            for (const [dateStr, count] of sentSeries.dates) {
-              const existing = dailySendsMap.get(dateStr) || 0;
-              dailySendsMap.set(dateStr, existing + count);
+          if (!chartData) return;
+
+          // Helper to aggregate a series into a map
+          const addSeries = (map: Map<string, number>, label: string) => {
+            const series = chartData.find(s => s.label.toLowerCase().includes(label));
+            if (series?.dates) {
+              for (const [dateStr, count] of series.dates) {
+                map.set(dateStr, (map.get(dateStr) || 0) + count);
+              }
             }
-          }
+          };
+
+          addSeries(dailySendsMap, 'sent');
+          addSeries(dailyRepliedMap, 'replied');
+          addSeries(dailyBouncedMap, 'bounced');
         } catch {
           // Skip failed campaign stats
         }
       });
       await Promise.all(chartPromises);
     } catch {
-      // Fall back to empty map if campaigns fetch fails
+      // Fall back to empty maps if campaigns fetch fails
     }
 
-    // Build volume history with real data where available
+    // Build volume history - 10 complete days ending yesterday
     const volumeHistory = {
       snapshots: Array.from({ length: 10 }, (_, i) => {
-        const date = new Date();
+        const date = new Date(yesterday);
         date.setDate(date.getDate() - (9 - i));
         const dateStr = date.toISOString().split('T')[0];
-        const actualSends = dailySendsMap.get(dateStr) || 0;
 
         return {
           date: dateStr,
-          emails_sent: actualSends,
+          emails_sent: dailySendsMap.get(dateStr) || 0,
+          campaign_sent: dailySendsMap.get(dateStr) || 0,
+          replied: dailyRepliedMap.get(dateStr) || 0,
+          bounced: dailyBouncedMap.get(dateStr) || 0,
           daily_capacity_available: operationalCapacity,
           live_inboxes: liveInboxes.length,
+          warming_inboxes: warmingInboxes.length,
         };
       }),
     };
