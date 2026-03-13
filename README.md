@@ -23,7 +23,7 @@ Edit `.env.local` - only the API token needs to be added:
 
 ```env
 # EmailBison API (Analytics Tab) - pre-configured
-EMAILBISON_API_URL=https://spellcast.hirecharm.com
+EMAILBISON_API_URL=
 EMAILBISON_API_TOKEN=<get from team lead>
 
 # Infrastructure API (Infrastructure Tab) - pre-configured for Selery
@@ -75,11 +75,11 @@ docker-compose up -d --build
 
 | Variable | Required | Description |
 |----------|----------|-------------|
-| `EMAILBISON_API_URL` | Yes | EmailBison API endpoint (default: `https://spellcast.hirecharm.com`) |
+| `EMAILBISON_API_URL` | Yes | EmailBison API endpoint (default: ``) |
 | `EMAILBISON_API_TOKEN` | Yes | Your EmailBison API token |
 | `INFRASTRUCTURE_API_URL` | Yes | Charm OS API endpoint |
 | `INFRASTRUCTURE_CLIENT_ID` | Yes | Client UUID in Charm OS database |
-| `NEXT_PUBLIC_DASHBOARD_TITLE` | No | Dashboard title in header (default: `Selery Dashboard`) |
+| `NEXT_PUBLIC_DASHBOARD_TITLE` | No | Dashboard title in header (default: ``) |
 | `NEXT_PUBLIC_AUTO_REFRESH_MS` | No | Auto-refresh interval in ms (default: `300000` = 5 min) |
 
 ---
