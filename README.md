@@ -27,8 +27,8 @@ EMAILBISON_API_URL=https://spellcast.hirecharm.com
 EMAILBISON_API_TOKEN=<get from team lead>
 
 # Infrastructure API (Infrastructure Tab) - pre-configured for Selery
-INFRASTRUCTURE_API_URL=http://ccssgc4gowsog04wck400o0w.31.97.142.123.sslip.io
-INFRASTRUCTURE_CLIENT_ID=e5988a33-ec6c-4b5a-be85-25b8bd0678bb
+INFRASTRUCTURE_API_URL=
+INFRASTRUCTURE_CLIENT_ID=
 ```
 
 > **Note**: The infrastructure API and client ID are pre-configured for Selery's production database. Only the `EMAILBISON_API_TOKEN` needs to be provided.
