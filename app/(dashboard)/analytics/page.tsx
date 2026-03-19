@@ -55,7 +55,7 @@ const toTitleCase = (s: string) => s.replace(/\b\w/g, c => c.toUpperCase());
 
 function SentimentBadge({ sentiment }: { sentiment: ReplySentiment }) {
   const config = {
-    positive: { label: 'Positive', bg: 'bg-searchatlas-green/20', text: 'text-searchatlas-green', icon: ThumbsUp },
+    positive: { label: 'Positive', bg: 'bg-linkgraph-orange/20', text: 'text-linkgraph-orange', icon: ThumbsUp },
     negative: { label: 'Negative', bg: 'bg-red-950/30', text: 'text-red-400', icon: ThumbsDown },
     neutral: { label: 'Neutral', bg: 'bg-secondary', text: 'text-muted-foreground', icon: Minus },
   }[sentiment];
@@ -70,10 +70,10 @@ function SentimentBadge({ sentiment }: { sentiment: ReplySentiment }) {
 
 function IntentBadge({ intent }: { intent: string }) {
   const colors: Record<string, string> = {
-    'interested': 'bg-searchatlas-green/20 text-searchatlas-green',
+    'interested': 'bg-linkgraph-orange/20 text-linkgraph-orange',
     'not-interested': 'bg-red-950/30 text-red-400',
-    'needs-info': 'bg-searchatlas-cyan/20 text-searchatlas-cyan',
-    'referral': 'bg-searchatlas-purple/10 text-searchatlas-purple',
+    'needs-info': 'bg-linkgraph-coral/20 text-linkgraph-coral',
+    'referral': 'bg-linkgraph-pink/10 text-linkgraph-pink',
     'out-of-office': 'bg-secondary text-muted-foreground',
     'unsubscribe': 'bg-red-950/30 text-red-400',
   };
@@ -86,7 +86,7 @@ function IntentBadge({ intent }: { intent: string }) {
 
 function HorizontalBarChart({
   data,
-  colorClass = 'bg-searchatlas-cyan',
+  colorClass = 'bg-linkgraph-coral',
   showInterested = false,
 }: {
   data: DemographicDistribution[];
@@ -104,7 +104,7 @@ function HorizontalBarChart({
             </span>
             <div className="flex items-center gap-3">
               {showInterested && item.interestedCount > 0 && (
-                <span className="text-xs text-searchatlas-green font-medium">
+                <span className="text-xs text-linkgraph-orange font-medium">
                   {item.interestedCount} interested
                 </span>
               )}
@@ -133,7 +133,7 @@ function SentimentOverview({
   total: number;
 }) {
   const items = [
-    { key: 'positive' as const, label: 'Positive', color: 'bg-searchatlas-green', count: breakdown.positive },
+    { key: 'positive' as const, label: 'Positive', color: 'bg-linkgraph-orange', count: breakdown.positive },
     { key: 'neutral' as const, label: 'Neutral', color: 'bg-gray-500', count: breakdown.neutral },
     { key: 'negative' as const, label: 'Negative', color: 'bg-red-500', count: breakdown.negative },
   ];
@@ -158,9 +158,9 @@ function SentimentOverview({
 function ConversionFunnel({ funnel }: { funnel: FastAnalytics['funnel'] }) {
   const steps = [
     { label: 'Total Leads', value: funnel.totalLeads, color: 'from-gray-600 to-gray-700' },
-    { label: 'Contacted', value: funnel.contacted, color: 'from-searchatlas-cyan/70 to-searchatlas-cyan/50' },
-    { label: 'Replied', value: funnel.replied, color: 'from-searchatlas-purple/70 to-searchatlas-purple/50' },
-    { label: 'Interested', value: funnel.interested, color: 'from-searchatlas-green/70 to-searchatlas-green/50' },
+    { label: 'Contacted', value: funnel.contacted, color: 'from-linkgraph-coral/70 to-linkgraph-coral/50' },
+    { label: 'Replied', value: funnel.replied, color: 'from-linkgraph-pink/70 to-linkgraph-pink/50' },
+    { label: 'Interested', value: funnel.interested, color: 'from-linkgraph-orange/70 to-linkgraph-orange/50' },
   ];
 
   return (
@@ -247,7 +247,7 @@ function CampaignComparison({ campaigns }: { campaigns: CampaignComparisonItem[]
 
   return (
     <div className="rounded-lg border bg-card shadow-sm overflow-hidden">
-      <div className="p-4 bg-gradient-to-r from-searchatlas-cyan/10 to-searchatlas-dark/10 border-b">
+      <div className="p-4 bg-gradient-to-r from-linkgraph-coral/10 to-linkgraph-dark/10 border-b">
         <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-2">
           <BarChart3 className="h-4 w-4" />
           Campaign Comparison
@@ -281,7 +281,7 @@ function CampaignComparison({ campaigns }: { campaigns: CampaignComparisonItem[]
                   </td>
                   <td className="py-3 px-4">
                     <div className="flex items-center gap-2">
-                      <span className={`w-2 h-2 rounded-full flex-shrink-0 ${c.status.toLowerCase() === 'active' ? 'bg-searchatlas-green' : 'bg-gray-500'}`} />
+                      <span className={`w-2 h-2 rounded-full flex-shrink-0 ${c.status.toLowerCase() === 'active' ? 'bg-linkgraph-orange' : 'bg-gray-500'}`} />
                       <span className={`font-medium truncate max-w-[200px] ${c.status.toLowerCase() === 'draft' ? 'text-muted-foreground' : 'text-foreground'}`} title={c.name}>
                         {c.name.replace(/^Cycle \d+:\s*/, '').replace(/^Campaign \d+,\s*/, '')}
                       </span>
@@ -299,7 +299,7 @@ function CampaignComparison({ campaigns }: { campaigns: CampaignComparisonItem[]
                     <span className="font-medium">{c.replyRate}%</span>
                   </td>
                   <td className="py-3 px-4 text-right">
-                    <span className={`font-bold ${c.interestRate === bestInterest && c.interestRate > 0 ? 'text-searchatlas-green' : ''}`}>
+                    <span className={`font-bold ${c.interestRate === bestInterest && c.interestRate > 0 ? 'text-linkgraph-orange' : ''}`}>
                       {c.interestRate}%
                     </span>
                     {c.interested > 0 && (
@@ -315,7 +315,7 @@ function CampaignComparison({ campaigns }: { campaigns: CampaignComparisonItem[]
                     <div className="flex items-center gap-2 justify-end">
                       <div className="w-16 h-1.5 bg-muted rounded-full overflow-hidden">
                         <div
-                          className="h-full bg-searchatlas-cyan rounded-full"
+                          className="h-full bg-linkgraph-coral rounded-full"
                           style={{ width: `${Math.min(c.completionPct, 100)}%` }}
                         />
                       </div>
@@ -343,22 +343,22 @@ function CampaignComparison({ campaigns }: { campaigns: CampaignComparisonItem[]
                           </div>
                           <div className="bg-card rounded-lg p-3 border">
                             <p className="text-xs text-muted-foreground mb-1">Interested</p>
-                            <p className="font-bold text-lg text-searchatlas-green">{c.interested.toLocaleString()}</p>
+                            <p className="font-bold text-lg text-linkgraph-orange">{c.interested.toLocaleString()}</p>
                           </div>
                         </div>
 
                         {/* Email Sequence */}
                         <div className="bg-card rounded-lg border overflow-hidden">
-                          <div className="bg-gradient-to-r from-searchatlas-cyan/10 to-searchatlas-dark/10 px-4 py-3 border-b">
+                          <div className="bg-gradient-to-r from-linkgraph-coral/10 to-linkgraph-dark/10 px-4 py-3 border-b">
                             <div className="flex items-center gap-2">
-                              <Mail className="h-4 w-4 text-searchatlas-cyan" />
-                              <p className="text-sm font-semibold text-searchatlas-cyan">Email Sequence</p>
+                              <Mail className="h-4 w-4 text-linkgraph-coral" />
+                              <p className="text-sm font-semibold text-linkgraph-coral">Email Sequence</p>
                             </div>
                           </div>
                           <div className="p-4">
                             {seqLoading === c.id ? (
                               <div className="flex items-center justify-center py-8">
-                                <Loader2 className="h-6 w-6 animate-spin text-searchatlas-cyan" />
+                                <Loader2 className="h-6 w-6 animate-spin text-linkgraph-coral" />
                                 <span className="ml-2 text-sm text-muted-foreground">Loading...</span>
                               </div>
                             ) : sequenceData[c.id] && sequenceData[c.id].length > 0 ? (
@@ -367,24 +367,24 @@ function CampaignComparison({ campaigns }: { campaigns: CampaignComparisonItem[]
                                   <div key={step.id || idx} className="border rounded-lg overflow-hidden">
                                     <div className="bg-muted/50 px-4 py-2 flex items-center justify-between">
                                       <div className="flex items-center gap-2">
-                                        <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-searchatlas-cyan/20 text-searchatlas-cyan text-xs font-bold">
+                                        <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-linkgraph-coral/20 text-linkgraph-coral text-xs font-bold">
                                           {idx + 1}
                                         </span>
                                         <span className="text-sm font-medium">Step {idx + 1}</span>
                                         {step.is_variant && (
-                                          <span className="text-xs bg-searchatlas-purple/10 text-searchatlas-cyan px-2 py-0.5 rounded">
+                                          <span className="text-xs bg-linkgraph-pink/10 text-linkgraph-coral px-2 py-0.5 rounded">
                                             Variant {step.variant_letter || ''}
                                           </span>
                                         )}
                                         {step.is_thread_reply && (
-                                          <span className="text-xs bg-searchatlas-cyan/20 text-searchatlas-cyan px-2 py-0.5 rounded">
+                                          <span className="text-xs bg-linkgraph-coral/20 text-linkgraph-coral px-2 py-0.5 rounded">
                                             Thread Reply
                                           </span>
                                         )}
                                       </div>
                                       <div className="flex items-center gap-3 text-xs text-muted-foreground">
                                         {step.sent !== undefined && <span>{step.sent?.toLocaleString()} sent</span>}
-                                        {step.reply_rate !== undefined && <span className="font-medium text-searchatlas-cyan">{step.reply_rate}% reply</span>}
+                                        {step.reply_rate !== undefined && <span className="font-medium text-linkgraph-coral">{step.reply_rate}% reply</span>}
                                         {(step.delay_days || step.delay_hours) && (
                                           <span>{step.delay_days ? `${step.delay_days}d` : ''}{step.delay_hours ? `${step.delay_hours}h` : ''} delay</span>
                                         )}
@@ -409,10 +409,10 @@ function CampaignComparison({ campaigns }: { campaigns: CampaignComparisonItem[]
                                             <div><span className="text-muted-foreground">Sent: </span><span className="font-medium">{step.sent?.toLocaleString()}</span></div>
                                           )}
                                           {step.unique_replies !== undefined && (
-                                            <div><span className="text-muted-foreground">Replies: </span><span className="font-medium text-searchatlas-cyan">{step.unique_replies}</span></div>
+                                            <div><span className="text-muted-foreground">Replies: </span><span className="font-medium text-linkgraph-coral">{step.unique_replies}</span></div>
                                           )}
                                           {step.interested !== undefined && (
-                                            <div><span className="text-muted-foreground">Interested: </span><span className="font-medium text-searchatlas-green">{step.interested}</span></div>
+                                            <div><span className="text-muted-foreground">Interested: </span><span className="font-medium text-linkgraph-orange">{step.interested}</span></div>
                                           )}
                                           {step.bounced !== undefined && (
                                             <div><span className="text-muted-foreground">Bounced: </span><span className="font-medium text-red-500">{step.bounced}</span></div>
@@ -433,15 +433,15 @@ function CampaignComparison({ campaigns }: { campaigns: CampaignComparisonItem[]
                         </div>
 
                         {/* Performance Summary */}
-                        <div className="bg-gradient-to-r from-searchatlas-cyan/10 to-searchatlas-dark/10 rounded-lg p-4 border border-searchatlas-cyan/10">
+                        <div className="bg-gradient-to-r from-linkgraph-coral/10 to-linkgraph-dark/10 rounded-lg p-4 border border-linkgraph-coral/10">
                           <div className="flex items-center gap-2 mb-2">
-                            <Target className="h-4 w-4 text-searchatlas-cyan" />
-                            <p className="text-xs text-searchatlas-cyan uppercase tracking-wider font-semibold">Performance Summary</p>
+                            <Target className="h-4 w-4 text-linkgraph-coral" />
+                            <p className="text-xs text-linkgraph-coral uppercase tracking-wider font-semibold">Performance Summary</p>
                           </div>
                           <p className="text-sm text-muted-foreground">
                             Reached <span className="font-semibold text-foreground">{c.leadsContacted.toLocaleString()}</span> leads
                             {' '}&rarr; <span className="font-semibold text-foreground">{c.uniqueReplies.toLocaleString()}</span> replied ({c.replyRate}%)
-                            {' '}&rarr; <span className="font-semibold text-searchatlas-green">{c.interested.toLocaleString()}</span> interested ({c.interestRate}%)
+                            {' '}&rarr; <span className="font-semibold text-linkgraph-orange">{c.interested.toLocaleString()}</span> interested ({c.interestRate}%)
                           </p>
                         </div>
                       </div>
@@ -478,19 +478,19 @@ function SequenceStepAnalysis({ steps }: { steps: SequenceStepPerformance[] }) {
                 <span className="text-xs text-muted-foreground">{step.totalSent.toLocaleString()} sent</span>
                 <span className="text-xs font-medium">{step.replyRate}% reply</span>
                 {step.totalInterested > 0 && (
-                  <span className="text-xs font-medium text-searchatlas-green">{step.interestRate}% interest ({step.totalInterested})</span>
+                  <span className="text-xs font-medium text-linkgraph-orange">{step.interestRate}% interest ({step.totalInterested})</span>
                 )}
               </div>
             </div>
             <div className="h-3 bg-muted rounded-full overflow-hidden flex">
               <div
-                className="h-full bg-searchatlas-cyan rounded-l-full transition-all duration-500"
+                className="h-full bg-linkgraph-coral rounded-l-full transition-all duration-500"
                 style={{ width: `${(step.replyRate / maxReplyRate) * 100}%` }}
                 title={`${step.replyRate}% reply rate`}
               />
               {step.interestRate > 0 && (
                 <div
-                  className="h-full bg-searchatlas-green transition-all duration-500"
+                  className="h-full bg-linkgraph-orange transition-all duration-500"
                   style={{ width: `${(step.interestRate / maxReplyRate) * 100}%` }}
                   title={`${step.interestRate}% interest rate`}
                 />
@@ -500,8 +500,8 @@ function SequenceStepAnalysis({ steps }: { steps: SequenceStepPerformance[] }) {
         ))}
       </div>
       <div className="flex items-center gap-4 mt-4 text-xs text-muted-foreground">
-        <div className="flex items-center gap-1"><div className="w-3 h-3 bg-searchatlas-cyan rounded" /> Reply rate</div>
-        <div className="flex items-center gap-1"><div className="w-3 h-3 bg-searchatlas-green rounded" /> Interest rate</div>
+        <div className="flex items-center gap-1"><div className="w-3 h-3 bg-linkgraph-coral rounded" /> Reply rate</div>
+        <div className="flex items-center gap-1"><div className="w-3 h-3 bg-linkgraph-orange rounded" /> Interest rate</div>
       </div>
     </div>
   );
@@ -514,7 +514,7 @@ function SenderPerformance({ data }: { data: SenderAnalytics }) {
 
   return (
     <div className="rounded-lg border bg-card shadow-sm overflow-hidden">
-      <div className="p-4 bg-gradient-to-r from-searchatlas-cyan/10 to-searchatlas-dark/10 border-b">
+      <div className="p-4 bg-gradient-to-r from-linkgraph-coral/10 to-linkgraph-dark/10 border-b">
         <div className="flex items-center justify-between">
           <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-2">
             <Mail className="h-4 w-4" />
@@ -548,7 +548,7 @@ function SenderPerformance({ data }: { data: SenderAnalytics }) {
                     <p className="text-xs text-muted-foreground">Bounce</p>
                   </div>
                   <div className="min-w-0">
-                    <p className="text-base font-bold text-searchatlas-cyan">{p.replied.toLocaleString()}</p>
+                    <p className="text-base font-bold text-linkgraph-coral">{p.replied.toLocaleString()}</p>
                     <p className="text-xs text-muted-foreground">Replied</p>
                   </div>
                 </div>
@@ -595,7 +595,7 @@ function SenderPerformance({ data }: { data: SenderAnalytics }) {
             <div className="p-3 text-center border-t">
               <button
                 onClick={() => setShowAllDomains(!showAllDomains)}
-                className="text-xs text-searchatlas-cyan hover:text-searchatlas-cyan/80 font-medium"
+                className="text-xs text-linkgraph-coral hover:text-linkgraph-coral/80 font-medium"
               >
                 {showAllDomains ? 'Show less' : `Show all ${activeDomains.length} domains`}
               </button>
@@ -687,7 +687,7 @@ function PipelineCompanies({
   return (
     <div className="rounded-lg border bg-card shadow-sm p-6">
       <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-4 flex items-center gap-2">
-        <Building2 className="h-4 w-4 text-searchatlas-green" />
+        <Building2 className="h-4 w-4 text-linkgraph-orange" />
         Pipeline Companies
         <span className="text-xs font-normal">({companies.length})</span>
         {enrichLoading && <Loader2 className="h-3 w-3 animate-spin text-muted-foreground" />}
@@ -700,14 +700,14 @@ function PipelineCompanies({
           const enrichData = latestReply?.email ? enriched[latestReply.email] : null;
           const hasEnrichment = enrichData && (enrichData.linkedinUrl || enrichData.phone || enrichData.location);
           return (
-            <div key={c.label} className="p-3 rounded-lg bg-searchatlas-green/10 border border-searchatlas-green/20">
+            <div key={c.label} className="p-3 rounded-lg bg-linkgraph-orange/10 border border-linkgraph-orange/20">
               <div className="flex items-center justify-between mb-1">
                 {domain ? (
-                  <a href={`https://${domain}`} target="_blank" rel="noopener noreferrer" className="font-medium text-sm truncate max-w-[180px] text-searchatlas-cyan hover:underline" title={c.label}>{c.label}</a>
+                  <a href={`https://${domain}`} target="_blank" rel="noopener noreferrer" className="font-medium text-sm truncate max-w-[180px] text-linkgraph-coral hover:underline" title={c.label}>{c.label}</a>
                 ) : (
                   <span className="font-medium text-sm truncate max-w-[180px]" title={c.label}>{c.label}</span>
                 )}
-                <span className="text-xs bg-searchatlas-green/20 text-searchatlas-green px-1.5 py-0.5 rounded font-medium">
+                <span className="text-xs bg-linkgraph-orange/20 text-linkgraph-orange px-1.5 py-0.5 rounded font-medium">
                   {c.interestedCount} interested
                 </span>
               </div>
@@ -724,13 +724,13 @@ function PipelineCompanies({
               )}
               {/* Enriched contact details from AI-Ark */}
               {hasEnrichment && (
-                <div className="mt-2 pt-2 border-t border-searchatlas-green/10 flex flex-wrap items-center gap-2">
+                <div className="mt-2 pt-2 border-t border-linkgraph-orange/10 flex flex-wrap items-center gap-2">
                   {enrichData.linkedinUrl && (
                     <a
                       href={enrichData.linkedinUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1 text-[11px] text-searchatlas-cyan hover:underline"
+                      className="inline-flex items-center gap-1 text-[11px] text-linkgraph-coral hover:underline"
                     >
                       <Linkedin className="h-3 w-3" />
                       LinkedIn
@@ -739,7 +739,7 @@ function PipelineCompanies({
                   {enrichData.phone && (
                     <a
                       href={`tel:${enrichData.phone}`}
-                      className="inline-flex items-center gap-1 text-[11px] text-searchatlas-cyan hover:underline"
+                      className="inline-flex items-center gap-1 text-[11px] text-linkgraph-coral hover:underline"
                     >
                       <Phone className="h-3 w-3" />
                       {enrichData.phone}
@@ -796,10 +796,10 @@ function LeadDeepDive({
 
   return (
     <div className="rounded-lg border bg-card shadow-sm overflow-hidden">
-      <div className="p-4 bg-gradient-to-r from-searchatlas-cyan/10 to-searchatlas-dark/10 border-b space-y-3">
+      <div className="p-4 bg-gradient-to-r from-linkgraph-coral/10 to-linkgraph-dark/10 border-b space-y-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 bg-searchatlas-purple/20 rounded-lg flex items-center justify-center">
+            <div className="w-8 h-8 bg-linkgraph-pink/20 rounded-lg flex items-center justify-center">
               <Users className="h-4 w-4 text-white" />
             </div>
             <h3 className="text-lg font-bold">
@@ -811,7 +811,7 @@ function LeadDeepDive({
             <button
               onClick={() => setShowFilters(!showFilters)}
               className={`flex items-center gap-1 px-3 py-1.5 text-xs font-medium rounded-lg border transition-colors ${
-                showFilters ? 'bg-searchatlas-purple text-white border-searchatlas-purple' : 'bg-secondary hover:bg-accent'
+                showFilters ? 'bg-linkgraph-pink text-white border-linkgraph-pink' : 'bg-secondary hover:bg-accent'
               }`}
             >
               <Filter className="h-3 w-3" />
@@ -824,7 +824,7 @@ function LeadDeepDive({
                 placeholder="Search..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-48 h-9 pl-9 pr-3 text-sm rounded-lg border bg-background focus:outline-none focus:ring-2 focus:ring-searchatlas-cyan/20"
+                className="w-48 h-9 pl-9 pr-3 text-sm rounded-lg border bg-background focus:outline-none focus:ring-2 focus:ring-linkgraph-coral/20"
               />
             </div>
           </div>
@@ -880,7 +880,7 @@ function LeadDeepDive({
                   </td>
                   <td className="py-3 px-4">
                     <p className="font-medium text-foreground">{reply.name}</p>
-                    {reply.title && <p className="text-xs text-searchatlas-cyan">{reply.title}</p>}
+                    {reply.title && <p className="text-xs text-linkgraph-coral">{reply.title}</p>}
                   </td>
                   <td className="py-3 px-4">
                     <p className="font-medium">{reply.company}</p>
@@ -910,12 +910,12 @@ function LeadDeepDive({
                         </div>
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                           {reply.buyingSignals.length > 0 && (
-                            <div className="bg-searchatlas-green/10 rounded-lg p-3 border border-searchatlas-green/20">
+                            <div className="bg-linkgraph-orange/10 rounded-lg p-3 border border-linkgraph-orange/20">
                               <div className="flex items-center gap-1 mb-2">
-                                <Sparkles className="h-3 w-3 text-searchatlas-green" />
-                                <p className="text-xs font-semibold text-searchatlas-green uppercase">Buying Signals</p>
+                                <Sparkles className="h-3 w-3 text-linkgraph-orange" />
+                                <p className="text-xs font-semibold text-linkgraph-orange uppercase">Buying Signals</p>
                               </div>
-                              <ul className="space-y-1">{reply.buyingSignals.map((s, i) => <li key={i} className="text-xs text-searchatlas-green">{s}</li>)}</ul>
+                              <ul className="space-y-1">{reply.buyingSignals.map((s, i) => <li key={i} className="text-xs text-linkgraph-orange">{s}</li>)}</ul>
                             </div>
                           )}
                           {reply.objections.length > 0 && (
@@ -928,12 +928,12 @@ function LeadDeepDive({
                             </div>
                           )}
                           {reply.themes.length > 0 && (
-                            <div className="bg-searchatlas-cyan/10 rounded-lg p-3 border border-searchatlas-cyan/20">
+                            <div className="bg-linkgraph-coral/10 rounded-lg p-3 border border-linkgraph-coral/20">
                               <div className="flex items-center gap-1 mb-2">
-                                <MessageSquare className="h-3 w-3 text-searchatlas-cyan" />
-                                <p className="text-xs font-semibold text-searchatlas-cyan uppercase">Themes</p>
+                                <MessageSquare className="h-3 w-3 text-linkgraph-coral" />
+                                <p className="text-xs font-semibold text-linkgraph-coral uppercase">Themes</p>
                               </div>
-                              <div className="flex flex-wrap gap-1">{reply.themes.map((t, i) => <span key={i} className="text-xs bg-searchatlas-cyan/20 text-searchatlas-cyan px-2 py-0.5 rounded">{t}</span>)}</div>
+                              <div className="flex flex-wrap gap-1">{reply.themes.map((t, i) => <span key={i} className="text-xs bg-linkgraph-coral/20 text-linkgraph-coral px-2 py-0.5 rounded">{t}</span>)}</div>
                             </div>
                           )}
                         </div>
@@ -941,7 +941,7 @@ function LeadDeepDive({
                           <span>Email: {reply.email}</span>
                           <span>Seniority: {reply.seniority}</span>
                           <span>Industry: {reply.industry}</span>
-                          {reply.isInterested && <span className="text-searchatlas-green font-medium">Marked Interested</span>}
+                          {reply.isInterested && <span className="text-linkgraph-orange font-medium">Marked Interested</span>}
                         </div>
                       </div>
                     </td>
@@ -1118,9 +1118,9 @@ export default function AnalyticsPage() {
     setExporting(true);
     try {
       const date = new Date().toISOString().split('T')[0];
-      await exportPageToPDF(contentRef.current, `Search Atlas-Analytics-Report-${date}.pdf`, {
+      await exportPageToPDF(contentRef.current, `LinkGraph-Analytics-Report-${date}.pdf`, {
         title: 'Response Analytics',
-        subtitle: fastData?.workspaceName || 'Search Atlas Fulfillment',
+        subtitle: fastData?.workspaceName || 'LinkGraph',
       });
     } finally {
       setExporting(false);
@@ -1141,7 +1141,7 @@ export default function AnalyticsPage() {
       }));
     const cycleSuffix = activeCycle !== null ? `-Cycle${activeCycle}` : '';
     const date = new Date().toISOString().split('T')[0];
-    exportToCSV(rows, `Search Atlas-Analyzed-Replies${cycleSuffix}-${date}.csv`);
+    exportToCSV(rows, `LinkGraph-Analyzed-Replies${cycleSuffix}-${date}.csv`);
   }, [filteredReport, activeCycle]);
 
   // Full loading state (only if Phase 1 hasn't loaded yet)
@@ -1184,7 +1184,7 @@ export default function AnalyticsPage() {
           <FileSpreadsheet className="h-4 w-4" /> Download CSV
         </button>
         <button onClick={handleExportPDF} disabled={exporting}
-          className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg bg-searchatlas-purple hover:bg-searchatlas-purple/80 text-white transition-colors disabled:opacity-50">
+          className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg bg-linkgraph-pink hover:bg-linkgraph-pink/80 text-white transition-colors disabled:opacity-50">
           {exporting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Download className="h-4 w-4" />}
           {exporting ? 'Generating...' : 'Export PDF'}
         </button>
@@ -1199,7 +1199,7 @@ export default function AnalyticsPage() {
               onClick={() => setActiveCycle(null)}
               className={`px-4 py-2 text-sm font-medium rounded-lg border transition-colors whitespace-nowrap ${
                 activeCycle === null
-                  ? 'bg-searchatlas-purple text-white border-searchatlas-purple'
+                  ? 'bg-linkgraph-pink text-white border-linkgraph-pink'
                   : 'bg-secondary hover:bg-accent border-border'
               }`}
             >
@@ -1211,7 +1211,7 @@ export default function AnalyticsPage() {
                 onClick={() => setActiveCycle(cycle)}
                 className={`px-4 py-2 text-sm font-medium rounded-lg border transition-colors whitespace-nowrap ${
                   activeCycle === cycle
-                    ? 'bg-searchatlas-purple text-white border-searchatlas-purple'
+                    ? 'bg-linkgraph-pink text-white border-linkgraph-pink'
                     : 'bg-secondary hover:bg-accent border-border'
                 }`}
               >
@@ -1223,7 +1223,7 @@ export default function AnalyticsPage() {
 
         {/* ── PHASE 1: Hero Section ─────────────────────────────── */}
         {hero && (
-          <div className="bg-gradient-to-br from-searchatlas-purple/90 to-searchatlas-dark text-white rounded-3xl p-8 shadow-xl">
+          <div className="bg-gradient-to-br from-linkgraph-pink/90 to-linkgraph-dark text-white rounded-3xl p-8 shadow-xl">
             <div className="flex items-center gap-4 mb-6">
               <div>
                 <span className="text-white/80 font-medium text-sm uppercase tracking-wider">OUTBOUND ANALYTICS</span>
@@ -1298,9 +1298,9 @@ export default function AnalyticsPage() {
           </div>
         ) : copyData?.subjects?.analysis ? (
           <div className="rounded-lg border bg-card shadow-sm overflow-hidden">
-            <div className="flex flex-col space-y-1.5 p-6 bg-gradient-to-r from-searchatlas-cyan/10 to-searchatlas-dark/10 border-b">
+            <div className="flex flex-col space-y-1.5 p-6 bg-gradient-to-r from-linkgraph-coral/10 to-linkgraph-dark/10 border-b">
               <h2 className="flex items-center gap-3 text-xl font-bold">
-                <div className="w-8 h-8 bg-searchatlas-purple/20 rounded-lg flex items-center justify-center">
+                <div className="w-8 h-8 bg-linkgraph-pink/20 rounded-lg flex items-center justify-center">
                   <CheckCircle className="h-5 w-5 text-white" />
                 </div>
                 Copy Analysis
@@ -1311,33 +1311,33 @@ export default function AnalyticsPage() {
             </div>
             <div className="p-6 space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div className="bg-searchatlas-cyan/10 p-4 rounded-xl border border-searchatlas-cyan/20">
+                <div className="bg-linkgraph-coral/10 p-4 rounded-xl border border-linkgraph-coral/20">
                   <div className="flex items-center gap-2 mb-2">
-                    <MessageSquare className="h-4 w-4 text-searchatlas-cyan" />
-                    <h4 className="font-semibold text-searchatlas-cyan text-sm">Subject Lines</h4>
+                    <MessageSquare className="h-4 w-4 text-linkgraph-coral" />
+                    <h4 className="font-semibold text-linkgraph-coral text-sm">Subject Lines</h4>
                   </div>
-                  <p className="text-sm text-searchatlas-cyan/80">
+                  <p className="text-sm text-linkgraph-coral/80">
                     {copyData.subjects.analysis.keyInsight}
                   </p>
                 </div>
                 {copyData.body?.analysis && (
-                  <div className="bg-searchatlas-cyan/10 p-4 rounded-xl border border-searchatlas-cyan/20">
+                  <div className="bg-linkgraph-coral/10 p-4 rounded-xl border border-linkgraph-coral/20">
                     <div className="flex items-center gap-2 mb-2">
-                      <Target className="h-4 w-4 text-searchatlas-cyan" />
-                      <h4 className="font-semibold text-searchatlas-cyan text-sm">Opening Hooks</h4>
+                      <Target className="h-4 w-4 text-linkgraph-coral" />
+                      <h4 className="font-semibold text-linkgraph-coral text-sm">Opening Hooks</h4>
                     </div>
-                    <p className="text-sm text-searchatlas-cyan/80">
+                    <p className="text-sm text-linkgraph-coral/80">
                       {copyData.body.analysis.contrast}
                     </p>
                   </div>
                 )}
                 {copyData.cta?.analysis && (
-                  <div className="bg-searchatlas-cyan/10 p-4 rounded-xl border border-searchatlas-cyan/20">
+                  <div className="bg-linkgraph-coral/10 p-4 rounded-xl border border-linkgraph-coral/20">
                     <div className="flex items-center gap-2 mb-2">
-                      <Mail className="h-4 w-4 text-searchatlas-cyan" />
-                      <h4 className="font-semibold text-searchatlas-cyan text-sm">CTAs</h4>
+                      <Mail className="h-4 w-4 text-linkgraph-coral" />
+                      <h4 className="font-semibold text-linkgraph-coral text-sm">CTAs</h4>
                     </div>
-                    <p className="text-sm text-searchatlas-cyan/80">
+                    <p className="text-sm text-linkgraph-coral/80">
                       {copyData.cta.analysis.commitmentAnalysis}
                     </p>
                   </div>
@@ -1380,7 +1380,7 @@ export default function AnalyticsPage() {
             {/* Response Intelligence */}
             <div>
               <h2 className="text-2xl font-bold text-foreground mb-4 flex items-center gap-2">
-                <Brain className="h-6 w-6 text-searchatlas-cyan" />
+                <Brain className="h-6 w-6 text-linkgraph-coral" />
                 Response Intelligence
               </h2>
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -1404,12 +1404,12 @@ export default function AnalyticsPage() {
                 {filteredReport.topBuyingSignals.length > 0 && (
                   <div className="rounded-lg border bg-card shadow-sm p-6">
                     <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-4 flex items-center gap-2">
-                      <Sparkles className="h-4 w-4 text-searchatlas-green" /> Buying Signals
+                      <Sparkles className="h-4 w-4 text-linkgraph-orange" /> Buying Signals
                     </h3>
                     <div className="space-y-2">
                       {filteredReport.topBuyingSignals.map((s) => (
                         <div key={s.signal} className="flex items-center justify-between">
-                          <span className="text-sm font-medium text-searchatlas-green">{toTitleCase(s.signal)}</span>
+                          <span className="text-sm font-medium text-linkgraph-orange">{toTitleCase(s.signal)}</span>
                           <span className="text-sm text-muted-foreground">{s.count}x</span>
                         </div>
                       ))}
@@ -1437,7 +1437,7 @@ export default function AnalyticsPage() {
             {/* Who's Responding */}
             <div>
               <h2 className="text-2xl font-bold text-foreground mb-4 flex items-center gap-2">
-                <BarChart3 className="h-6 w-6 text-searchatlas-cyan" />
+                <BarChart3 className="h-6 w-6 text-linkgraph-coral" />
                 Who&apos;s Responding
               </h2>
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -1445,13 +1445,13 @@ export default function AnalyticsPage() {
                   <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-4 flex items-center gap-2">
                     <Building2 className="h-4 w-4" /> Industry Distribution
                   </h3>
-                  <HorizontalBarChart data={filteredReport.industryDistribution} colorClass="bg-searchatlas-cyan" showInterested />
+                  <HorizontalBarChart data={filteredReport.industryDistribution} colorClass="bg-linkgraph-coral" showInterested />
                 </div>
                 <div className="rounded-lg border bg-card shadow-sm p-6">
                   <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-4 flex items-center gap-2">
                     <Briefcase className="h-4 w-4" /> Title Seniority
                   </h3>
-                  <HorizontalBarChart data={filteredReport.seniorityDistribution} colorClass="bg-searchatlas-purple" showInterested />
+                  <HorizontalBarChart data={filteredReport.seniorityDistribution} colorClass="bg-linkgraph-pink" showInterested />
                 </div>
 
                 {/* Pipeline Companies (replaces Top Responding Companies) */}

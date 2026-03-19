@@ -20,7 +20,7 @@ export function HealthScoreGauge({ score, label, size = 'lg' }: HealthScoreGauge
 
   const getStrokeColor = (score: number) => {
     if (score >= 80) return '#22c55e';
-    if (score >= 60) return '#936BDA';
+    if (score >= 60) return '#FF2D84';
     if (score >= 40) return '#f59e0b';
     return '#ef4444';
   };

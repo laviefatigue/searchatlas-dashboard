@@ -20,12 +20,12 @@ export function VolumeHistoryChart({ data }: VolumeHistoryChartProps) {
         <AreaChart data={chartData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
           <defs>
             <linearGradient id="gradientSent" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="#936BDA" stopOpacity={0.4} />
-              <stop offset="100%" stopColor="#936BDA" stopOpacity={0.02} />
+              <stop offset="0%" stopColor="#FF2D84" stopOpacity={0.4} />
+              <stop offset="100%" stopColor="#FF2D84" stopOpacity={0.02} />
             </linearGradient>
             <linearGradient id="gradientCapacity" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="#88C2FF" stopOpacity={0.4} />
-              <stop offset="100%" stopColor="#88C2FF" stopOpacity={0.02} />
+              <stop offset="0%" stopColor="#FF644D" stopOpacity={0.4} />
+              <stop offset="100%" stopColor="#FF644D" stopOpacity={0.02} />
             </linearGradient>
           </defs>
           <CartesianGrid
@@ -55,7 +55,7 @@ export function VolumeHistoryChart({ data }: VolumeHistoryChartProps) {
               boxShadow: '0 4px 16px rgba(0, 0, 0, 0.1)',
             }}
             labelStyle={{ color: '#0F0F11', fontWeight: 500, marginBottom: 4 }}
-            itemStyle={{ color: '#936BDA' }}
+            itemStyle={{ color: '#FF2D84' }}
           />
           <Legend
             wrapperStyle={{ fontSize: '12px', paddingTop: '12px' }}
@@ -64,7 +64,7 @@ export function VolumeHistoryChart({ data }: VolumeHistoryChartProps) {
           <Area
             type="monotone"
             dataKey="Emails Sent"
-            stroke="#936BDA"
+            stroke="#FF2D84"
             strokeWidth={2}
             fillOpacity={1}
             fill="url(#gradientSent)"
@@ -72,7 +72,7 @@ export function VolumeHistoryChart({ data }: VolumeHistoryChartProps) {
           <Area
             type="monotone"
             dataKey="Capacity"
-            stroke="#88C2FF"
+            stroke="#FF644D"
             strokeWidth={2}
             fillOpacity={1}
             fill="url(#gradientCapacity)"

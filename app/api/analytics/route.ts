@@ -147,7 +147,7 @@ interface AIClassification {
   summary: string;
 }
 
-// ── AI Classification with SearchAtlas context ──────────────────────────────
+// ── AI Classification with client context ──────────────────────────────
 async function classifyRepliesWithAI(
   replies: Array<{ id: number; text: string; from: string; subject: string; interested: boolean }>
 ): Promise<Map<number, AIClassification>> {
@@ -181,7 +181,7 @@ async function classifyRepliesWithAI(
         max_tokens: 8192,
         messages: [{
           role: 'user',
-          content: `You are classifying replies to cold outbound emails sent by **SearchAtlas Fulfillment**, a 3PL (third-party logistics) company that handles warehousing, fulfillment, and shipping for e-commerce brands. The emails pitch SearchAtlas's fulfillment services to e-commerce brand owners and operators.
+          content: `You are classifying replies to cold outbound emails sent by **LinkGraph**, an AI-powered SEO agency that provides holistic SEO services including link building, content strategy, and technical SEO for businesses. The emails pitch LinkGraph's SEO services to business owners and marketing teams.
 
 Classify each reply below. For each, return:
 - **sentiment**: "positive" | "negative" | "neutral"
@@ -193,7 +193,7 @@ Classify each reply below. For each, return:
 
 ### CLASSIFICATION RULES (follow strictly):
 
-**POSITIVE / INTERESTED** — The person explicitly expresses interest in SearchAtlas's services or wants to continue the conversation:
+**POSITIVE / INTERESTED** — The person explicitly expresses interest in LinkGraph's services or wants to continue the conversation:
   - "Yes, let's set up a call"
   - "We're currently looking for a new 3PL"
   - "Can you send me a quote?"
@@ -487,7 +487,7 @@ export async function GET(request: Request) {
       fetchAllReplies(),
     ]);
 
-    const workspaceName = userResult.data.workspace?.name || userResult.data.team?.name || 'SearchAtlas';
+    const workspaceName = userResult.data.workspace?.name || userResult.data.team?.name || 'LinkGraph';
     const campaigns = campaignsResult.data;
     const activeCampaigns = campaigns.filter(c => c.emails_sent > 0);
     const campaignMap = new Map(campaigns.map(c => [c.id, c]));

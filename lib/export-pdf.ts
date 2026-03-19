@@ -9,11 +9,11 @@ interface ExportOptions {
 
 function addHeader(pdf: jsPDF, title: string, subtitle: string | undefined, margin: number, pageWidth: number) {
   // Indigo accent bar
-  pdf.setFillColor(79, 70, 229);
+  pdf.setFillColor(255, 38, 142);
   pdf.rect(margin, margin, pageWidth - margin * 2, 1, 'F');
 
   pdf.setFontSize(18);
-  pdf.setTextColor(79, 70, 229);
+  pdf.setTextColor(255, 38, 142);
   pdf.text(title, margin, margin + 8);
 
   if (subtitle) {
@@ -35,14 +35,14 @@ function addHeader(pdf: jsPDF, title: string, subtitle: string | undefined, marg
 
 function addFooter(pdf: jsPDF, page: number, totalPages: number, margin: number, pageWidth: number, pageHeight: number) {
   // Accent line
-  pdf.setDrawColor(79, 70, 229);
+  pdf.setDrawColor(255, 38, 142);
   pdf.setLineWidth(0.3);
   pdf.line(margin, pageHeight - margin - 2, pageWidth - margin, pageHeight - margin - 2);
 
   pdf.setFontSize(7);
   pdf.setTextColor(156, 163, 175);
   pdf.text(
-    'SearchAtlas Fulfillment  |  Outbound Analytics Report',
+    'LinkGraph Fulfillment  |  Outbound Analytics Report',
     margin,
     pageHeight - margin + 1
   );

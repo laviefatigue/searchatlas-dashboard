@@ -1,6 +1,6 @@
 // App constants
 
-export const APP_NAME = 'SearchAtlas Dashboard';
+export const APP_NAME = 'LinkGraph Dashboard';
 
 export const COOKIE_NAME = 'emailbison_token';
 
@@ -26,7 +26,7 @@ export const STATUS_COLORS: Record<string, { bg: string; text: string }> = {
   active: { bg: 'bg-green-500', text: 'text-white' },
   paused: { bg: 'bg-amber-500', text: 'text-white' },
   draft: { bg: 'bg-gray-200', text: 'text-gray-700' },
-  launching: { bg: 'bg-[#936BDA]', text: 'text-white' },
+  launching: { bg: 'bg-[#FF2D84]', text: 'text-white' },
   completed: { bg: 'bg-purple-500', text: 'text-white' },
   stopped: { bg: 'bg-red-500', text: 'text-white' },
   failed: { bg: 'bg-red-600', text: 'text-white' },
@@ -35,10 +35,10 @@ export const STATUS_COLORS: Record<string, { bg: string; text: string }> = {
 };
 
 export const CHART_COLORS = {
-  sent: '#A57BEA',      // SearchAtlas Purple (brighter)
-  opens: '#86EFAC',     // SearchAtlas Green (brighter)
-  replies: '#93C5FD',   // SearchAtlas Cyan (brighter)
-  bounced: '#F87171',   // Red (brighter)
-  interested: '#F9A8D4', // SearchAtlas Pink (brighter)
-  unsubscribed: '#9CA3AF', // Gray (brighter)
+  sent: '#FF268E',      // LinkGraph Pink (primary)
+  opens: '#86EFAC',     // Green (status)
+  replies: '#FF644D',   // LinkGraph Coral (secondary)
+  bounced: '#F87171',   // Red (status)
+  interested: '#FD8460', // LinkGraph Orange (accent)
+  unsubscribed: '#9CA3AF', // Gray
 };

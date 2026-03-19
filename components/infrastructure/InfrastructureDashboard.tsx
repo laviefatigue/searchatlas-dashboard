@@ -144,7 +144,7 @@ export function InfrastructureDashboard() {
 
   const getStatusMessage = () => {
     if (infrastructure.avg_health_score >= 85) return { text: 'All systems operational', icon: CheckCircle2, color: 'text-green-500' };
-    if (infrastructure.avg_health_score >= 70) return { text: 'Systems operational with minor issues', icon: CheckCircle2, color: 'text-searchatlas-purple' };
+    if (infrastructure.avg_health_score >= 70) return { text: 'Systems operational with minor issues', icon: CheckCircle2, color: 'text-linkgraph-pink' };
     return { text: 'Some systems need attention', icon: Activity, color: 'text-amber-500' };
   };
 
@@ -247,8 +247,8 @@ export function InfrastructureDashboard() {
           {/* Avg Daily Volume */}
           <div className="rounded-xl border bg-card p-5">
             <div className="flex items-center gap-2 mb-3">
-              <div className="w-8 h-8 rounded-lg bg-searchatlas-purple/10 flex items-center justify-center">
-                <Mail className="h-4 w-4 text-searchatlas-purple" />
+              <div className="w-8 h-8 rounded-lg bg-linkgraph-pink/10 flex items-center justify-center">
+                <Mail className="h-4 w-4 text-linkgraph-pink" />
               </div>
               <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Avg. Daily Sent</span>
             </div>

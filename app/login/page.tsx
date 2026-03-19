@@ -43,12 +43,12 @@ function LoginForm() {
 
   return (
     <div className="w-full max-w-sm">
-      {/* SearchAtlas Logo */}
+      {/* LinkGraph Logo */}
       <div className="flex justify-center mb-8">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
-          src="https://searchatlas.com/wp-content/uploads/2023/12/white.svg"
-          alt="SearchAtlas"
+          src="/linkgraph-logo.svg"
+          alt="LinkGraph"
           className="h-10 w-auto"
         />
       </div>
@@ -56,8 +56,8 @@ function LoginForm() {
       {/* Login Card */}
       <div className="bg-[#1C1D24] border border-[#2A2B35] rounded-xl p-6 shadow-xl">
         <div className="flex items-center gap-3 mb-6">
-          <div className="w-10 h-10 rounded-lg bg-[#A57BEA]/10 flex items-center justify-center">
-            <Lock className="w-5 h-5 text-[#A57BEA]" />
+          <div className="w-10 h-10 rounded-lg bg-[#FF268E]/10 flex items-center justify-center">
+            <Lock className="w-5 h-5 text-[#FF268E]" />
           </div>
           <div>
             <h1 className="text-lg font-semibold text-white">Dashboard Access</h1>
@@ -78,7 +78,7 @@ function LoginForm() {
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Enter password"
                 autoFocus
-                className="w-full px-4 py-3 bg-[#14151A] border border-[#2A2B35] rounded-lg text-white placeholder:text-[#5C5E6A] focus:outline-none focus:ring-2 focus:ring-[#A57BEA] focus:border-transparent transition-all"
+                className="w-full px-4 py-3 bg-[#14151A] border border-[#2A2B35] rounded-lg text-white placeholder:text-[#5C5E6A] focus:outline-none focus:ring-2 focus:ring-[#FF268E] focus:border-transparent transition-all"
               />
               <button
                 type="button"
@@ -103,7 +103,7 @@ function LoginForm() {
           <button
             type="submit"
             disabled={isLoading || !password}
-            className="w-full py-3 px-4 bg-[#A57BEA] hover:bg-[#9066D8] disabled:bg-[#A57BEA]/50 disabled:cursor-not-allowed text-white font-medium rounded-lg transition-colors flex items-center justify-center gap-2"
+            className="w-full py-3 px-4 bg-[#FF268E] hover:bg-[#E6207A] disabled:bg-[#FF268E]/50 disabled:cursor-not-allowed text-white font-medium rounded-lg transition-colors flex items-center justify-center gap-2"
           >
             {isLoading ? (
               <>
@@ -133,7 +133,7 @@ function LoginFallback() {
       </div>
       <div className="bg-[#1C1D24] border border-[#2A2B35] rounded-xl p-6">
         <div className="h-40 flex items-center justify-center">
-          <Loader2 className="w-6 h-6 animate-spin text-[#A57BEA]" />
+          <Loader2 className="w-6 h-6 animate-spin text-[#FF268E]" />
         </div>
       </div>
     </div>

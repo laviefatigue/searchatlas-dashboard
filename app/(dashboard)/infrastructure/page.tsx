@@ -16,10 +16,10 @@ import { exportToCSV } from '@/lib/export-csv';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// SEARCHATLAS BRAND COLORS - IMPROVED READABILITY
-// Primary: Purple #A57BEA (brighter)
-// Secondary: Cyan #93C5FD (brighter)
-// Accent: Green #86EFAC, Pink #F9A8D4
+// LINKGRAPH BRAND COLORS
+// Primary: Hot Pink #FF268E
+// Secondary: Coral #FF644D
+// Accent: Orange #FD8460
 // Background: Dark #14151A / Card #1D1E24
 // ═══════════════════════════════════════════════════════════════════════════════
 
@@ -141,16 +141,16 @@ function HealthScoreGauge({ score, size = 'md' }: { score: number; size?: 'sm' |
   const strokeDashoffset = circumference - (score / 100) * circumference;
 
   const getStrokeColor = (score: number) => {
-    if (score >= 80) return '#86EFAC'; // SearchAtlas green
-    if (score >= 60) return '#A57BEA'; // SearchAtlas purple
-    if (score >= 40) return '#F9A8D4'; // SearchAtlas pink
+    if (score >= 80) return '#86EFAC'; // Healthy green
+    if (score >= 60) return '#FF268E'; // LinkGraph pink
+    if (score >= 40) return '#FD8460'; // LinkGraph orange
     return '#ef4444';
   };
 
   const getGlowColor = (score: number) => {
     if (score >= 80) return 'rgba(156, 255, 172, 0.3)';
-    if (score >= 60) return 'rgba(147, 107, 218, 0.3)';
-    if (score >= 40) return 'rgba(255, 173, 219, 0.3)';
+    if (score >= 60) return 'rgba(255, 38, 142, 0.3)';
+    if (score >= 40) return 'rgba(253, 132, 96, 0.3)';
     return 'rgba(239, 68, 68, 0.3)';
   };
 
@@ -266,7 +266,7 @@ function VolumeTooltip({ active, payload, label }: { active?: boolean; payload?:
       <div className="space-y-2">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <div className="w-2 h-2 rounded-full bg-[#A57BEA]" />
+            <div className="w-2 h-2 rounded-full bg-[#FF268E]" />
             <span className="text-xs text-gray-400">Sent</span>
           </div>
           <span className="text-sm font-medium text-white">{sent.toLocaleString()}</span>
@@ -319,7 +319,7 @@ function VolumeHistoryChart({ data }: { data: VolumeHistory }) {
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-6">
           <div className="flex items-center gap-2">
-            <div className="w-3 h-3 rounded-sm bg-[#A57BEA]" />
+            <div className="w-3 h-3 rounded-sm bg-[#FF268E]" />
             <span className="text-xs text-gray-400">Sent</span>
             <span className="text-xs font-medium text-white ml-1">{totalSent.toLocaleString()}</span>
           </div>
@@ -346,8 +346,8 @@ function VolumeHistoryChart({ data }: { data: VolumeHistory }) {
           <AreaChart data={chartData} margin={{ top: 20, right: 10, left: 0, bottom: 0 }}>
             <defs>
               <linearGradient id="gradientSent" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="#A57BEA" stopOpacity={0.35} />
-                <stop offset="100%" stopColor="#A57BEA" stopOpacity={0.02} />
+                <stop offset="0%" stopColor="#FF268E" stopOpacity={0.35} />
+                <stop offset="100%" stopColor="#FF268E" stopOpacity={0.02} />
               </linearGradient>
               <linearGradient id="gradientReplied" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="0%" stopColor="#86EFAC" stopOpacity={0.3} />
@@ -383,14 +383,14 @@ function VolumeHistoryChart({ data }: { data: VolumeHistory }) {
 
             <Tooltip
               content={<VolumeTooltip />}
-              cursor={{ stroke: 'rgba(165, 123, 234, 0.2)' }}
+              cursor={{ stroke: 'rgba(255, 38, 142, 0.2)' }}
             />
 
             {/* Sends area (main volume) */}
             <Area
               type="monotone"
               dataKey="sent"
-              stroke="#A57BEA"
+              stroke="#FF268E"
               strokeWidth={2.5}
               fill="url(#gradientSent)"
               isAnimationActive={true}
@@ -419,19 +419,19 @@ function VolumeHistoryChart({ data }: { data: VolumeHistory }) {
 function ProviderCapacityCharts({ providers }: { providers: ProviderMetrics[] }) {
   const getHealthColor = (score: number) => {
     if (score >= 80) return '#86EFAC';
-    if (score >= 60) return '#A57BEA';
-    if (score >= 40) return '#F9A8D4';
+    if (score >= 60) return '#FF268E';
+    if (score >= 40) return '#FD8460';
     return '#ef4444';
   };
 
   const totalKills = providers.reduce((sum, p) => sum + p.dead_count, 0);
 
   return (
-    <div className="bg-[#1D1E24] border border-[#3A3C47] rounded-2xl p-6 hover:border-[#A57BEA]/50 transition-colors">
+    <div className="bg-[#1D1E24] border border-[#3A3C47] rounded-2xl p-6 hover:border-[#FF268E]/50 transition-colors">
       {/* Header with Legend */}
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-2">
-          <Server className="h-4 w-4 text-[#A57BEA]" />
+          <Server className="h-4 w-4 text-[#FF268E]" />
           <span className="text-xs font-medium text-gray-400 uppercase tracking-wide">Capacity Pipeline</span>
         </div>
         <div className="flex items-center gap-4 text-xs">
@@ -440,7 +440,7 @@ function ProviderCapacityCharts({ providers }: { providers: ProviderMetrics[] })
             <span className="text-gray-300">Live</span>
           </span>
           <span className="flex items-center gap-1.5">
-            <div className="w-3 h-3 rounded bg-[#93C5FD]" />
+            <div className="w-3 h-3 rounded bg-[#FF644D]" />
             <span className="text-gray-300">Reserve</span>
           </span>
           {providers.some(p => (p.inbox_flagged_count || 0) > 0) && (
@@ -481,9 +481,9 @@ function ProviderCapacityCharts({ providers }: { providers: ProviderMetrics[] })
               <div className="flex items-center justify-between mb-2">
                 <div className="flex items-center gap-3">
                   {provider.name.toLowerCase().includes('microsoft') ? (
-                    <Cloud className="h-5 w-5 text-[#93C5FD]" />
+                    <Cloud className="h-5 w-5 text-[#FF644D]" />
                   ) : (
-                    <Mail className="h-5 w-5 text-[#F9A8D4]" />
+                    <Mail className="h-5 w-5 text-[#FD8460]" />
                   )}
                   <span className="text-lg font-semibold text-white">{provider.name}</span>
                   <span
@@ -513,7 +513,7 @@ function ProviderCapacityCharts({ providers }: { providers: ProviderMetrics[] })
 
                 {/* Reserve Segment */}
                 <div
-                  className="h-full bg-gradient-to-r from-[#93C5FD] to-[#60a5fa] transition-all duration-700 flex items-center justify-center relative overflow-hidden"
+                  className="h-full bg-gradient-to-r from-[#FF644D] to-[#FF7A5C] transition-all duration-700 flex items-center justify-center relative overflow-hidden"
                   style={{ width: `${reservePercent}%` }}
                 >
                   {reservePercent >= 15 && (
@@ -552,18 +552,18 @@ function ProviderCapacityCharts({ providers }: { providers: ProviderMetrics[] })
                   <span className="text-gray-400">
                     <span className="text-[#86EFAC]">Live:</span> {provider.live_set_count} connected
                     {(provider.live_set_disconnected || 0) > 0 && (
-                      <span className="text-[#F9A8D4]"> · {provider.live_set_disconnected} disconnected</span>
+                      <span className="text-[#FD8460]"> · {provider.live_set_disconnected} disconnected</span>
                     )}
                   </span>
                   <span className="text-gray-400">
-                    <span className="text-[#93C5FD]">Reserve:</span> {provider.reserve_set_count} connected
+                    <span className="text-[#FF644D]">Reserve:</span> {provider.reserve_set_count} connected
                     {(provider.reserve_set_disconnected || 0) > 0 && (
-                      <span className="text-[#F9A8D4]"> · {provider.reserve_set_disconnected} disconnected</span>
+                      <span className="text-[#FD8460]"> · {provider.reserve_set_disconnected} disconnected</span>
                     )}
                   </span>
                 </div>
                 <span className="text-gray-400">
-                  Warming: <span className="text-[#F9A8D4] font-medium">{provider.warming_count}</span>
+                  Warming: <span className="text-[#FD8460] font-medium">{provider.warming_count}</span>
                 </span>
               </div>
             </div>
@@ -584,7 +584,7 @@ function ProviderCapacityCharts({ providers }: { providers: ProviderMetrics[] })
               </span>
             </span>
             <span className="flex items-center gap-2">
-              <div className="w-2 h-2 rounded-full bg-[#93C5FD]" />
+              <div className="w-2 h-2 rounded-full bg-[#FF644D]" />
               <span className="text-gray-400">Reserve:</span>
               <span className="text-white font-bold">
                 {providers.reduce((sum, p) => sum + p.reserve_set_count + (p.reserve_set_disconnected || 0), 0).toLocaleString()}
@@ -735,7 +735,7 @@ export default function InfrastructurePage() {
     return (
       <div className="min-h-screen bg-[#14151A] flex items-center justify-center">
         <div className="flex items-center gap-3 text-gray-400">
-          <Loader2 className="h-5 w-5 animate-spin text-[#A57BEA]" />
+          <Loader2 className="h-5 w-5 animate-spin text-[#FF268E]" />
           <span>Loading dashboard...</span>
         </div>
       </div>
@@ -749,7 +749,7 @@ export default function InfrastructurePage() {
           <p className="text-gray-400 mb-4">{error}</p>
           <button
             onClick={fetchData}
-            className="px-4 py-2 rounded-lg bg-[#A57BEA] text-white hover:bg-[#a57de6] transition-colors"
+            className="px-4 py-2 rounded-lg bg-[#FF268E] text-white hover:bg-[#FF3D9A] transition-colors"
           >
             Retry
           </button>
@@ -786,8 +786,8 @@ export default function InfrastructurePage() {
 
   const getStatusMessage = () => {
     if (infrastructure.avg_health_score >= 85) return { text: 'All systems operational', icon: CheckCircle2, color: 'text-[#86EFAC]' };
-    if (infrastructure.avg_health_score >= 70) return { text: 'Systems operational with minor issues', icon: CheckCircle2, color: 'text-[#A57BEA]' };
-    return { text: 'Some systems need attention', icon: Activity, color: 'text-[#F9A8D4]' };
+    if (infrastructure.avg_health_score >= 70) return { text: 'Systems operational with minor issues', icon: CheckCircle2, color: 'text-[#FF268E]' };
+    return { text: 'Some systems need attention', icon: Activity, color: 'text-[#FD8460]' };
   };
 
   const status = getStatusMessage();
@@ -800,11 +800,11 @@ export default function InfrastructurePage() {
         <header className="mb-8">
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center gap-4">
-              {/* SearchAtlas Logo */}
+              {/* LinkGraph Logo */}
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
-                src="https://searchatlas.com/wp-content/uploads/2023/12/white.svg"
-                alt="SearchAtlas"
+                src="/linkgraph-logo.svg"
+                alt="LinkGraph"
                 className="h-8 w-auto"
               />
             </div>
@@ -812,7 +812,7 @@ export default function InfrastructurePage() {
               <button
                 onClick={() => setExportMenuOpen(!exportMenuOpen)}
                 disabled={exporting}
-                className="flex items-center gap-2 px-4 py-2 rounded-lg border border-[#3A3C47] bg-[#1D1E24] text-white hover:border-[#A57BEA] hover:bg-[#A57BEA]/10 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex items-center gap-2 px-4 py-2 rounded-lg border border-[#3A3C47] bg-[#1D1E24] text-white hover:border-[#FF268E] hover:bg-[#FF268E]/10 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {exporting ? (
                   <Loader2 className="h-4 w-4 animate-spin" />
@@ -828,14 +828,14 @@ export default function InfrastructurePage() {
                   <div className="absolute right-0 top-full mt-1 z-50 w-56 rounded-lg border border-[#3A3C47] bg-[#1D1E24] shadow-xl overflow-hidden">
                     <button
                       onClick={() => handleExport('inboxes')}
-                      className="w-full px-4 py-3 text-left text-sm text-white hover:bg-[#A57BEA]/10 transition-colors border-b border-[#3A3C47]"
+                      className="w-full px-4 py-3 text-left text-sm text-white hover:bg-[#FF268E]/10 transition-colors border-b border-[#3A3C47]"
                     >
                       <div className="font-medium">All Inboxes</div>
                       <div className="text-xs text-gray-400 mt-0.5">Full inbox health report</div>
                     </button>
                     <button
                       onClick={() => handleExport('kill-triggers')}
-                      className="w-full px-4 py-3 text-left text-sm text-white hover:bg-[#A57BEA]/10 transition-colors"
+                      className="w-full px-4 py-3 text-left text-sm text-white hover:bg-[#FF268E]/10 transition-colors"
                     >
                       <div className="font-medium">Kill Triggers</div>
                       <div className="text-xs text-gray-400 mt-0.5">Flagged inboxes with severity &amp; date</div>
@@ -854,7 +854,7 @@ export default function InfrastructurePage() {
         {/* Hero - Health + Package */}
         <div className="grid grid-cols-2 gap-6 mb-6">
           {/* Health Score */}
-          <div className="bg-[#1D1E24] border border-[#3A3C47] rounded-2xl p-6 hover:border-[#A57BEA]/50 transition-colors">
+          <div className="bg-[#1D1E24] border border-[#3A3C47] rounded-2xl p-6 hover:border-[#FF268E]/50 transition-colors">
             <div className="flex items-center justify-between">
               <div className="flex-1">
                 <p className="text-xs font-medium text-gray-400 uppercase tracking-wide mb-6">
@@ -877,7 +877,7 @@ export default function InfrastructurePage() {
           </div>
 
           {/* Package Status */}
-          <div className="bg-[#1D1E24] border border-[#3A3C47] rounded-2xl p-6 hover:border-[#A57BEA]/50 transition-colors">
+          <div className="bg-[#1D1E24] border border-[#3A3C47] rounded-2xl p-6 hover:border-[#FF268E]/50 transition-colors">
             <p className="text-xs font-medium text-gray-400 uppercase tracking-wide mb-4">
               Your Package
             </p>
@@ -889,7 +889,7 @@ export default function InfrastructurePage() {
                 </p>
               </div>
               <div className="text-right">
-                <p className="text-3xl font-bold text-[#A57BEA]">{Math.min(100, packagePercent)}%</p>
+                <p className="text-3xl font-bold text-[#FF268E]">{Math.min(100, packagePercent)}%</p>
                 <p className="text-xs text-gray-400">fulfilled</p>
               </div>
             </div>
@@ -898,7 +898,7 @@ export default function InfrastructurePage() {
                 className="h-full rounded-full transition-all duration-700"
                 style={{
                   width: `${Math.min(100, packagePercent)}%`,
-                  background: 'linear-gradient(90deg, #A57BEA, #C4B5FD)'
+                  background: 'linear-gradient(90deg, #FF268E, #FF8FA3)'
                 }}
               />
             </div>
@@ -906,7 +906,7 @@ export default function InfrastructurePage() {
             {infrastructure.disconnected_inboxes > 0 || infrastructure.dead_inboxes > 0 ? (
               <div className="flex items-center gap-3 mt-2 text-xs">
                 {infrastructure.disconnected_inboxes > 0 && (
-                  <span className="text-[#F9A8D4]">
+                  <span className="text-[#FD8460]">
                     +{infrastructure.disconnected_inboxes} inboxes being provisioned
                   </span>
                 )}
@@ -927,10 +927,10 @@ export default function InfrastructurePage() {
         {/* Key Metrics Row */}
         <div className="grid grid-cols-3 gap-4 mb-6">
           {/* Sending Capacity with Live/Reserve Breakdown */}
-          <div className="bg-[#1D1E24] border border-[#3A3C47] rounded-2xl p-5 hover:border-[#A57BEA]/50 transition-colors">
+          <div className="bg-[#1D1E24] border border-[#3A3C47] rounded-2xl p-5 hover:border-[#FF268E]/50 transition-colors">
             <div className="flex items-center gap-2 mb-3">
-              <div className="w-8 h-8 rounded-lg bg-[#A57BEA]/20 flex items-center justify-center">
-                <Zap className="h-4 w-4 text-[#A57BEA]" />
+              <div className="w-8 h-8 rounded-lg bg-[#FF268E]/20 flex items-center justify-center">
+                <Zap className="h-4 w-4 text-[#FF268E]" />
               </div>
               <span className="text-xs font-medium text-gray-400 uppercase tracking-wide">Sending Capacity</span>
             </div>
@@ -944,7 +944,7 @@ export default function InfrastructurePage() {
                 style={{ width: `${livePercent}%` }}
               />
               <div
-                className="h-full bg-[#93C5FD] transition-all duration-500"
+                className="h-full bg-[#FF644D] transition-all duration-500"
                 style={{ width: `${100 - livePercent}%` }}
               />
             </div>
@@ -956,7 +956,7 @@ export default function InfrastructurePage() {
                 <span className="text-white font-medium">{liveCapacity.toLocaleString()}</span>
               </span>
               <span className="flex items-center gap-1.5">
-                <div className="w-2 h-2 rounded-full bg-[#93C5FD]" />
+                <div className="w-2 h-2 rounded-full bg-[#FF644D]" />
                 <span className="text-gray-400">Reserve:</span>
                 <span className="text-white font-medium">{reserveCapacity.toLocaleString()}</span>
               </span>
@@ -964,10 +964,10 @@ export default function InfrastructurePage() {
           </div>
 
           {/* Avg Daily Volume */}
-          <div className="bg-[#1D1E24] border border-[#3A3C47] rounded-2xl p-5 hover:border-[#A57BEA]/50 transition-colors">
+          <div className="bg-[#1D1E24] border border-[#3A3C47] rounded-2xl p-5 hover:border-[#FF268E]/50 transition-colors">
             <div className="flex items-center gap-2 mb-3">
-              <div className="w-8 h-8 rounded-lg bg-[#93C5FD]/20 flex items-center justify-center">
-                <Mail className="h-4 w-4 text-[#93C5FD]" />
+              <div className="w-8 h-8 rounded-lg bg-[#FF644D]/20 flex items-center justify-center">
+                <Mail className="h-4 w-4 text-[#FF644D]" />
               </div>
               <span className="text-xs font-medium text-gray-400 uppercase tracking-wide">Avg. Daily Sent</span>
             </div>
@@ -978,7 +978,7 @@ export default function InfrastructurePage() {
           </div>
 
           {/* Domains */}
-          <div className="bg-[#1D1E24] border border-[#3A3C47] rounded-2xl p-5 hover:border-[#A57BEA]/50 transition-colors">
+          <div className="bg-[#1D1E24] border border-[#3A3C47] rounded-2xl p-5 hover:border-[#FF268E]/50 transition-colors">
             <div className="flex items-center gap-2 mb-3">
               <div className="w-8 h-8 rounded-lg bg-[#86EFAC]/20 flex items-center justify-center">
                 <Server className="h-4 w-4 text-[#86EFAC]" />
@@ -1001,10 +1001,10 @@ export default function InfrastructurePage() {
 
         {/* Volume Chart */}
         {volumeHistory && (
-          <div className="bg-[#1D1E24] border border-[#3A3C47] rounded-2xl p-6 mb-6 hover:border-[#A57BEA]/50 transition-colors">
+          <div className="bg-[#1D1E24] border border-[#3A3C47] rounded-2xl p-6 mb-6 hover:border-[#FF268E]/50 transition-colors">
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-2">
-                <TrendingUp className="h-4 w-4 text-[#A57BEA]" />
+                <TrendingUp className="h-4 w-4 text-[#FF268E]" />
                 <span className="text-xs font-medium text-gray-400 uppercase tracking-wide">
                   Sending Volume
                 </span>

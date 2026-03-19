@@ -20,8 +20,8 @@ export function VolumeHistoryChart({ data }: VolumeHistoryChartProps) {
         <AreaChart data={chartData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
           <defs>
             <linearGradient id="gradientSent" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="#936BDA" stopOpacity={0.4} />
-              <stop offset="100%" stopColor="#936BDA" stopOpacity={0.02} />
+              <stop offset="0%" stopColor="#FF2D84" stopOpacity={0.4} />
+              <stop offset="100%" stopColor="#FF2D84" stopOpacity={0.02} />
             </linearGradient>
             <linearGradient id="gradientCapacity" x1="0" y1="0" x2="0" y2="1">
               <stop offset="0%" stopColor="#0F0F11" stopOpacity={0.3} />
@@ -63,7 +63,7 @@ export function VolumeHistoryChart({ data }: VolumeHistoryChartProps) {
           <Area
             type="monotone"
             dataKey="Emails Sent"
-            stroke="#936BDA"
+            stroke="#FF2D84"
             strokeWidth={2}
             fillOpacity={1}
             fill="url(#gradientSent)"

@@ -7,11 +7,11 @@ interface KillBreakdownPieProps {
   data: KillBreakdown;
 }
 
-// SearchAtlas-themed chart colors
+// LinkGraph-themed chart colors
 const COLORS = [
-  '#936BDA', // cyan
+  '#FF268E', // pink
   '#0F0F11', // navy
-  '#88C2FF', // gold
+  '#FF644D', // coral
   '#ef4444', // red
   '#22c55e', // green
 ];

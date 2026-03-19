@@ -28,12 +28,12 @@ export function Sidebar() {
 
   return (
     <div className="flex h-screen w-64 flex-col border-r border-sidebar-border bg-sidebar">
-      {/* SearchAtlas Logo */}
+      {/* LinkGraph Logo */}
       <div className="flex h-16 items-center border-b border-sidebar-border px-6">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
-          src="https://searchatlas.com/wp-content/uploads/2023/12/white.svg"
-          alt="SearchAtlas"
+          src="/linkgraph-logo.svg"
+          alt="LinkGraph"
           className="h-7 w-auto"
         />
       </div>
@@ -66,7 +66,7 @@ export function Sidebar() {
       <div className="border-t border-sidebar-border p-4 space-y-4">
         <div className="flex items-center gap-3">
           <Avatar className="h-8 w-8">
-            <AvatarFallback className="bg-[#A57BEA] text-white text-xs">
+            <AvatarFallback className="bg-[#FF268E] text-white text-xs">
               {user?.name ? getInitials(user.name) : 'U'}
             </AvatarFallback>
           </Avatar>

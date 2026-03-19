@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "SearchAtlas Dashboard",
+  title: "LinkGraph Dashboard",
   description: "Monitor your email infrastructure",
 };
 
