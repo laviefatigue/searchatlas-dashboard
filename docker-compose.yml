@@ -1,19 +1,26 @@
 version: "3.8"
 
 services:
-  selery-dashboard:
+  dashboard:
     build: .
     ports:
       - "3000:3000"
     environment:
       # EmailBison API (Analytics)
-      - EMAILBISON_API_URL=https://spellcast.hirecharm.com
+      - EMAILBISON_API_URL=${EMAILBISON_API_URL}
       - EMAILBISON_API_TOKEN=${EMAILBISON_API_TOKEN}
-      # Infrastructure API (Charm OS) - defaults to production
-      - INFRASTRUCTURE_API_URL=${INFRASTRUCTURE_API_URL:-http://ccssgc4gowsog04wck400o0w.31.97.142.123.sslip.io}
-      - INFRASTRUCTURE_CLIENT_ID=e5988a33-ec6c-4b5a-be85-25b8bd0678bb
+      # Workspace
+      - WORKSPACE_ID=${WORKSPACE_ID}
+      - WORKSPACE_NAME=${WORKSPACE_NAME:-Dashboard}
+      # Infrastructure API (Charm OS)
+      - INFRASTRUCTURE_API_URL=${INFRASTRUCTURE_API_URL}
+      - INFRASTRUCTURE_CLIENT_ID=${INFRASTRUCTURE_CLIENT_ID}
+      # Security
+      - DASHBOARD_PASSWORD=${DASHBOARD_PASSWORD}
       # Optional
-      - NEXT_PUBLIC_DASHBOARD_TITLE=Selery Dashboard
+      - NEXT_PUBLIC_DASHBOARD_TITLE=${NEXT_PUBLIC_DASHBOARD_TITLE:-Client Dashboard}
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY:-}
+      - AI_ARK_API_KEY=${AI_ARK_API_KEY:-}
     restart: unless-stopped
     extra_hosts:
       - "host.docker.internal:host-gateway"

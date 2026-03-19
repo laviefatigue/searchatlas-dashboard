@@ -1,8 +1,49 @@
-# Selery Client Analytics Dashboard
+# SearchAtlas Client Analytics Dashboard
 
-Real-time analytics and infrastructure health monitoring dashboard for Selery's email campaigns.
+Real-time analytics, campaign management, and infrastructure health monitoring dashboard for email outreach campaigns.
 
-## Quick Start (Production Deployment)
+## Tech Stack
+
+- **Next.js 16.1** (App Router)
+- **React 19**
+- **Tailwind CSS v4**
+- **Recharts** for data visualizations
+- **shadcn/ui** (Radix UI) for accessible components
+- **Dark theme** with SearchAtlas brand colors
+
+## Dashboard Tabs
+
+### Analytics
+
+Three-phase progressive data loading powers the main analytics view:
+
+- **Hero metrics** — top-level KPIs at a glance
+- **Conversion funnel** — full-funnel visualization from sends to conversions
+- **Campaign comparison** — sortable table with expandable rows for per-campaign detail
+- **Sequence step performance** — breakdown by outreach step
+- **Sender and domain performance** — deliverability by sender/domain
+- **AI-powered response intelligence** — sentiment analysis, theme extraction, buying-signal detection
+- **Copy analysis** — subject line and body performance insights
+- **Lead deep-dive** — filterable lead-level data explorer
+- **Cycle-based filtering** — parses "Cycle N" from campaign names for cycle-level analysis
+
+### Campaigns
+
+Draft campaign management and editing.
+
+### Infrastructure
+
+- Inbox health status (live / dead / warming)
+- Provider breakdown (Google / Microsoft / Other)
+- Kill velocity tracking
+- Domain authentication status
+- At-risk inbox forecasting
+
+### Settings & Login
+
+Password-protected access and dashboard configuration.
+
+## Quick Start
 
 ### 1. Install Dependencies
 
@@ -13,123 +54,63 @@ npm install
 
 ### 2. Configure Environment
 
-Copy the example environment file and update with your credentials:
+Copy the example environment file and fill in your values:
 
 ```bash
 cp .env.example .env.local
 ```
 
-Edit `.env.local` - only the API token needs to be added:
-
-```env
-# EmailBison API (Analytics Tab) - pre-configured
-EMAILBISON_API_URL=
-EMAILBISON_API_TOKEN=<get from team lead>
-
-# Infrastructure API (Infrastructure Tab) - pre-configured for Selery
-INFRASTRUCTURE_API_URL=
-INFRASTRUCTURE_CLIENT_ID=
-```
-
-> **Note**: The infrastructure API and client ID are pre-configured for Selery's production database. Only the `EMAILBISON_API_TOKEN` needs to be provided.
+See the **Environment Variables** section below for required values.
 
 ### 3. Build & Run
 
 ```bash
-# Production build
 npm run build
-
-# Start production server
 npm start
 ```
 
-The dashboard will be available at `http://localhost:3000`
+The dashboard will be available at `http://localhost:3000`.
 
----
-
-## Docker Deployment (Pre-Configured)
-
-Infrastructure API is pre-configured to Selery's production database. Just set your token:
+### Development
 
 ```bash
-# Set your API token (get from team lead)
-export EMAILBISON_API_TOKEN="your_token_here"
+npm run dev
+```
 
-# Build and run - infrastructure auto-connects to Selery production
+## Docker Deployment
+
+The application produces a standalone Next.js build for containerised deployment.
+
+```bash
 docker-compose up -d --build
 
 # View logs
 docker-compose logs -f
 ```
 
-For local development with localhost Charm API:
-```bash
-export EMAILBISON_API_TOKEN="your_token_here"
-export INFRASTRUCTURE_API_URL="http://host.docker.internal:8000"
-docker-compose up -d --build
-```
-
----
-
 ## Environment Variables
 
 | Variable | Required | Description |
 |----------|----------|-------------|
-| `EMAILBISON_API_URL` | Yes | EmailBison API endpoint (default: ``) |
-| `EMAILBISON_API_TOKEN` | Yes | Your EmailBison API token |
-| `INFRASTRUCTURE_API_URL` | Yes | Charm OS API endpoint |
-| `INFRASTRUCTURE_CLIENT_ID` | Yes | Client UUID in Charm OS database |
-| `NEXT_PUBLIC_DASHBOARD_TITLE` | No | Dashboard title in header (default: ``) |
-| `NEXT_PUBLIC_AUTO_REFRESH_MS` | No | Auto-refresh interval in ms (default: `300000` = 5 min) |
+| `EMAILBISON_API_URL` | Yes | EmailBison API endpoint |
+| `EMAILBISON_API_TOKEN` | Yes | EmailBison API token |
+| `WORKSPACE_ID` | Yes | Workspace identifier |
+| `WORKSPACE_NAME` | Yes | Display name for the workspace |
+| `INFRASTRUCTURE_API_URL` | Yes | Infrastructure health API endpoint |
+| `INFRASTRUCTURE_CLIENT_ID` | Yes | Client UUID in the infrastructure database |
+| `DASHBOARD_PASSWORD` | Yes | Password for dashboard login |
+| `ANTHROPIC_API_KEY` | No | Enables AI-powered response intelligence features |
+| `AI_ARK_API_KEY` | No | Enables lead enrichment features |
 
----
+## Multi-Tenant Deployment
 
-## Development
-
-```bash
-# Start development server with hot-reload
-npm run dev
-```
-
----
-
-## Dashboard Tabs
-
-### Analytics Tab
-- Campaign performance metrics
-- Reply rates, open rates, bounce analysis
-- Sequence step breakdown
-- Time-based trends
-
-### Infrastructure Tab
-- Inbox health status (live/dead/warming)
-- Provider breakdown (Google/Microsoft/Other)
-- Kill velocity tracking
-- Domain authentication status
-- At-risk inbox forecasting
-
-**Data Source**: Charm OS PostgreSQL database via FastAPI
-- Endpoint: `GET /api/health/infrastructure/{client_id}`
-- Kill data: `GET /api/health/kill-velocity/{client_id}`
-- Volume history: `GET /api/health/daily-volume/{client_id}`
-
----
-
-## Tech Stack
-
-- **Next.js 16** (App Router)
-- **React 19**
-- **Tailwind CSS 4**
-- **Recharts** for visualizations
-- **Radix UI** for accessible components
-
----
+The same codebase is deployed once per client. Each deployment uses its own set of environment variables (workspace ID, API credentials, etc.) to isolate client data. No code changes are needed between tenants.
 
 ## Brand Colors
 
 | Color | Hex | Usage |
 |-------|-----|-------|
-| Navy | `#1C2655` | Primary, headers |
-| Cyan | `#28BFFC` | Accents, links |
-| Gold | `#F9B416` | Highlights, CTAs |
-
+| Purple | `#936BDA` | Primary accent |
+| Cyan | `#88C2FF` | Secondary accent, links |
+| Green | `#9CFFAC` | Positive indicators |
+| Pink | `#FFADDB` | Highlights |
