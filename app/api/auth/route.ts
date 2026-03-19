@@ -33,10 +33,12 @@ export async function POST(request: NextRequest) {
     const response = NextResponse.json({ success: true });
 
     // Set httpOnly cookie with 7 day expiry
+    // secure: true only when accessed over HTTPS (not just NODE_ENV)
+    const isHttps = request.headers.get('x-forwarded-proto') === 'https' || request.url.startsWith('https');
     response.cookies.set('dashboard_auth', 'authenticated', {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
+      secure: isHttps,
+      sameSite: 'lax',
       maxAge: 60 * 60 * 24 * 7, // 7 days
       path: '/',
     });
@@ -56,8 +58,8 @@ export async function DELETE() {
 
   response.cookies.set('dashboard_auth', '', {
     httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'strict',
+    secure: false,
+    sameSite: 'lax',
     maxAge: 0,
     path: '/',
   });
