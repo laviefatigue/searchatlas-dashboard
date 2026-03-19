@@ -7,11 +7,12 @@ import type {
   AnalyticsReport,
   AnalyzedReply,
   ReplySentiment,
-  ReplyIntent,
   DemographicDistribution,
   FastAnalytics,
+  SenderAnalytics,
   CampaignComparisonItem,
   SequenceStepPerformance,
+  DomainStats,
   CopyAnalysis,
 } from '@/lib/types/emailbison';
 import { exportPageToPDF } from '@/lib/export-pdf';
@@ -36,6 +37,7 @@ import {
   FileSpreadsheet,
   Loader2,
   Mail,
+  Globe,
   Zap,
   Target,
   ArrowRight,
@@ -53,7 +55,7 @@ const toTitleCase = (s: string) => s.replace(/\b\w/g, c => c.toUpperCase());
 
 function SentimentBadge({ sentiment }: { sentiment: ReplySentiment }) {
   const config = {
-    positive: { label: 'Positive', bg: 'bg-searchatlas-cyan/20', text: 'text-searchatlas-cyan', icon: ThumbsUp },
+    positive: { label: 'Positive', bg: 'bg-searchatlas-green/20', text: 'text-searchatlas-green', icon: ThumbsUp },
     negative: { label: 'Negative', bg: 'bg-red-950/30', text: 'text-red-400', icon: ThumbsDown },
     neutral: { label: 'Neutral', bg: 'bg-secondary', text: 'text-muted-foreground', icon: Minus },
   }[sentiment];
@@ -68,10 +70,10 @@ function SentimentBadge({ sentiment }: { sentiment: ReplySentiment }) {
 
 function IntentBadge({ intent }: { intent: string }) {
   const colors: Record<string, string> = {
-    'interested': 'bg-searchatlas-cyan/20 text-searchatlas-cyan',
+    'interested': 'bg-searchatlas-green/20 text-searchatlas-green',
     'not-interested': 'bg-red-950/30 text-red-400',
-    'needs-info': 'bg-searchatlas-purple/20 text-searchatlas-purple',
-    'referral': 'bg-searchatlas-purple/20 text-searchatlas-purple',
+    'needs-info': 'bg-searchatlas-cyan/20 text-searchatlas-cyan',
+    'referral': 'bg-searchatlas-purple/10 text-searchatlas-purple',
     'out-of-office': 'bg-secondary text-muted-foreground',
     'unsubscribe': 'bg-red-950/30 text-red-400',
   };
@@ -84,7 +86,7 @@ function IntentBadge({ intent }: { intent: string }) {
 
 function HorizontalBarChart({
   data,
-  colorClass = 'bg-searchatlas-purple',
+  colorClass = 'bg-searchatlas-cyan',
   showInterested = false,
 }: {
   data: DemographicDistribution[];
@@ -102,7 +104,7 @@ function HorizontalBarChart({
             </span>
             <div className="flex items-center gap-3">
               {showInterested && item.interestedCount > 0 && (
-                <span className="text-xs text-searchatlas-cyan font-medium">
+                <span className="text-xs text-searchatlas-green font-medium">
                   {item.interestedCount} interested
                 </span>
               )}
@@ -131,14 +133,14 @@ function SentimentOverview({
   total: number;
 }) {
   const items = [
-    { key: 'positive' as const, label: 'Positive', color: 'bg-searchatlas-cyan', count: breakdown.positive },
-    { key: 'neutral' as const, label: 'Neutral', color: 'bg-searchatlas-pink', count: breakdown.neutral },
-    { key: 'negative' as const, label: 'Negative', color: 'bg-red-400', count: breakdown.negative },
+    { key: 'positive' as const, label: 'Positive', color: 'bg-searchatlas-green', count: breakdown.positive },
+    { key: 'neutral' as const, label: 'Neutral', color: 'bg-gray-500', count: breakdown.neutral },
+    { key: 'negative' as const, label: 'Negative', color: 'bg-red-500', count: breakdown.negative },
   ];
   return (
-    <div className="grid grid-cols-2 md:grid-cols-4 gap-5">
+    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
       {items.map((item) => (
-        <div key={item.key} className="text-center p-5 rounded-xl bg-muted/50 border">
+        <div key={item.key} className="text-center p-4 rounded-xl bg-muted/50 border">
           <div className={`w-3 h-3 ${item.color} rounded-full mx-auto mb-2`} />
           <p className="text-2xl font-bold text-foreground">{item.count}</p>
           <p className="text-xs text-muted-foreground">{item.label}</p>
@@ -155,10 +157,10 @@ function SentimentOverview({
 
 function ConversionFunnel({ funnel }: { funnel: FastAnalytics['funnel'] }) {
   const steps = [
-    { label: 'Total Leads', value: funnel.totalLeads, color: 'from-searchatlas-purple/60 to-searchatlas-purple/40' },
-    { label: 'Contacted', value: funnel.contacted, color: 'from-searchatlas-purple to-searchatlas-purple/80' },
-    { label: 'Replied', value: funnel.replied, color: 'from-searchatlas-pink to-searchatlas-pink/80' },
-    { label: 'Interested', value: funnel.interested, color: 'from-searchatlas-cyan to-searchatlas-cyan/80' },
+    { label: 'Total Leads', value: funnel.totalLeads, color: 'from-gray-600 to-gray-700' },
+    { label: 'Contacted', value: funnel.contacted, color: 'from-searchatlas-cyan/70 to-searchatlas-cyan/50' },
+    { label: 'Replied', value: funnel.replied, color: 'from-searchatlas-purple/70 to-searchatlas-purple/50' },
+    { label: 'Interested', value: funnel.interested, color: 'from-searchatlas-green/70 to-searchatlas-green/50' },
   ];
 
   return (
@@ -245,7 +247,7 @@ function CampaignComparison({ campaigns }: { campaigns: CampaignComparisonItem[]
 
   return (
     <div className="rounded-lg border bg-card shadow-sm overflow-hidden">
-      <div className="p-4 bg-gradient-to-r from-searchatlas-purple/10 to-searchatlas-purple/5  border-b">
+      <div className="p-4 bg-gradient-to-r from-searchatlas-cyan/10 to-searchatlas-dark/10 border-b">
         <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-2">
           <BarChart3 className="h-4 w-4" />
           Campaign Comparison
@@ -279,23 +281,25 @@ function CampaignComparison({ campaigns }: { campaigns: CampaignComparisonItem[]
                   </td>
                   <td className="py-3 px-4">
                     <div className="flex items-center gap-2">
-                      <span className={`w-2 h-2 rounded-full flex-shrink-0 ${c.status === 'Active' ? 'bg-searchatlas-cyan' : c.status?.toLowerCase() === 'draft' ? 'bg-gray-400' : 'bg-muted-foreground'}`} />
-                      <span className={`font-medium truncate max-w-[200px] ${c.status?.toLowerCase() === 'draft' ? 'text-muted-foreground' : 'text-foreground'}`} title={c.name}>
+                      <span className={`w-2 h-2 rounded-full flex-shrink-0 ${c.status.toLowerCase() === 'active' ? 'bg-searchatlas-green' : 'bg-gray-500'}`} />
+                      <span className={`font-medium truncate max-w-[200px] ${c.status.toLowerCase() === 'draft' ? 'text-muted-foreground' : 'text-foreground'}`} title={c.name}>
                         {c.name.replace(/^Cycle \d+:\s*/, '').replace(/^Campaign \d+,\s*/, '')}
                       </span>
-                      {c.status?.toLowerCase() === 'draft' && (
-                        <span className="text-xs bg-muted text-muted-foreground px-1.5 py-0.5 rounded">Draft</span>
+                      {c.status.toLowerCase() === 'draft' && (
+                        <span className="text-[10px] font-medium px-1.5 py-0.5 rounded bg-muted text-muted-foreground uppercase tracking-wider">
+                          {'Draft'}
+                        </span>
                       )}
                     </div>
                   </td>
-                  <td className="py-3 px-4 text-right text-muted-foreground">{c.totalLeads?.toLocaleString() || "-"}</td>
+                  <td className="py-3 px-4 text-right text-muted-foreground">{c.totalLeads.toLocaleString()}</td>
                   <td className="py-3 px-4 text-right text-muted-foreground">{c.emailsSent.toLocaleString()}</td>
                   <td className="py-3 px-4 text-right text-muted-foreground">{c.leadsContacted.toLocaleString()}</td>
                   <td className="py-3 px-4 text-right">
                     <span className="font-medium">{c.replyRate}%</span>
                   </td>
                   <td className="py-3 px-4 text-right">
-                    <span className={`font-bold ${c.interestRate === bestInterest && c.interestRate > 0 ? 'text-searchatlas-cyan' : ''}`}>
+                    <span className={`font-bold ${c.interestRate === bestInterest && c.interestRate > 0 ? 'text-searchatlas-green' : ''}`}>
                       {c.interestRate}%
                     </span>
                     {c.interested > 0 && (
@@ -303,7 +307,7 @@ function CampaignComparison({ campaigns }: { campaigns: CampaignComparisonItem[]
                     )}
                   </td>
                   <td className="py-3 px-4 text-right">
-                    <span className={c.bounceRate > 3 ? 'text-red-600 font-medium' : 'text-muted-foreground'}>
+                    <span className={c.bounceRate > 3 ? 'text-red-400 font-medium' : 'text-muted-foreground'}>
                       {c.bounceRate}%
                     </span>
                   </td>
@@ -311,7 +315,7 @@ function CampaignComparison({ campaigns }: { campaigns: CampaignComparisonItem[]
                     <div className="flex items-center gap-2 justify-end">
                       <div className="w-16 h-1.5 bg-muted rounded-full overflow-hidden">
                         <div
-                          className="h-full bg-searchatlas-purple rounded-full"
+                          className="h-full bg-searchatlas-cyan rounded-full"
                           style={{ width: `${Math.min(c.completionPct, 100)}%` }}
                         />
                       </div>
@@ -321,40 +325,40 @@ function CampaignComparison({ campaigns }: { campaigns: CampaignComparisonItem[]
                 </tr>
                 {expandedId === c.id && (
                   <tr className="bg-muted/30">
-                    <td colSpan={9} className="p-8">
-                      <div className="space-y-6">
+                    <td colSpan={9} className="p-6">
+                      <div className="space-y-4">
                         {/* Stats Grid */}
-                        <div className="grid grid-cols-2 md:grid-cols-4 gap-5">
-                          <div className="bg-card rounded-xl p-4 border">
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                          <div className="bg-card rounded-lg p-3 border">
                             <p className="text-xs text-muted-foreground mb-1">Leads Reached</p>
-                            <p className="font-bold text-xl">{c.leadsContacted.toLocaleString()}</p>
+                            <p className="font-bold text-lg">{c.leadsContacted.toLocaleString()}</p>
                           </div>
-                          <div className="bg-card rounded-xl p-4 border">
+                          <div className="bg-card rounded-lg p-3 border">
                             <p className="text-xs text-muted-foreground mb-1">Emails Sent</p>
-                            <p className="font-bold text-xl">{c.emailsSent.toLocaleString()}</p>
+                            <p className="font-bold text-lg">{c.emailsSent.toLocaleString()}</p>
                           </div>
-                          <div className="bg-card rounded-xl p-4 border">
+                          <div className="bg-card rounded-lg p-3 border">
                             <p className="text-xs text-muted-foreground mb-1">Replies</p>
-                            <p className="font-bold text-xl">{c.uniqueReplies.toLocaleString()}</p>
+                            <p className="font-bold text-lg">{c.uniqueReplies.toLocaleString()}</p>
                           </div>
-                          <div className="bg-card rounded-xl p-4 border">
+                          <div className="bg-card rounded-lg p-3 border">
                             <p className="text-xs text-muted-foreground mb-1">Interested</p>
-                            <p className="font-bold text-xl text-searchatlas-cyan">{c.interested.toLocaleString()}</p>
+                            <p className="font-bold text-lg text-searchatlas-green">{c.interested.toLocaleString()}</p>
                           </div>
                         </div>
 
                         {/* Email Sequence */}
                         <div className="bg-card rounded-lg border overflow-hidden">
-                          <div className="bg-gradient-to-r from-searchatlas-purple/10 to-searchatlas-purple/5  px-4 py-3 border-b">
+                          <div className="bg-gradient-to-r from-searchatlas-cyan/10 to-searchatlas-dark/10 px-4 py-3 border-b">
                             <div className="flex items-center gap-2">
-                              <Mail className="h-4 w-4 text-searchatlas-purple" />
-                              <p className="text-sm font-semibold text-searchatlas-purple">Email Sequence</p>
+                              <Mail className="h-4 w-4 text-searchatlas-cyan" />
+                              <p className="text-sm font-semibold text-searchatlas-cyan">Email Sequence</p>
                             </div>
                           </div>
                           <div className="p-4">
                             {seqLoading === c.id ? (
                               <div className="flex items-center justify-center py-8">
-                                <Loader2 className="h-6 w-6 animate-spin text-searchatlas-purple" />
+                                <Loader2 className="h-6 w-6 animate-spin text-searchatlas-cyan" />
                                 <span className="ml-2 text-sm text-muted-foreground">Loading...</span>
                               </div>
                             ) : sequenceData[c.id] && sequenceData[c.id].length > 0 ? (
@@ -363,24 +367,24 @@ function CampaignComparison({ campaigns }: { campaigns: CampaignComparisonItem[]
                                   <div key={step.id || idx} className="border rounded-lg overflow-hidden">
                                     <div className="bg-muted/50 px-4 py-2 flex items-center justify-between">
                                       <div className="flex items-center gap-2">
-                                        <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-searchatlas-purple/20 text-searchatlas-purple text-xs font-bold">
+                                        <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-searchatlas-cyan/20 text-searchatlas-cyan text-xs font-bold">
                                           {idx + 1}
                                         </span>
                                         <span className="text-sm font-medium">Step {idx + 1}</span>
                                         {step.is_variant && (
-                                          <span className="text-xs bg-searchatlas-purple/20 text-searchatlas-purple px-2 py-0.5 rounded">
+                                          <span className="text-xs bg-searchatlas-purple/10 text-searchatlas-cyan px-2 py-0.5 rounded">
                                             Variant {step.variant_letter || ''}
                                           </span>
                                         )}
                                         {step.is_thread_reply && (
-                                          <span className="text-xs bg-searchatlas-purple/20 text-searchatlas-purple px-2 py-0.5 rounded">
+                                          <span className="text-xs bg-searchatlas-cyan/20 text-searchatlas-cyan px-2 py-0.5 rounded">
                                             Thread Reply
                                           </span>
                                         )}
                                       </div>
                                       <div className="flex items-center gap-3 text-xs text-muted-foreground">
                                         {step.sent !== undefined && <span>{step.sent?.toLocaleString()} sent</span>}
-                                        {step.reply_rate !== undefined && <span className="font-medium text-searchatlas-purple">{step.reply_rate}% reply</span>}
+                                        {step.reply_rate !== undefined && <span className="font-medium text-searchatlas-cyan">{step.reply_rate}% reply</span>}
                                         {(step.delay_days || step.delay_hours) && (
                                           <span>{step.delay_days ? `${step.delay_days}d` : ''}{step.delay_hours ? `${step.delay_hours}h` : ''} delay</span>
                                         )}
@@ -405,10 +409,10 @@ function CampaignComparison({ campaigns }: { campaigns: CampaignComparisonItem[]
                                             <div><span className="text-muted-foreground">Sent: </span><span className="font-medium">{step.sent?.toLocaleString()}</span></div>
                                           )}
                                           {step.unique_replies !== undefined && (
-                                            <div><span className="text-muted-foreground">Replies: </span><span className="font-medium text-searchatlas-purple">{step.unique_replies}</span></div>
+                                            <div><span className="text-muted-foreground">Replies: </span><span className="font-medium text-searchatlas-cyan">{step.unique_replies}</span></div>
                                           )}
                                           {step.interested !== undefined && (
-                                            <div><span className="text-muted-foreground">Interested: </span><span className="font-medium text-searchatlas-cyan">{step.interested}</span></div>
+                                            <div><span className="text-muted-foreground">Interested: </span><span className="font-medium text-searchatlas-green">{step.interested}</span></div>
                                           )}
                                           {step.bounced !== undefined && (
                                             <div><span className="text-muted-foreground">Bounced: </span><span className="font-medium text-red-500">{step.bounced}</span></div>
@@ -429,15 +433,15 @@ function CampaignComparison({ campaigns }: { campaigns: CampaignComparisonItem[]
                         </div>
 
                         {/* Performance Summary */}
-                        <div className="bg-gradient-to-r from-searchatlas-purple/10 to-searchatlas-purple/5  rounded-lg p-4 border border-searchatlas-purple/10">
+                        <div className="bg-gradient-to-r from-searchatlas-cyan/10 to-searchatlas-dark/10 rounded-lg p-4 border border-searchatlas-cyan/10">
                           <div className="flex items-center gap-2 mb-2">
-                            <Target className="h-4 w-4 text-searchatlas-purple" />
-                            <p className="text-xs text-searchatlas-purple uppercase tracking-wider font-semibold">Performance Summary</p>
+                            <Target className="h-4 w-4 text-searchatlas-cyan" />
+                            <p className="text-xs text-searchatlas-cyan uppercase tracking-wider font-semibold">Performance Summary</p>
                           </div>
                           <p className="text-sm text-muted-foreground">
                             Reached <span className="font-semibold text-foreground">{c.leadsContacted.toLocaleString()}</span> leads
                             {' '}&rarr; <span className="font-semibold text-foreground">{c.uniqueReplies.toLocaleString()}</span> replied ({c.replyRate}%)
-                            {' '}&rarr; <span className="font-semibold text-searchatlas-cyan">{c.interested.toLocaleString()}</span> interested ({c.interestRate}%)
+                            {' '}&rarr; <span className="font-semibold text-searchatlas-green">{c.interested.toLocaleString()}</span> interested ({c.interestRate}%)
                           </p>
                         </div>
                       </div>
@@ -460,33 +464,33 @@ function SequenceStepAnalysis({ steps }: { steps: SequenceStepPerformance[] }) {
 
   return (
     <div className="rounded-lg border bg-card shadow-sm p-6">
-      <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-5 flex items-center gap-2">
+      <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-4 flex items-center gap-2">
         <Zap className="h-4 w-4" />
         Sequence Step Performance
         <span className="text-xs font-normal text-muted-foreground">(across {steps[0]?.campaignCount || 0} campaigns)</span>
       </h3>
-      <div className="space-y-5">
+      <div className="space-y-4">
         {steps.map((step) => (
           <div key={step.stepNumber} className="space-y-2">
             <div className="flex items-center justify-between text-sm">
               <span className="font-medium text-foreground">{step.subject}</span>
-              <div className="flex items-center gap-5">
+              <div className="flex items-center gap-4">
                 <span className="text-xs text-muted-foreground">{step.totalSent.toLocaleString()} sent</span>
                 <span className="text-xs font-medium">{step.replyRate}% reply</span>
                 {step.totalInterested > 0 && (
-                  <span className="text-xs font-medium text-searchatlas-cyan">{step.interestRate}% interest ({step.totalInterested})</span>
+                  <span className="text-xs font-medium text-searchatlas-green">{step.interestRate}% interest ({step.totalInterested})</span>
                 )}
               </div>
             </div>
             <div className="h-3 bg-muted rounded-full overflow-hidden flex">
               <div
-                className="h-full bg-searchatlas-purple rounded-l-full transition-all duration-500"
+                className="h-full bg-searchatlas-cyan rounded-l-full transition-all duration-500"
                 style={{ width: `${(step.replyRate / maxReplyRate) * 100}%` }}
                 title={`${step.replyRate}% reply rate`}
               />
               {step.interestRate > 0 && (
                 <div
-                  className="h-full bg-searchatlas-cyan transition-all duration-500"
+                  className="h-full bg-searchatlas-green transition-all duration-500"
                   style={{ width: `${(step.interestRate / maxReplyRate) * 100}%` }}
                   title={`${step.interestRate}% interest rate`}
                 />
@@ -495,10 +499,117 @@ function SequenceStepAnalysis({ steps }: { steps: SequenceStepPerformance[] }) {
           </div>
         ))}
       </div>
-      <div className="flex items-center gap-5 mt-5 text-xs text-muted-foreground">
-        <div className="flex items-center gap-1"><div className="w-3 h-3 bg-searchatlas-purple rounded" /> Reply rate</div>
-        <div className="flex items-center gap-1"><div className="w-3 h-3 bg-searchatlas-cyan rounded" /> Interest rate</div>
+      <div className="flex items-center gap-4 mt-4 text-xs text-muted-foreground">
+        <div className="flex items-center gap-1"><div className="w-3 h-3 bg-searchatlas-cyan rounded" /> Reply rate</div>
+        <div className="flex items-center gap-1"><div className="w-3 h-3 bg-searchatlas-green rounded" /> Interest rate</div>
       </div>
+    </div>
+  );
+}
+
+function SenderPerformance({ data }: { data: SenderAnalytics }) {
+  const [showAllDomains, setShowAllDomains] = useState(false);
+  const activeDomains = data.byDomain.filter(d => d.emailsSent > 0);
+  const domainsToShow = showAllDomains ? activeDomains : activeDomains.slice(0, 10);
+
+  return (
+    <div className="rounded-lg border bg-card shadow-sm overflow-hidden">
+      <div className="p-4 bg-gradient-to-r from-searchatlas-cyan/10 to-searchatlas-dark/10 border-b">
+        <div className="flex items-center justify-between">
+          <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-2">
+            <Mail className="h-4 w-4" />
+            Sender & Domain Performance
+          </h3>
+          <div className="flex items-center gap-3 text-xs text-muted-foreground">
+            <span>{data.totalAccounts} accounts</span>
+            <span>{data.connectedAccounts} connected</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Provider Summary */}
+      {data.byProvider.length > 0 && (
+        <div className="p-4 border-b">
+          <div className={`grid grid-cols-1 gap-3 ${data.byProvider.length >= 3 ? 'md:grid-cols-3' : 'md:grid-cols-2'}`}>
+            {data.byProvider.map((p) => (
+              <div key={p.provider} className="p-4 rounded-lg bg-muted/50 border">
+                <div className="flex items-center gap-2 mb-3">
+                  <Globe className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+                  <span className="font-medium text-sm truncate">{p.provider}</span>
+                  <span className="text-xs text-muted-foreground whitespace-nowrap">({p.accountCount})</span>
+                </div>
+                <div className="grid grid-cols-3 gap-4 text-center">
+                  <div className="min-w-0">
+                    <p className="text-base font-bold">{p.replyRate}%</p>
+                    <p className="text-xs text-muted-foreground">Reply</p>
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-base font-bold">{p.bounceRate}%</p>
+                    <p className="text-xs text-muted-foreground">Bounce</p>
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-base font-bold text-searchatlas-cyan">{p.replied.toLocaleString()}</p>
+                    <p className="text-xs text-muted-foreground">Replied</p>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Domain Breakdown Table */}
+      {activeDomains.length > 0 && (
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="border-b bg-muted/30">
+                <th className="h-9 px-4 text-left font-medium text-muted-foreground text-xs uppercase">Domain</th>
+                <th className="h-9 px-4 text-right font-medium text-muted-foreground text-xs uppercase">Accounts</th>
+                <th className="h-9 px-4 text-right font-medium text-muted-foreground text-xs uppercase">Sent</th>
+                <th className="h-9 px-4 text-right font-medium text-muted-foreground text-xs uppercase">Reply %</th>
+                <th className="h-9 px-4 text-right font-medium text-muted-foreground text-xs uppercase">Bounce %</th>
+                <th className="h-9 px-4 text-right font-medium text-muted-foreground text-xs uppercase">Replied</th>
+              </tr>
+            </thead>
+            <tbody>
+              {domainsToShow.map((d: DomainStats) => (
+                <tr key={d.domain} className="border-b border-border/50 hover:bg-muted/20">
+                  <td className="py-2.5 px-4 font-medium">{d.domain}</td>
+                  <td className="py-2.5 px-4 text-right text-muted-foreground">{d.accountCount}</td>
+                  <td className="py-2.5 px-4 text-right text-muted-foreground">{d.emailsSent.toLocaleString()}</td>
+                  <td className="py-2.5 px-4 text-right font-medium">{d.replyRate}%</td>
+                  <td className="py-2.5 px-4 text-right">
+                    <span className={d.bounceRate > 3 ? 'text-red-400 font-medium' : 'text-muted-foreground'}>
+                      {d.bounceRate}%
+                    </span>
+                  </td>
+                  <td className="py-2.5 px-4 text-right">
+                    <span className="text-muted-foreground">{d.replied.toLocaleString()}</span>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          {activeDomains.length > 10 && (
+            <div className="p-3 text-center border-t">
+              <button
+                onClick={() => setShowAllDomains(!showAllDomains)}
+                className="text-xs text-searchatlas-cyan hover:text-searchatlas-cyan/80 font-medium"
+              >
+                {showAllDomains ? 'Show less' : `Show all ${activeDomains.length} domains`}
+              </button>
+            </div>
+          )}
+        </div>
+      )}
+
+      {activeDomains.length === 0 && (
+        <div className="p-8 text-center text-muted-foreground">
+          <Mail className="h-8 w-8 mx-auto mb-2 opacity-50" />
+          <p className="text-sm">No sending activity yet</p>
+        </div>
+      )}
     </div>
   );
 }
@@ -565,7 +676,7 @@ function PipelineCompanies({
 
   if (companies.length === 0) {
     return (
-      <div className="rounded-lg border bg-card shadow-sm p-6 text-center">
+      <div className="rounded-lg border bg-card shadow-sm p-8 text-center">
         <Building2 className="h-8 w-8 mx-auto mb-2 text-muted-foreground opacity-50" />
         <p className="text-sm text-muted-foreground">No pipeline companies yet</p>
         <p className="text-xs text-muted-foreground mt-1">Companies appear here when they express interest</p>
@@ -575,8 +686,8 @@ function PipelineCompanies({
 
   return (
     <div className="rounded-lg border bg-card shadow-sm p-6">
-      <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-5 flex items-center gap-2">
-        <Building2 className="h-4 w-4 text-searchatlas-cyan" />
+      <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-4 flex items-center gap-2">
+        <Building2 className="h-4 w-4 text-searchatlas-green" />
         Pipeline Companies
         <span className="text-xs font-normal">({companies.length})</span>
         {enrichLoading && <Loader2 className="h-3 w-3 animate-spin text-muted-foreground" />}
@@ -589,14 +700,14 @@ function PipelineCompanies({
           const enrichData = latestReply?.email ? enriched[latestReply.email] : null;
           const hasEnrichment = enrichData && (enrichData.linkedinUrl || enrichData.phone || enrichData.location);
           return (
-            <div key={c.label} className="p-3 rounded-lg bg-searchatlas-cyan/10 border border-searchatlas-cyan/20 ">
+            <div key={c.label} className="p-3 rounded-lg bg-searchatlas-green/10 border border-searchatlas-green/20">
               <div className="flex items-center justify-between mb-1">
                 {domain ? (
-                  <a href={`https://${domain}`} target="_blank" rel="noopener noreferrer" className="font-medium text-sm truncate max-w-[180px] text-searchatlas-purple hover:underline" title={c.label}>{c.label}</a>
+                  <a href={`https://${domain}`} target="_blank" rel="noopener noreferrer" className="font-medium text-sm truncate max-w-[180px] text-searchatlas-cyan hover:underline" title={c.label}>{c.label}</a>
                 ) : (
                   <span className="font-medium text-sm truncate max-w-[180px]" title={c.label}>{c.label}</span>
                 )}
-                <span className="text-xs bg-searchatlas-cyan/20 text-searchatlas-cyan px-1.5 py-0.5 rounded font-medium">
+                <span className="text-xs bg-searchatlas-green/20 text-searchatlas-green px-1.5 py-0.5 rounded font-medium">
                   {c.interestedCount} interested
                 </span>
               </div>
@@ -613,13 +724,13 @@ function PipelineCompanies({
               )}
               {/* Enriched contact details from AI-Ark */}
               {hasEnrichment && (
-                <div className="mt-2 pt-2 border-t border-searchatlas-cyan/10 flex flex-wrap items-center gap-2">
+                <div className="mt-2 pt-2 border-t border-searchatlas-green/10 flex flex-wrap items-center gap-2">
                   {enrichData.linkedinUrl && (
                     <a
                       href={enrichData.linkedinUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1 text-[11px] text-searchatlas-purple hover:underline"
+                      className="inline-flex items-center gap-1 text-[11px] text-searchatlas-cyan hover:underline"
                     >
                       <Linkedin className="h-3 w-3" />
                       LinkedIn
@@ -628,7 +739,7 @@ function PipelineCompanies({
                   {enrichData.phone && (
                     <a
                       href={`tel:${enrichData.phone}`}
-                      className="inline-flex items-center gap-1 text-[11px] text-searchatlas-purple hover:underline"
+                      className="inline-flex items-center gap-1 text-[11px] text-searchatlas-cyan hover:underline"
                     >
                       <Phone className="h-3 w-3" />
                       {enrichData.phone}
@@ -685,10 +796,10 @@ function LeadDeepDive({
 
   return (
     <div className="rounded-lg border bg-card shadow-sm overflow-hidden">
-      <div className="p-4 bg-gradient-to-r from-searchatlas-purple/10 to-searchatlas-purple/5  border-b space-y-3">
+      <div className="p-4 bg-gradient-to-r from-searchatlas-cyan/10 to-searchatlas-dark/10 border-b space-y-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 bg-searchatlas-purple rounded-lg flex items-center justify-center">
+            <div className="w-8 h-8 bg-searchatlas-purple/20 rounded-lg flex items-center justify-center">
               <Users className="h-4 w-4 text-white" />
             </div>
             <h3 className="text-lg font-bold">
@@ -700,7 +811,7 @@ function LeadDeepDive({
             <button
               onClick={() => setShowFilters(!showFilters)}
               className={`flex items-center gap-1 px-3 py-1.5 text-xs font-medium rounded-lg border transition-colors ${
-                showFilters ? 'bg-searchatlas-purple text-white border-searchatlas-purple' : 'bg-card hover:bg-secondary border-border text-foreground'
+                showFilters ? 'bg-searchatlas-purple text-white border-searchatlas-purple' : 'bg-secondary hover:bg-accent'
               }`}
             >
               <Filter className="h-3 w-3" />
@@ -713,7 +824,7 @@ function LeadDeepDive({
                 placeholder="Search..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-48 h-9 pl-9 pr-3 text-sm rounded-lg border bg-background focus:outline-none focus:ring-2 focus:ring-searchatlas-purple/20"
+                className="w-48 h-9 pl-9 pr-3 text-sm rounded-lg border bg-background focus:outline-none focus:ring-2 focus:ring-searchatlas-cyan/20"
               />
             </div>
           </div>
@@ -735,7 +846,7 @@ function LeadDeepDive({
               {campaigns.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
             </select>
             {(sentimentFilter || industryFilter || campaignFilter) && (
-              <button onClick={() => { setSentimentFilter(''); setIndustryFilter(''); setCampaignFilter(''); }} className="h-8 px-3 text-xs rounded-lg border bg-secondary text-muted-foreground hover:bg-muted">
+              <button onClick={() => { setSentimentFilter(''); setIndustryFilter(''); setCampaignFilter(''); }} className="h-8 px-3 text-xs rounded-lg border bg-secondary text-muted-foreground hover:bg-accent">
                 Clear filters
               </button>
             )}
@@ -753,7 +864,6 @@ function LeadDeepDive({
               <th className="h-10 px-4 text-left font-medium text-muted-foreground text-xs uppercase tracking-wider">Sentiment</th>
               <th className="h-10 px-4 text-left font-medium text-muted-foreground text-xs uppercase tracking-wider">Intent</th>
               <th className="h-10 px-4 text-left font-medium text-muted-foreground text-xs uppercase tracking-wider">Campaign</th>
-              <th className="h-10 px-4 text-right font-medium text-muted-foreground text-xs uppercase tracking-wider">Leads</th>
               <th className="h-10 px-4 text-left font-medium text-muted-foreground text-xs uppercase tracking-wider">Summary</th>
             </tr>
           </thead>
@@ -770,7 +880,7 @@ function LeadDeepDive({
                   </td>
                   <td className="py-3 px-4">
                     <p className="font-medium text-foreground">{reply.name}</p>
-                    {reply.title && <p className="text-xs text-searchatlas-purple">{reply.title}</p>}
+                    {reply.title && <p className="text-xs text-searchatlas-cyan">{reply.title}</p>}
                   </td>
                   <td className="py-3 px-4">
                     <p className="font-medium">{reply.company}</p>
@@ -787,9 +897,9 @@ function LeadDeepDive({
                 </tr>
                 {expandedId === reply.replyId && (
                   <tr key={`${reply.replyId}-exp`} className="bg-muted/20">
-                    <td colSpan={7} className="p-8">
-                      <div className="space-y-5">
-                        <div className="bg-card rounded-lg border p-5">
+                    <td colSpan={7} className="p-6">
+                      <div className="space-y-4">
+                        <div className="bg-card rounded-lg border p-4">
                           <p className="text-xs text-muted-foreground uppercase tracking-wider font-semibold mb-2">Full Reply</p>
                           <p className="text-sm text-foreground whitespace-pre-wrap bg-muted/30 rounded-lg p-3 max-h-48 overflow-y-auto">
                             {reply.replyText || 'No reply text available'}
@@ -798,40 +908,40 @@ function LeadDeepDive({
                             Subject: {reply.subject} | Date: {new Date(reply.replyDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
                           </p>
                         </div>
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                           {reply.buyingSignals.length > 0 && (
-                            <div className="bg-searchatlas-cyan/10 rounded-lg p-3 border border-searchatlas-cyan/20">
+                            <div className="bg-searchatlas-green/10 rounded-lg p-3 border border-searchatlas-green/20">
                               <div className="flex items-center gap-1 mb-2">
-                                <Sparkles className="h-3 w-3 text-searchatlas-cyan" />
-                                <p className="text-xs font-semibold text-searchatlas-cyan uppercase">Buying Signals</p>
+                                <Sparkles className="h-3 w-3 text-searchatlas-green" />
+                                <p className="text-xs font-semibold text-searchatlas-green uppercase">Buying Signals</p>
                               </div>
-                              <ul className="space-y-1">{reply.buyingSignals.map((s, i) => <li key={i} className="text-xs text-searchatlas-cyan">{s}</li>)}</ul>
+                              <ul className="space-y-1">{reply.buyingSignals.map((s, i) => <li key={i} className="text-xs text-searchatlas-green">{s}</li>)}</ul>
                             </div>
                           )}
                           {reply.objections.length > 0 && (
                             <div className="bg-red-950/20 rounded-lg p-3 border border-red-500/20">
                               <div className="flex items-center gap-1 mb-2">
-                                <AlertTriangle className="h-3 w-3 text-red-600" />
+                                <AlertTriangle className="h-3 w-3 text-red-400" />
                                 <p className="text-xs font-semibold text-red-400 uppercase">Objections</p>
                               </div>
-                              <ul className="space-y-1">{reply.objections.map((o, i) => <li key={i} className="text-xs text-red-600">{o}</li>)}</ul>
+                              <ul className="space-y-1">{reply.objections.map((o, i) => <li key={i} className="text-xs text-red-400">{o}</li>)}</ul>
                             </div>
                           )}
                           {reply.themes.length > 0 && (
-                            <div className="bg-searchatlas-purple/10 rounded-lg p-3 border border-searchatlas-purple/20">
+                            <div className="bg-searchatlas-cyan/10 rounded-lg p-3 border border-searchatlas-cyan/20">
                               <div className="flex items-center gap-1 mb-2">
-                                <MessageSquare className="h-3 w-3 text-searchatlas-purple" />
-                                <p className="text-xs font-semibold text-searchatlas-purple uppercase">Themes</p>
+                                <MessageSquare className="h-3 w-3 text-searchatlas-cyan" />
+                                <p className="text-xs font-semibold text-searchatlas-cyan uppercase">Themes</p>
                               </div>
-                              <div className="flex flex-wrap gap-1">{reply.themes.map((t, i) => <span key={i} className="text-xs bg-searchatlas-purple/20 text-searchatlas-purple px-2 py-0.5 rounded">{t}</span>)}</div>
+                              <div className="flex flex-wrap gap-1">{reply.themes.map((t, i) => <span key={i} className="text-xs bg-searchatlas-cyan/20 text-searchatlas-cyan px-2 py-0.5 rounded">{t}</span>)}</div>
                             </div>
                           )}
                         </div>
-                        <div className="flex flex-wrap gap-5 text-xs text-muted-foreground">
+                        <div className="flex flex-wrap gap-4 text-xs text-muted-foreground">
                           <span>Email: {reply.email}</span>
                           <span>Seniority: {reply.seniority}</span>
                           <span>Industry: {reply.industry}</span>
-                          {reply.isInterested && <span className="text-searchatlas-cyan font-medium">Marked Interested</span>}
+                          {reply.isInterested && <span className="text-searchatlas-green font-medium">Marked Interested</span>}
                         </div>
                       </div>
                     </td>
@@ -876,6 +986,7 @@ function Phase2Skeleton() {
 export default function AnalyticsPage() {
   // Phase 1: Fast data
   const [fastData, setFastData] = useState<FastAnalytics | null>(null);
+  const [senderData, setSenderData] = useState<SenderAnalytics | null>(null);
   const [phase1Loading, setPhase1Loading] = useState(true);
   const [phase1Error, setPhase1Error] = useState<string | null>(null);
 
@@ -897,123 +1008,36 @@ export default function AnalyticsPage() {
     return fastData?.availableCycles || [];
   }, [fastData]);
 
-  // Parse cycle number from a campaign name
-  const parseCycle = useCallback((name: string): number | null => {
-    const match = name.match(/^Cycle\s+(\d+)/i);
-    return match ? parseInt(match[1], 10) : null;
-  }, []);
+  // Server-side now handles cycle filtering — pass data through directly
+  const filteredFastData = fastData;
+  const filteredReport = report;
 
-  // Filter Phase 1 data by cycle
-  const filteredFastData = useMemo(() => {
-    if (!fastData || activeCycle === null) return fastData;
-    const filtered = fastData.campaignComparison.filter(c => parseCycle(c.name) === activeCycle);
-    const emailsSent = filtered.reduce((s, c) => s + c.emailsSent, 0);
-    const leadsContacted = filtered.reduce((s, c) => s + c.leadsContacted, 0);
-    const totalReplies = filtered.reduce((s, c) => s + c.uniqueReplies, 0);
-    const totalInterested = filtered.reduce((s, c) => s + c.interested, 0);
-    return {
-      ...fastData,
-      heroMetrics: {
-        ...fastData.heroMetrics,
-        activeCampaigns: filtered.length,
-        emailsSent,
-        leadsContacted,
-        totalReplies,
-        totalInterested,
-        avgReplyRate: leadsContacted > 0 ? parseFloat(((totalReplies / leadsContacted) * 100).toFixed(2)) : 0,
-        avgInterestRate: leadsContacted > 0 ? parseFloat(((totalInterested / leadsContacted) * 100).toFixed(2)) : 0,
-        avgBounceRate: emailsSent > 0
-          ? parseFloat(((filtered.reduce((s, c) => s + Math.round(c.bounceRate * c.emailsSent / 100), 0) / emailsSent) * 100).toFixed(2))
-          : 0,
-      },
-      funnel: {
-        totalLeads: leadsContacted,
-        contacted: leadsContacted,
-        replied: totalReplies,
-        interested: totalInterested,
-      },
-      campaignComparison: filtered,
-    } as FastAnalytics;
-  }, [fastData, activeCycle, parseCycle]);
+  // Build query string for cycle + refresh
+  const buildQuery = useCallback((refresh = false) => {
+    const params = new URLSearchParams();
+    if (activeCycle !== null) params.set('cycle', String(activeCycle));
+    if (refresh) params.set('refresh', 'true');
+    const qs = params.toString();
+    return qs ? `?${qs}` : '';
+  }, [activeCycle]);
 
-  // Filter Phase 2 data by cycle
-  const filteredReport = useMemo(() => {
-    if (!report || activeCycle === null) return report;
-    const filteredReplies = report.replies.filter(r => r.cycleNumber === activeCycle);
-    // Recompute sentiment/intent breakdown
-    const sentimentBreakdown: Record<ReplySentiment, number> = { positive: 0, negative: 0, neutral: 0 };
-    const intentBreakdown: Record<ReplyIntent, number> = {
-      'interested': 0, 'not-interested': 0, 'needs-info': 0,
-      'referral': 0, 'out-of-office': 0, 'unsubscribe': 0,
-    };
-    for (const r of filteredReplies) {
-      sentimentBreakdown[r.sentiment]++;
-      intentBreakdown[r.intent]++;
-    }
-    // Recompute themes, signals, objections
-    const themeCount = new Map<string, number>();
-    const objCount = new Map<string, number>();
-    const sigCount = new Map<string, number>();
-    for (const r of filteredReplies) {
-      for (const t of r.themes) themeCount.set(t, (themeCount.get(t) || 0) + 1);
-      for (const o of r.objections) objCount.set(o, (objCount.get(o) || 0) + 1);
-      for (const s of r.buyingSignals) sigCount.set(s, (sigCount.get(s) || 0) + 1);
-    }
-    // Recompute demographics
-    const buildDist = (items: string[], interestedReplies: AnalyzedReply[]): DemographicDistribution[] => {
-      const counts = new Map<string, number>();
-      for (const item of items) counts.set(item, (counts.get(item) || 0) + 1);
-      return Array.from(counts.entries())
-        .map(([label, count]) => ({
-          label,
-          count,
-          percentage: items.length > 0 ? parseFloat(((count / items.length) * 100).toFixed(1)) : 0,
-          interestedCount: interestedReplies.filter(r => r.company === label || r.industry === label || r.seniority === label).filter(r => r.isInterested).length,
-        }))
-        .sort((a, b) => b.count - a.count);
-    };
-    const industries = filteredReplies.map(r => r.industry);
-    const seniorities = filteredReplies.map(r => r.seniority);
-    const companies = filteredReplies.map(r => r.company);
-    // Pipeline companies from filtered replies
-    const pipeMap = new Map<string, number>();
-    for (const r of filteredReplies) {
-      if (r.isInterested) pipeMap.set(r.company, (pipeMap.get(r.company) || 0) + 1);
-    }
-    const pipelineCompanies: DemographicDistribution[] = Array.from(pipeMap.entries())
-      .map(([label, interestedCount]) => ({
-        label,
-        count: interestedCount,
-        percentage: filteredReplies.length > 0 ? parseFloat(((interestedCount / filteredReplies.length) * 100).toFixed(1)) : 0,
-        interestedCount,
-      }))
-      .sort((a, b) => b.interestedCount - a.interestedCount);
-
-    return {
-      ...report,
-      totalAnalyzed: filteredReplies.length,
-      sentimentBreakdown,
-      intentBreakdown,
-      industryDistribution: buildDist(industries, filteredReplies),
-      seniorityDistribution: buildDist(seniorities, filteredReplies),
-      topCompanies: buildDist(companies, filteredReplies).slice(0, 15),
-      pipelineCompanies,
-      topThemes: Array.from(themeCount.entries()).map(([theme, count]) => ({ theme, count })).sort((a, b) => b.count - a.count).slice(0, 10),
-      topObjections: Array.from(objCount.entries()).map(([objection, count]) => ({ objection, count })).sort((a, b) => b.count - a.count).slice(0, 10),
-      topBuyingSignals: Array.from(sigCount.entries()).map(([signal, count]) => ({ signal, count })).sort((a, b) => b.count - a.count).slice(0, 10),
-      replies: filteredReplies,
-      industries: [...new Set(industries)],
-    } as AnalyticsReport;
-  }, [report, activeCycle]);
-
-  // Phase 1: Fast fetch
+  // Phase 1: Fast fetch (re-fetches on cycle change)
   useEffect(() => {
     const fetchFast = async () => {
+      setPhase1Loading(true);
       try {
-        const fastRes = await fetch('/api/analytics/fast');
+        const query = activeCycle !== null ? `?cycle=${activeCycle}` : '';
+        const [fastRes, senderRes] = await Promise.all([
+          fetch(`/api/analytics/fast${query}`),
+          fetch(`/api/analytics/senders${query}`),
+        ]);
         if (fastRes.ok) {
           const { data } = await fastRes.json();
           setFastData(data);
+        }
+        if (senderRes.ok) {
+          const { data } = await senderRes.json();
+          setSenderData(data);
         }
       } catch (err) {
         setPhase1Error(err instanceof Error ? err.message : 'Failed to load analytics');
@@ -1022,13 +1046,15 @@ export default function AnalyticsPage() {
       }
     };
     fetchFast();
-  }, []);
+  }, [activeCycle]);
 
-  // Phase 2: Deep analysis (starts immediately, renders when ready)
+  // Phase 2: Deep analysis (re-fetches on cycle change)
   useEffect(() => {
     const fetchDeep = async () => {
+      setPhase2Loading(true);
       try {
-        const response = await fetch('/api/analytics');
+        const query = activeCycle !== null ? `?cycle=${activeCycle}` : '';
+        const response = await fetch(`/api/analytics${query}`);
         if (!response.ok) throw new Error('Failed to fetch deep analytics');
         const { data } = await response.json();
         setReport(data);
@@ -1039,13 +1065,15 @@ export default function AnalyticsPage() {
       }
     };
     fetchDeep();
-  }, []);
+  }, [activeCycle]);
 
-  // Phase 3: Copy analysis (starts immediately, renders when ready)
+  // Phase 3: Copy analysis (re-fetches on cycle change)
   useEffect(() => {
     const fetchCopy = async () => {
+      setPhase3Loading(true);
       try {
-        const response = await fetch('/api/analytics/copy');
+        const query = activeCycle !== null ? `?cycle=${activeCycle}` : '';
+        const response = await fetch(`/api/analytics/copy${query}`);
         if (response.ok) {
           const { data } = await response.json();
           setCopyData(data);
@@ -1057,16 +1085,42 @@ export default function AnalyticsPage() {
       }
     };
     fetchCopy();
-  }, []);
+  }, [activeCycle]);
+
+  // Refresh handler — clears caches and re-fetches
+  const handleRefresh = useCallback(async () => {
+    const query = buildQuery(true);
+    setPhase1Loading(true);
+    setPhase2Loading(true);
+    setPhase3Loading(true);
+    try {
+      const [fastRes, senderRes, deepRes, copyRes] = await Promise.all([
+        fetch(`/api/analytics/fast${query}`),
+        fetch(`/api/analytics/senders${query}`),
+        fetch(`/api/analytics${query}`),
+        fetch(`/api/analytics/copy${query}`),
+      ]);
+      if (fastRes.ok) { const { data } = await fastRes.json(); setFastData(data); }
+      if (senderRes.ok) { const { data } = await senderRes.json(); setSenderData(data); }
+      if (deepRes.ok) { const { data } = await deepRes.json(); setReport(data); }
+      if (copyRes.ok) { const { data } = await copyRes.json(); setCopyData(data); }
+    } catch {
+      // individual errors handled by display
+    } finally {
+      setPhase1Loading(false);
+      setPhase2Loading(false);
+      setPhase3Loading(false);
+    }
+  }, [buildQuery]);
 
   const handleExportPDF = useCallback(async () => {
     if (!contentRef.current || exporting) return;
     setExporting(true);
     try {
       const date = new Date().toISOString().split('T')[0];
-      await exportPageToPDF(contentRef.current, `SearchAtlas-Analytics-Report-${date}.pdf`, {
+      await exportPageToPDF(contentRef.current, `Search Atlas-Analytics-Report-${date}.pdf`, {
         title: 'Response Analytics',
-        subtitle: fastData?.workspaceName || 'SearchAtlas Fulfillment',
+        subtitle: fastData?.workspaceName || 'Search Atlas Fulfillment',
       });
     } finally {
       setExporting(false);
@@ -1087,7 +1141,7 @@ export default function AnalyticsPage() {
       }));
     const cycleSuffix = activeCycle !== null ? `-Cycle${activeCycle}` : '';
     const date = new Date().toISOString().split('T')[0];
-    exportToCSV(rows, `SearchAtlas-Analyzed-Replies${cycleSuffix}-${date}.csv`);
+    exportToCSV(rows, `Search Atlas-Analyzed-Replies${cycleSuffix}-${date}.csv`);
   }, [filteredReport, activeCycle]);
 
   // Full loading state (only if Phase 1 hasn't loaded yet)
@@ -1118,6 +1172,24 @@ export default function AnalyticsPage() {
 
   return (
     <PageContainer className="space-y-8 pb-12">
+      {/* Export Buttons */}
+      <div className="flex items-center justify-end gap-3 hide-on-export">
+        <button onClick={handleRefresh} disabled={phase1Loading && phase2Loading}
+          className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg border bg-secondary hover:bg-accent text-foreground transition-colors disabled:opacity-50">
+          {(phase1Loading || phase2Loading) ? <Loader2 className="h-4 w-4 animate-spin" /> : <Zap className="h-4 w-4" />}
+          Refresh Data
+        </button>
+        <button onClick={handleExportCSV} disabled={!filteredReport}
+          className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg border bg-secondary hover:bg-accent text-foreground transition-colors disabled:opacity-50">
+          <FileSpreadsheet className="h-4 w-4" /> Download CSV
+        </button>
+        <button onClick={handleExportPDF} disabled={exporting}
+          className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg bg-searchatlas-purple hover:bg-searchatlas-purple/80 text-white transition-colors disabled:opacity-50">
+          {exporting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Download className="h-4 w-4" />}
+          {exporting ? 'Generating...' : 'Export PDF'}
+        </button>
+      </div>
+
       <div ref={contentRef} className="space-y-8">
 
         {/* ── Cycle Tabs ──────────────────────────────────────────── */}
@@ -1125,10 +1197,10 @@ export default function AnalyticsPage() {
           <div className="flex items-center gap-2 overflow-x-auto pb-1 hide-on-export">
             <button
               onClick={() => setActiveCycle(null)}
-              className={`px-5 py-2.5 text-sm font-semibold rounded-xl border-2 transition-all whitespace-nowrap ${
+              className={`px-4 py-2 text-sm font-medium rounded-lg border transition-colors whitespace-nowrap ${
                 activeCycle === null
-                  ? 'bg-searchatlas-purple text-white border-searchatlas-purple shadow-lg shadow-searchatlas-purple/20'
-                  : 'bg-card hover:bg-secondary border-border text-foreground'
+                  ? 'bg-searchatlas-purple text-white border-searchatlas-purple'
+                  : 'bg-secondary hover:bg-accent border-border'
               }`}
             >
               All Cycles
@@ -1137,10 +1209,10 @@ export default function AnalyticsPage() {
               <button
                 key={cycle}
                 onClick={() => setActiveCycle(cycle)}
-                className={`px-5 py-2.5 text-sm font-semibold rounded-xl border-2 transition-all whitespace-nowrap ${
+                className={`px-4 py-2 text-sm font-medium rounded-lg border transition-colors whitespace-nowrap ${
                   activeCycle === cycle
-                    ? 'bg-searchatlas-purple text-white border-searchatlas-purple shadow-lg shadow-searchatlas-purple/20'
-                    : 'bg-card hover:bg-secondary border-border text-foreground'
+                    ? 'bg-searchatlas-purple text-white border-searchatlas-purple'
+                    : 'bg-secondary hover:bg-accent border-border'
                 }`}
               >
                 Cycle {cycle}
@@ -1151,68 +1223,56 @@ export default function AnalyticsPage() {
 
         {/* ── PHASE 1: Hero Section ─────────────────────────────── */}
         {hero && (
-          <div className="bg-card rounded-3xl p-6 shadow-lg border border-border">
-            <div className="flex items-center justify-between mb-8">
+          <div className="bg-gradient-to-br from-searchatlas-purple/90 to-searchatlas-dark text-white rounded-3xl p-8 shadow-xl">
+            <div className="flex items-center gap-4 mb-6">
               <div>
-                <span className="text-searchatlas-purple font-semibold text-sm uppercase tracking-wider">OUTBOUND ANALYTICS</span>
-                <h1 className="text-3xl font-bold text-foreground">{activeCycle !== null ? `Cycle ${activeCycle}` : 'All Cycles'}</h1>
-              </div>
-              {/* Export Buttons */}
-              <div className="flex items-center gap-3 hide-on-export">
-                <button onClick={handleExportCSV} disabled={!filteredReport}
-                  className="inline-flex items-center gap-2 px-4 py-2.5 text-sm font-medium rounded-xl border border-border bg-card hover:bg-secondary text-foreground transition-colors disabled:opacity-50 shadow-sm">
-                  <FileSpreadsheet className="h-4 w-4 text-searchatlas-purple" /> Download CSV
-                </button>
-                <button onClick={handleExportPDF} disabled={exporting}
-                  className="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-semibold rounded-xl bg-searchatlas-purple hover:bg-searchatlas-purple/90 text-white transition-colors disabled:opacity-50 shadow-sm">
-                  {exporting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Download className="h-4 w-4" />}
-                  {exporting ? 'Generating...' : 'Export PDF'}
-                </button>
+                <span className="text-white/80 font-medium text-sm uppercase tracking-wider">OUTBOUND ANALYTICS</span>
+                <h1 className="text-3xl font-bold">{activeCycle !== null ? `Cycle ${activeCycle}` : 'All Cycles'}</h1>
               </div>
             </div>
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-5">
-              <div className="bg-secondary rounded-2xl p-5 border border-border hover:border-searchatlas-purple/50 transition-colors">
-                <div className="flex items-center gap-2 mb-3">
-                  <BarChart3 className="h-4 w-4 text-searchatlas-purple" />
-                  <span className="text-muted-foreground text-xs font-medium uppercase">Campaigns</span>
+            <div className="grid grid-cols-2 md:grid-cols-6 gap-4">
+              <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-4 border border-white/20">
+                <div className="flex items-center gap-2 mb-1">
+                  <BarChart3 className="h-4 w-4 text-white/70" />
+                  <span className="text-white/70 text-xs">Campaigns</span>
                 </div>
-                <p className="text-3xl font-bold text-foreground">{hero.totalCampaigns}</p>
-                <p className="text-xs text-muted-foreground">{hero.activeCampaigns} sending</p>
+                <p className="text-2xl font-bold">{hero.totalCampaigns}</p>
+                <p className="text-xs text-white/60">{hero.activeCampaigns} sending</p>
               </div>
-              <div className="bg-secondary rounded-2xl p-5 border border-border hover:border-searchatlas-purple/50 transition-colors">
-                <div className="flex items-center gap-2 mb-3">
-                  <Mail className="h-4 w-4 text-searchatlas-purple" />
-                  <span className="text-muted-foreground text-xs font-medium uppercase">Emails Sent</span>
+              <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-4 border border-white/20">
+                <div className="flex items-center gap-2 mb-1">
+                  <Mail className="h-4 w-4 text-white/70" />
+                  <span className="text-white/70 text-xs">Emails Sent</span>
                 </div>
-                <p className="text-3xl font-bold text-foreground">{hero.emailsSent.toLocaleString()}</p>
+                <p className="text-2xl font-bold">{hero.emailsSent.toLocaleString()}</p>
               </div>
-              <div className="bg-secondary rounded-2xl p-5 border border-border hover:border-searchatlas-purple/50 transition-colors">
-                <div className="flex items-center gap-2 mb-3">
-                  <Users className="h-4 w-4 text-searchatlas-purple" />
-                  <span className="text-muted-foreground text-xs font-medium uppercase">Contacted</span>
+              <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-4 border border-white/20">
+                <div className="flex items-center gap-2 mb-1">
+                  <Users className="h-4 w-4 text-white/70" />
+                  <span className="text-white/70 text-xs">Contacted</span>
                 </div>
-                <p className="text-3xl font-bold text-foreground">{hero.leadsContacted.toLocaleString()}</p>
+                <p className="text-2xl font-bold">{hero.leadsContacted.toLocaleString()}</p>
               </div>
-              <div className="bg-secondary rounded-2xl p-5 border border-border hover:border-searchatlas-purple/50 transition-colors">
-                <div className="flex items-center gap-2 mb-3">
-                  <MessageSquare className="h-4 w-4 text-searchatlas-purple" />
-                  <span className="text-muted-foreground text-xs font-medium uppercase">Reply Rate</span>
+              <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-4 border border-white/20">
+                <div className="flex items-center gap-2 mb-1">
+                  <MessageSquare className="h-4 w-4 text-white/70" />
+                  <span className="text-white/70 text-xs">Reply Rate</span>
                 </div>
-                <p className="text-3xl font-bold text-foreground">{hero.avgReplyRate}%</p>
+                <p className="text-2xl font-bold">{hero.avgReplyRate}%</p>
               </div>
-              <div className="bg-searchatlas-cyan/20 rounded-2xl p-5 border border-searchatlas-cyan/30 hover:border-searchatlas-cyan/60 transition-colors">
-                <div className="flex items-center gap-2 mb-3">
-                  <TrendingUp className="h-4 w-4 text-searchatlas-cyan" />
-                  <span className="text-searchatlas-cyan/80 text-xs font-medium uppercase">Interested</span>
+              <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-4 border border-white/20">
+                <div className="flex items-center gap-2 mb-1">
+                  <TrendingUp className="h-4 w-4 text-white/70" />
+                  <span className="text-white/70 text-xs">Interested</span>
                 </div>
-                <p className="text-3xl font-bold text-searchatlas-cyan">{hero.totalInterested}</p>
+                <p className="text-2xl font-bold">{hero.totalInterested}</p>
               </div>
-              <div className="bg-searchatlas-cyan/20 rounded-2xl p-5 border border-searchatlas-cyan/30 hover:border-searchatlas-cyan/60 transition-colors">
-                <div className="flex items-center gap-2 mb-3">
-                  <Target className="h-4 w-4 text-searchatlas-cyan" />
-                  <span className="text-searchatlas-cyan/80 text-xs font-medium uppercase">Interest Rate</span>
+              <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-4 border border-white/20">
+                <div className="flex items-center gap-2 mb-1">
+                  <Target className="h-4 w-4 text-white/70" />
+                  <span className="text-white/70 text-xs">Interest Rate</span>
                 </div>
-                <p className="text-3xl font-bold text-searchatlas-cyan">{hero.avgInterestRate}%</p>
+                <p className="text-2xl font-bold">{hero.avgInterestRate}%</p>
               </div>
             </div>
           </div>
@@ -1224,8 +1284,11 @@ export default function AnalyticsPage() {
         {/* ── PHASE 1: Campaign Comparison ──────────────────────── */}
         {filteredFastData && <CampaignComparison campaigns={filteredFastData.campaignComparison} />}
 
-        {/* ── PHASE 1: Sequence Step Performance ──────────────── */}
-        {fastData && <SequenceStepAnalysis steps={fastData.sequenceStepPerformance} />}
+        {/* ── PHASE 1: Sequence Step + Sender side-by-side ──────── */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {fastData && <SequenceStepAnalysis steps={fastData.sequenceStepPerformance} />}
+          {senderData && <SenderPerformance data={senderData} />}
+        </div>
 
         {/* ── Copy Analysis (Phase 3) ─────────────────────────── */}
         {phase3Loading ? (
@@ -1234,11 +1297,11 @@ export default function AnalyticsPage() {
             <span className="text-sm">Analyzing email copy...</span>
           </div>
         ) : copyData?.subjects?.analysis ? (
-          <div className="rounded-2xl border border-border bg-card shadow-sm overflow-hidden">
-            <div className="flex flex-col space-y-1.5 p-6 border-b border-border">
-              <h2 className="flex items-center gap-3 text-xl font-bold text-foreground">
-                <div className="w-10 h-10 bg-searchatlas-purple/10 rounded-xl flex items-center justify-center">
-                  <CheckCircle className="h-5 w-5 text-searchatlas-purple" />
+          <div className="rounded-lg border bg-card shadow-sm overflow-hidden">
+            <div className="flex flex-col space-y-1.5 p-6 bg-gradient-to-r from-searchatlas-cyan/10 to-searchatlas-dark/10 border-b">
+              <h2 className="flex items-center gap-3 text-xl font-bold">
+                <div className="w-8 h-8 bg-searchatlas-purple/20 rounded-lg flex items-center justify-center">
+                  <CheckCircle className="h-5 w-5 text-white" />
                 </div>
                 Copy Analysis
               </h2>
@@ -1247,40 +1310,34 @@ export default function AnalyticsPage() {
               </p>
             </div>
             <div className="p-6 space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-                <div className="bg-secondary p-5 rounded-xl border border-border">
-                  <div className="flex items-center gap-2 mb-3">
-                    <div className="w-8 h-8 bg-searchatlas-purple/10 rounded-lg flex items-center justify-center">
-                      <MessageSquare className="h-4 w-4 text-searchatlas-purple" />
-                    </div>
-                    <h4 className="font-semibold text-foreground text-sm">Subject Lines</h4>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="bg-searchatlas-cyan/10 p-4 rounded-xl border border-searchatlas-cyan/20">
+                  <div className="flex items-center gap-2 mb-2">
+                    <MessageSquare className="h-4 w-4 text-searchatlas-cyan" />
+                    <h4 className="font-semibold text-searchatlas-cyan text-sm">Subject Lines</h4>
                   </div>
-                  <p className="text-sm text-muted-foreground">
+                  <p className="text-sm text-searchatlas-cyan/80">
                     {copyData.subjects.analysis.keyInsight}
                   </p>
                 </div>
                 {copyData.body?.analysis && (
-                  <div className="bg-secondary p-5 rounded-xl border border-border">
-                    <div className="flex items-center gap-2 mb-3">
-                      <div className="w-8 h-8 bg-searchatlas-purple/10 rounded-lg flex items-center justify-center">
-                        <Target className="h-4 w-4 text-searchatlas-purple" />
-                      </div>
-                      <h4 className="font-semibold text-foreground text-sm">Opening Hooks</h4>
+                  <div className="bg-searchatlas-cyan/10 p-4 rounded-xl border border-searchatlas-cyan/20">
+                    <div className="flex items-center gap-2 mb-2">
+                      <Target className="h-4 w-4 text-searchatlas-cyan" />
+                      <h4 className="font-semibold text-searchatlas-cyan text-sm">Opening Hooks</h4>
                     </div>
-                    <p className="text-sm text-muted-foreground">
+                    <p className="text-sm text-searchatlas-cyan/80">
                       {copyData.body.analysis.contrast}
                     </p>
                   </div>
                 )}
                 {copyData.cta?.analysis && (
-                  <div className="bg-secondary p-5 rounded-xl border border-border">
-                    <div className="flex items-center gap-2 mb-3">
-                      <div className="w-8 h-8 bg-searchatlas-purple/10 rounded-lg flex items-center justify-center">
-                        <Mail className="h-4 w-4 text-searchatlas-purple" />
-                      </div>
-                      <h4 className="font-semibold text-foreground text-sm">CTAs</h4>
+                  <div className="bg-searchatlas-cyan/10 p-4 rounded-xl border border-searchatlas-cyan/20">
+                    <div className="flex items-center gap-2 mb-2">
+                      <Mail className="h-4 w-4 text-searchatlas-cyan" />
+                      <h4 className="font-semibold text-searchatlas-cyan text-sm">CTAs</h4>
                     </div>
-                    <p className="text-sm text-muted-foreground">
+                    <p className="text-sm text-searchatlas-cyan/80">
                       {copyData.cta.analysis.commitmentAnalysis}
                     </p>
                   </div>
@@ -1289,18 +1346,18 @@ export default function AnalyticsPage() {
 
               {/* Performance Highlight */}
               {filteredFastData && (
-                <div className="bg-gradient-to-r from-searchatlas-purple to-searchatlas-purple/80 p-6 rounded-xl text-white">
+                <div className="bg-secondary p-5 rounded-xl text-foreground">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-white/80 text-sm mb-1 font-medium">Performance Summary</p>
-                      <p className="font-semibold text-lg">
+                      <p className="text-white/80 text-sm mb-1">Performance Summary</p>
+                      <p className="font-semibold">
                         {filteredFastData.heroMetrics.leadsContacted.toLocaleString()} leads contacted across {filteredFastData.heroMetrics.activeCampaigns} campaigns
                         with {filteredFastData.heroMetrics.avgReplyRate}% average response rate.
                       </p>
                     </div>
-                    <div className="text-right bg-white/20 rounded-xl px-6 py-3">
-                      <p className="text-4xl font-bold">{filteredFastData.heroMetrics.totalInterested}</p>
-                      <p className="text-white/80 text-sm font-medium">interested leads</p>
+                    <div className="text-right">
+                      <p className="text-3xl font-bold">{filteredFastData.heroMetrics.totalInterested}</p>
+                      <p className="text-white/70 text-sm">interested leads</p>
                     </div>
                   </div>
                 </div>
@@ -1313,7 +1370,7 @@ export default function AnalyticsPage() {
         {phase2Loading ? (
           <Phase2Skeleton />
         ) : phase2Error ? (
-          <div className="rounded-lg border bg-card shadow-sm p-6 text-center">
+          <div className="rounded-lg border bg-card shadow-sm p-8 text-center">
             <AlertTriangle className="h-8 w-8 mx-auto mb-2 text-muted-foreground opacity-50" />
             <p className="text-sm text-muted-foreground">Reply analysis unavailable</p>
             <p className="text-xs text-muted-foreground mt-1">{phase2Error}</p>
@@ -1322,55 +1379,53 @@ export default function AnalyticsPage() {
           <>
             {/* Response Intelligence */}
             <div>
-              <h2 className="text-2xl font-bold text-foreground mb-6 flex items-center gap-3">
-                <div className="w-10 h-10 bg-searchatlas-purple/10 rounded-xl flex items-center justify-center">
-                  <Brain className="h-5 w-5 text-searchatlas-purple" />
-                </div>
+              <h2 className="text-2xl font-bold text-foreground mb-4 flex items-center gap-2">
+                <Brain className="h-6 w-6 text-searchatlas-cyan" />
                 Response Intelligence
               </h2>
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <div className="rounded-2xl border border-border bg-card shadow-sm p-6">
-                  <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-5">Sentiment Breakdown</h3>
+                <div className="rounded-lg border bg-card shadow-sm p-6">
+                  <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-4">Sentiment Breakdown</h3>
                   <SentimentOverview breakdown={filteredReport.sentimentBreakdown} total={filteredReport.totalAnalyzed} />
                 </div>
-                <div className="rounded-2xl border border-border bg-card shadow-sm p-6">
-                  <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-5">Top Themes</h3>
+                <div className="rounded-lg border bg-card shadow-sm p-6">
+                  <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-4">Top Themes</h3>
                   {filteredReport.topThemes.length > 0 ? (
-                    <div className="space-y-3">
+                    <div className="space-y-2">
                       {filteredReport.topThemes.map((t) => (
-                        <div key={t.theme} className="flex items-center justify-between py-1">
-                          <span className="text-sm font-medium text-foreground">{toTitleCase(t.theme)}</span>
-                          <span className="text-sm text-muted-foreground bg-secondary px-2 py-0.5 rounded-full">{t.count} replies</span>
+                        <div key={t.theme} className="flex items-center justify-between">
+                          <span className="text-sm font-medium">{toTitleCase(t.theme)}</span>
+                          <span className="text-sm text-muted-foreground">{t.count} replies</span>
                         </div>
                       ))}
                     </div>
                   ) : <p className="text-sm text-muted-foreground">No themes extracted yet</p>}
                 </div>
                 {filteredReport.topBuyingSignals.length > 0 && (
-                  <div className="rounded-2xl border border-searchatlas-cyan/30 bg-searchatlas-cyan/10 shadow-sm p-6">
-                    <h3 className="text-sm font-semibold text-searchatlas-cyan uppercase tracking-wider mb-5 flex items-center gap-2">
-                      <Sparkles className="h-4 w-4" /> Buying Signals
+                  <div className="rounded-lg border bg-card shadow-sm p-6">
+                    <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-4 flex items-center gap-2">
+                      <Sparkles className="h-4 w-4 text-searchatlas-green" /> Buying Signals
                     </h3>
-                    <div className="space-y-3">
+                    <div className="space-y-2">
                       {filteredReport.topBuyingSignals.map((s) => (
-                        <div key={s.signal} className="flex items-center justify-between py-1">
-                          <span className="text-sm font-medium text-searchatlas-cyan">{toTitleCase(s.signal)}</span>
-                          <span className="text-sm text-searchatlas-cyan/80 bg-searchatlas-cyan/20 px-2 py-0.5 rounded-full font-medium">{s.count}x</span>
+                        <div key={s.signal} className="flex items-center justify-between">
+                          <span className="text-sm font-medium text-searchatlas-green">{toTitleCase(s.signal)}</span>
+                          <span className="text-sm text-muted-foreground">{s.count}x</span>
                         </div>
                       ))}
                     </div>
                   </div>
                 )}
                 {filteredReport.topObjections.length > 0 && (
-                  <div className="rounded-2xl border border-red-900/50 bg-red-950/30 shadow-sm p-6">
-                    <h3 className="text-sm font-semibold text-red-400 uppercase tracking-wider mb-5 flex items-center gap-2">
-                      <AlertTriangle className="h-4 w-4" /> Common Objections
+                  <div className="rounded-lg border bg-card shadow-sm p-6">
+                    <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-4 flex items-center gap-2">
+                      <AlertTriangle className="h-4 w-4 text-red-400" /> Common Objections
                     </h3>
-                    <div className="space-y-3">
+                    <div className="space-y-2">
                       {filteredReport.topObjections.map((o) => (
-                        <div key={o.objection} className="flex items-center justify-between py-1">
+                        <div key={o.objection} className="flex items-center justify-between">
                           <span className="text-sm font-medium text-red-400">{toTitleCase(o.objection)}</span>
-                          <span className="text-sm text-red-600/80 bg-red-900/50 px-2 py-0.5 rounded-full font-medium">{o.count}x</span>
+                          <span className="text-sm text-muted-foreground">{o.count}x</span>
                         </div>
                       ))}
                     </div>
@@ -1381,22 +1436,20 @@ export default function AnalyticsPage() {
 
             {/* Who's Responding */}
             <div>
-              <h2 className="text-2xl font-bold text-foreground mb-6 flex items-center gap-3">
-                <div className="w-10 h-10 bg-searchatlas-purple/10 rounded-xl flex items-center justify-center">
-                  <BarChart3 className="h-5 w-5 text-searchatlas-purple" />
-                </div>
+              <h2 className="text-2xl font-bold text-foreground mb-4 flex items-center gap-2">
+                <BarChart3 className="h-6 w-6 text-searchatlas-cyan" />
                 Who&apos;s Responding
               </h2>
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <div className="rounded-2xl border border-border bg-card shadow-sm p-6">
-                  <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-5 flex items-center gap-2">
-                    <Building2 className="h-4 w-4 text-searchatlas-purple" /> Industry Distribution
+                <div className="rounded-lg border bg-card shadow-sm p-6">
+                  <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-4 flex items-center gap-2">
+                    <Building2 className="h-4 w-4" /> Industry Distribution
                   </h3>
-                  <HorizontalBarChart data={filteredReport.industryDistribution} colorClass="bg-searchatlas-purple" showInterested />
+                  <HorizontalBarChart data={filteredReport.industryDistribution} colorClass="bg-searchatlas-cyan" showInterested />
                 </div>
-                <div className="rounded-2xl border border-border bg-card shadow-sm p-6">
-                  <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-5 flex items-center gap-2">
-                    <Briefcase className="h-4 w-4 text-searchatlas-purple" /> Title Seniority
+                <div className="rounded-lg border bg-card shadow-sm p-6">
+                  <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-4 flex items-center gap-2">
+                    <Briefcase className="h-4 w-4" /> Title Seniority
                   </h3>
                   <HorizontalBarChart data={filteredReport.seniorityDistribution} colorClass="bg-searchatlas-purple" showInterested />
                 </div>
@@ -1413,12 +1466,7 @@ export default function AnalyticsPage() {
 
             {/* Lead Deep-Dive */}
             <div>
-              <h2 className="text-2xl font-bold text-foreground mb-6 flex items-center gap-3">
-                <div className="w-10 h-10 bg-searchatlas-cyan/10 rounded-xl flex items-center justify-center">
-                  <Users className="h-5 w-5 text-searchatlas-cyan" />
-                </div>
-                Lead Deep-Dive
-              </h2>
+              <h2 className="text-2xl font-bold text-foreground mb-4">Lead Deep-Dive</h2>
               <LeadDeepDive replies={filteredReport.replies} industries={filteredReport.industries} campaigns={filteredReport.campaigns} />
             </div>
           </>

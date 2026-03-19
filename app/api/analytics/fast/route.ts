@@ -1,33 +1,58 @@
 import { NextResponse } from 'next/server';
-import { getCampaigns, getCampaignStats, switchWorkspace } from '@/lib/api/emailbison';
+import { getAllCampaigns, getCampaignStats, switchWorkspace } from '@/lib/api/emailbison';
+import { getCache, setCache, clearCache } from '@/lib/cache';
 import type {
   FastAnalytics,
   CampaignComparisonItem,
   SequenceStepPerformance,
 } from '@/lib/types/emailbison';
 
-// Environment-driven workspace configuration
 const WORKSPACE_ID = parseInt(process.env.WORKSPACE_ID || '0', 10);
 const WORKSPACE_NAME = process.env.WORKSPACE_NAME || 'Dashboard';
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
-    // Switch workspace
-    if (WORKSPACE_ID > 0) {
-      await switchWorkspace(WORKSPACE_ID).catch(() => {});
+    const url = new URL(request.url);
+    const cycleParam = url.searchParams.get('cycle');
+    const refresh = url.searchParams.get('refresh') === 'true';
+
+    const cacheKey = `fast-analytics-cycle-${cycleParam || 'all'}`;
+    if (!refresh) {
+      const cached = await getCache<FastAnalytics>(cacheKey);
+      if (cached) {
+        return NextResponse.json({ data: cached }, {
+          headers: { 'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=120' },
+        });
+      }
+    } else {
+      await clearCache('fast-analytics');
     }
 
-    // Fetch campaign list
-    const { data: campaigns } = await getCampaigns();
+    // Switch workspace
+    await switchWorkspace(WORKSPACE_ID).catch(() => {});
 
-    // All campaigns with leads loaded (including drafts)
-    // Include campaigns with leads OR draft campaigns (to show them in table)
-    const allCampaignsWithLeads = campaigns.filter(c => 
-      c.total_leads > 0 || c.status.toLowerCase() === 'draft'
-    );
+    // Fetch ALL campaigns (paginated)
+    const campaigns = await getAllCampaigns();
 
-    // Only campaigns that have actually sent emails
-    const activeCampaigns = campaigns.filter(c => c.emails_sent > 0);
+    // Compute available cycles from the FULL unfiltered list
+    const availableCycles = [...new Set(
+      campaigns
+        .map(c => {
+          const match = c.name.match(/Cycle\s+(\d+)/i);
+          return match ? parseInt(match[1], 10) : null;
+        })
+        .filter((n): n is number => n !== null)
+    )].sort((a, b) => a - b);
+
+    // Filter by cycle if requested
+    const cycleFilter = cycleParam ? parseInt(cycleParam, 10) : null;
+    const cycleRegex = cycleFilter !== null ? new RegExp(`Cycle\\s+${cycleFilter}\\b`, 'i') : null;
+
+    const filteredCampaigns = cycleRegex
+      ? campaigns.filter(c => cycleRegex.test(c.name))
+      : campaigns;
+
+    const activeCampaigns = filteredCampaigns.filter(c => c.emails_sent > 0);
 
     // Fetch stats for all active campaigns in parallel
     const now = new Date();
@@ -47,7 +72,7 @@ export async function GET() {
 
     const statsMap = new Map(statsResults.map(r => [r.campaignId, r.stats]));
 
-    // Build hero metrics - totalLeads from active campaigns only
+    // Build hero metrics from campaign list objects
     const totalLeads = activeCampaigns.reduce((s, c) => s + c.total_leads, 0);
     const leadsContacted = activeCampaigns.reduce((s, c) => s + c.total_leads_contacted, 0);
     const emailsSent = activeCampaigns.reduce((s, c) => s + c.emails_sent, 0);
@@ -55,8 +80,8 @@ export async function GET() {
     const totalInterested = activeCampaigns.reduce((s, c) => s + c.interested, 0);
     const totalBounced = activeCampaigns.reduce((s, c) => s + c.bounced, 0);
 
-    // Campaign comparison - include ALL campaigns with leads (drafts too)
-    const campaignComparison: CampaignComparisonItem[] = allCampaignsWithLeads
+    // Campaign comparison — include ALL campaigns (even those with 0 leads/sends)
+    const campaignComparison: CampaignComparisonItem[] = filteredCampaigns
       .map(c => ({
         id: c.id,
         name: c.name,
@@ -79,7 +104,7 @@ export async function GET() {
       }))
       .sort((a, b) => b.interestRate - a.interestRate);
 
-    // Sequence step performance — aggregate across campaigns
+    // Sequence step performance — aggregate across filtered campaigns
     const stepAgg = new Map<number, {
       subjects: string[];
       sent: number;
@@ -132,9 +157,7 @@ export async function GET() {
     const report: FastAnalytics = {
       workspaceName: WORKSPACE_NAME,
       heroMetrics: {
-        // totalCampaigns = all campaigns with leads (including drafts)
-        totalCampaigns: allCampaignsWithLeads.length,
-        // activeCampaigns = only campaigns that have sent emails
+        totalCampaigns: filteredCampaigns.length,
         activeCampaigns: activeCampaigns.length,
         totalLeads,
         leadsContacted,
@@ -159,16 +182,11 @@ export async function GET() {
       },
       campaignComparison,
       sequenceStepPerformance,
-      // Available cycles from campaigns with leads (not just active)
-      availableCycles: [...new Set(
-        allCampaignsWithLeads
-          .map(c => {
-            const match = c.name.match(/^Cycle\s+(\d+)/i);
-            return match ? parseInt(match[1], 10) : null;
-          })
-          .filter((n): n is number => n !== null)
-      )].sort((a, b) => a - b),
+      availableCycles,
     };
+
+    // Cache for 10 minutes
+    await setCache(cacheKey, report, 600);
 
     return NextResponse.json({ data: report }, {
       headers: { 'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=120' },

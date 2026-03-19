@@ -563,7 +563,7 @@ export async function GET(request: Request) {
         campaignId: reply.campaign_id || 0,
         campaignName: campaignName.split(':').pop()?.trim() || campaignName,
         cycleNumber: (() => {
-          const m = campaignName.match(/^Cycle\s+(\d+)/i);
+          const m = campaignName.match(/Cycle\s+(\d+)/i);
           return m ? parseInt(m[1], 10) : null;
         })(),
         subject: reply.subject.replace(/^Re:\s*/i, '').replace(/^\[External\]\s*/i, '').trim(),
