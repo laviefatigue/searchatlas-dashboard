@@ -1,0 +1,161 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../lib/generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+// ── HeyReach Campaigns ───────────────────────────────────────────────
+
+model Campaign {
+  id            Int      @id // HeyReach campaign ID
+  name          String
+  status        String   // IN_PROGRESS, PAUSED, DRAFT, FINISHED, FAILED, CANCELED
+  createdAt     DateTime @map("created_at")
+  startedAt     DateTime? @map("started_at")
+  totalLeads    Int      @default(0) @map("total_leads")
+  inProgress    Int      @default(0) @map("in_progress")
+  pending       Int      @default(0)
+  finished      Int      @default(0)
+  failed        Int      @default(0)
+  stopped       Int      @default(0)
+  excluded      Int      @default(0)
+  listName      String?  @map("list_name")
+  listId        Int?     @map("list_id")
+  syncedAt      DateTime @default(now()) @map("synced_at")
+
+  leads           Lead[]
+  campaignSenders CampaignSender[]
+
+  @@map("campaigns")
+}
+
+// ── LinkedIn Sender Accounts ─────────────────────────────────────────
+
+model Sender {
+  id          Int      @id // HeyReach account ID
+  fullName    String   @map("full_name")
+  isActive    Boolean  @default(false) @map("is_active")
+  authIsValid Boolean  @default(false) @map("auth_is_valid")
+  profileUrl  String?  @map("profile_url")
+  syncedAt    DateTime @default(now()) @map("synced_at")
+
+  leads           Lead[]
+  campaignSenders CampaignSender[]
+  conversations   Conversation[]
+
+  @@map("senders")
+}
+
+// ── Campaign ↔ Sender Junction ───────────────────────────────────────
+
+model CampaignSender {
+  campaignId Int @map("campaign_id")
+  senderId   Int @map("sender_id")
+
+  campaign Campaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  sender   Sender   @relation(fields: [senderId], references: [id], onDelete: Cascade)
+
+  @@id([campaignId, senderId])
+  @@map("campaign_senders")
+}
+
+// ── Leads (per campaign) ─────────────────────────────────────────────
+
+model Lead {
+  id               Int      @id // HeyReach lead member ID
+  campaignId       Int      @map("campaign_id")
+  senderId         Int      @map("sender_id")
+  firstName        String?  @map("first_name")
+  lastName         String?  @map("last_name")
+  headline         String?
+  companyName      String?  @map("company_name")
+  position         String?
+  profileUrl       String?  @map("profile_url")
+  location         String?
+  email            String?
+  connectionStatus String   @default("None") @map("connection_status") // None, ConnectionRequestSent, Connected
+  messageStatus    String   @default("None") @map("message_status")    // None, MessageSent, MessageReply, InMailSent, InMailReply
+  campaignStatus   String   @default("Pending") @map("campaign_status") // InProgress, Pending, Finished, Failed, ManuallyStopped, Excluded
+  createdAt        DateTime @map("created_at")
+  lastActionAt     DateTime? @map("last_action_at")
+  finishedAt       DateTime? @map("finished_at")
+  syncedAt         DateTime @default(now()) @map("synced_at")
+
+  campaign Campaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  sender   Sender   @relation(fields: [senderId], references: [id], onDelete: Cascade)
+
+  @@index([campaignId])
+  @@index([senderId])
+  @@index([messageStatus])
+  @@index([connectionStatus])
+  @@map("leads")
+}
+
+// ── Conversations ────────────────────────────────────────────────────
+
+model Conversation {
+  id                      Int      @id @default(autoincrement())
+  heyreachConversationId  String   @map("heyreach_conversation_id")
+  senderId                Int      @map("sender_id")
+  leadProfileUrl          String?  @map("lead_profile_url")
+  leadName                String?  @map("lead_name")
+  leadCompanyName         String?  @map("lead_company_name")
+  campaignId              Int?     @map("campaign_id")
+  syncedAt                DateTime @default(now()) @map("synced_at")
+
+  sender   Sender    @relation(fields: [senderId], references: [id], onDelete: Cascade)
+  messages Message[]
+
+  @@unique([heyreachConversationId, senderId])
+  @@map("conversations")
+}
+
+// ── Messages ─────────────────────────────────────────────────────────
+
+model Message {
+  id             Int      @id @default(autoincrement())
+  conversationId Int      @map("conversation_id")
+  isFromLead     Boolean  @default(false) @map("is_from_lead")
+  content        String
+  sentAt         DateTime? @map("sent_at")
+
+  conversation Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+
+  @@index([conversationId])
+  @@map("messages")
+}
+
+// ── Daily Stats Snapshots ────────────────────────────────────────────
+
+model StatsDaily {
+  id                     Int      @id @default(autoincrement())
+  date                   DateTime
+  campaignId             Int?     @map("campaign_id")
+  connectionRequestsSent Int      @default(0) @map("connection_requests_sent")
+  connectionsAccepted    Int      @default(0) @map("connections_accepted")
+  messagesSent           Int      @default(0) @map("messages_sent")
+  replies                Int      @default(0)
+  inmailsSent            Int      @default(0) @map("inmails_sent")
+  inmailReplies          Int      @default(0) @map("inmail_replies")
+  syncedAt               DateTime @default(now()) @map("synced_at")
+
+  @@unique([date, campaignId])
+  @@map("stats_daily")
+}
+
+// ── Sync Log ─────────────────────────────────────────────────────────
+
+model SyncLog {
+  id            Int      @id @default(autoincrement())
+  startedAt     DateTime @default(now()) @map("started_at")
+  completedAt   DateTime? @map("completed_at")
+  type          String   // full, incremental
+  recordsSynced Int      @default(0) @map("records_synced")
+  error         String?
+  details       String?  // JSON string with breakdown
+
+  @@map("sync_log")
+}

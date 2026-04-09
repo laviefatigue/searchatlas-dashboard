@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useState, useMemo, useRef, useCallback } from 'react';
+import Link from 'next/link';
 import { PageContainer } from '@/components/layout';
 import { Skeleton } from '@/components/ui/skeleton';
 import type {
@@ -1172,6 +1173,21 @@ export default function AnalyticsPage() {
 
   return (
     <PageContainer className="space-y-8 pb-12">
+      {/* ── Channel Tab Switcher ─────────────────────────────────── */}
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-1 bg-muted rounded-lg p-[3px]">
+          <div className="px-4 py-1.5 text-sm font-medium rounded-md bg-background text-foreground shadow-sm">
+            Email
+          </div>
+          <Link
+            href="/analytics/social"
+            className="px-4 py-1.5 text-sm font-medium rounded-md text-muted-foreground hover:text-foreground transition-colors"
+          >
+            Social
+          </Link>
+        </div>
+      </div>
+
       {/* Export Buttons */}
       <div className="flex items-center justify-end gap-3 hide-on-export">
         <button onClick={handleRefresh} disabled={phase1Loading && phase2Loading}
