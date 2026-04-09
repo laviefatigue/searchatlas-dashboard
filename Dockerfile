@@ -18,6 +18,9 @@ COPY . .
 # Generate Prisma client (gitignored, must be generated in build)
 RUN npx prisma generate
 
+# Create empty database with schema applied (local DB is not committed)
+RUN mkdir -p data && npx prisma migrate deploy
+
 # Build the application
 ENV NEXT_TELEMETRY_DISABLED=1
 RUN npm run build
@@ -43,8 +46,8 @@ RUN chown nextjs:nodejs .next
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 
-# Create writable data directory for SQLite
-RUN mkdir -p data && chown nextjs:nodejs data
+# Copy empty schema'd SQLite database from builder
+COPY --from=builder --chown=nextjs:nodejs /app/data ./data
 
 USER nextjs
 
