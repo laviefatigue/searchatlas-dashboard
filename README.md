@@ -116,7 +116,218 @@ docker-compose logs -f
 
 ## Multi-Tenant Deployment
 
-The same codebase is deployed once per client. Each deployment uses its own set of environment variables (workspace ID, API credentials, etc.) to isolate client data. No code changes are needed between tenants.
+The same codebase is deployed once per client. Each deployment uses its own set of environment variables (workspace ID, API credentials, etc.) to isolate client data.
+
+---
+
+## New Client Onboarding Checklist
+
+Follow these steps every time a new client dashboard is spun up.
+
+### Step 1 — Create a Git Branch
+
+```bash
+git checkout searchatlas-dashboard   # always branch from the current base
+git checkout -b client/<clientname>
+git push -u origin client/<clientname>
+```
+
+Branch naming convention: `client/<clientname>` (e.g. `client/guardare`, `client/linkgraph`).
+
+### Step 2 — Apply Client Branding
+
+**a) Scan the client's website for brand assets** using Playwright or browser DevTools:
+- Logo URL (SVG preferred — look in `<img>` tags or CDN references)
+- CSS custom properties on `:root` (background, primary, accent colors)
+- Font families
+
+**b) Download the logo:**
+
+```bash
+curl -sL "<logo-url>" -o public/<clientname>-logo.svg
+```
+
+**c) Update `app/globals.css`** — replace brand color tokens in `@theme inline`, `:root`, and `.dark`:
+
+| Token | What to update |
+|-------|---------------|
+| `--color-<brand>-purple` | Primary brand color |
+| `--color-<brand>-lime` / accent | CTA / accent color |
+| `--color-<brand>-dark` | Page background |
+| `--chart-1` through `--chart-5` | Chart palette |
+| `--primary`, `--ring`, `--sidebar-primary` | Match primary brand color |
+
+**d) Update `components/layout/Sidebar.tsx`** — swap the logo `src` and `alt`.
+
+**e) Update `app/login/page.tsx`** — swap logo, update all hardcoded hex colors to the new brand tokens. Also update `DASHBOARD_PASSWORD` (see Step 3).
+
+**f) Replace all previous client color token references** across the codebase:
+
+```bash
+# Adapt token names to match whatever was renamed in globals.css
+for f in "app/(dashboard)/analytics/page.tsx" \
+          "app/(dashboard)/analytics/social/page.tsx" \
+          "app/(dashboard)/infrastructure/page.tsx" \
+          "components/infrastructure/InfrastructureDashboard.tsx"; do
+  sed -i \
+    -e 's/oldbrand-purple/newbrand-purple/g' \
+    -e 's/oldbrand-cyan/newbrand-lime/g' \
+    -e 's/oldbrand-green/newbrand-lime/g' \
+    -e 's/oldbrand-dark/newbrand-dark/g' \
+    "$f"
+done
+```
+
+> **Rule:** Every time you apply a new client brand, search the full codebase for the previous client's color token names and replace them all. Orphaned tokens will silently break charts and UI elements.
+
+**g) Confirm `app/layout.tsx`** uses the env-driven title:
+
+```ts
+export const metadata: Metadata = {
+  title: process.env.NEXT_PUBLIC_DASHBOARD_TITLE ?? "<ClientName> Dashboard",
+};
+```
+
+### Step 3 — Set Environment Variables
+
+Create `.env.local` from the template (gitignored — never committed):
+
+```env
+EMAILBISON_API_TOKEN=<client-eb-token>
+WORKSPACE_ID=<client-eb-workspace-id>
+WORKSPACE_NAME=<ClientName>
+INFRASTRUCTURE_CLIENT_ID=<client-uuid-in-charm-os>
+INFRASTRUCTURE_API_URL=http://ccssgc4gowsog04wck400o0w.31.97.142.123.sslip.io
+NEXT_PUBLIC_DASHBOARD_TITLE=<ClientName> Dashboard
+NEXT_PUBLIC_AUTO_REFRESH_MS=300000
+DASHBOARD_PASSWORD=<clientname><year>
+DATABASE_URL=file:./data/heyreach.db
+HEYREACH_API_KEY=                       # only if Social tab is enabled
+HEYREACH_CAMPAIGN_IDS=
+HEYREACH_SENDER_IDS=
+```
+
+> ⚠️ **Always set a unique `DASHBOARD_PASSWORD` per client.** Convention: `<clientname><year>` (e.g. `guardare2026`). Never carry over a password from a previous client's deployment.
+
+### Step 4 — Commit and Push
+
+```bash
+git add app/globals.css app/layout.tsx app/login/page.tsx \
+        components/layout/Sidebar.tsx \
+        "app/(dashboard)/analytics/page.tsx" \
+        "app/(dashboard)/analytics/social/page.tsx" \
+        "app/(dashboard)/infrastructure/page.tsx" \
+        "components/infrastructure/InfrastructureDashboard.tsx" \
+        public/<clientname>-logo.svg
+
+git commit -m "feat: apply <ClientName> brand theme and logo"
+git push
+```
+
+### Step 5 — Create the Coolify App (via API)
+
+```bash
+curl -X POST "http://82.180.160.120:8000/api/v1/applications/public" \
+  -H "Authorization: Bearer <COOLIFY_API_TOKEN>" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "project_uuid": "egc0kgcwckw8osgkgkkggcwc",
+    "environment_name": "production",
+    "server_uuid": "bw40kkoo8kwwc8sssg0sg4ko",
+    "destination_uuid": "m084g4s8wk04cc8o88g0owoc",
+    "git_repository": "https://github.com/laviefatigue/searchatlas-dashboard",
+    "git_branch": "client/<clientname>",
+    "build_pack": "dockerfile",
+    "ports_exposes": "3000",
+    "name": "<clientname>-dashboard",
+    "description": "<ClientName> infrastructure and analytics dashboard",
+    "redirect": "both",
+    "instant_deploy": false
+  }'
+# → Returns {"uuid":"<APP_UUID>","domains":"http://<APP_UUID>.82.180.160.120.sslip.io"}
+```
+
+> ⚠️ **Critical — always patch `dockerfile_location` and `start_command` immediately after creation.**
+>
+> The public API endpoint does not set `dockerfile_location` automatically. Without this, Coolify falls back to nixpacks and runs `next start` — which breaks `output: "standalone"` builds. The container starts but serves a blank page.
+
+```bash
+APP_UUID="<APP_UUID>"
+COOLIFY_URL="http://82.180.160.120:8000"
+TOKEN="<COOLIFY_API_TOKEN>"
+
+# Required: tell Coolify where the Dockerfile is
+curl -X PATCH "$COOLIFY_URL/api/v1/applications/$APP_UUID" \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"dockerfile_location":"/Dockerfile"}'
+
+# Belt-and-suspenders: explicit start command for standalone output
+curl -X PATCH "$COOLIFY_URL/api/v1/applications/$APP_UUID" \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"start_command":"node server.js"}'
+```
+
+### Step 6 — Set Environment Variables in Coolify
+
+```bash
+set_env() {
+  curl -s -X POST "$COOLIFY_URL/api/v1/applications/$APP_UUID/envs" \
+    -H "Authorization: Bearer $TOKEN" \
+    -H "Content-Type: application/json" \
+    -d "{\"key\":\"$1\",\"value\":\"$2\",\"is_buildtime\":true}"
+}
+
+set_env EMAILBISON_API_URL       "https://spellcast.hirecharm.com"
+set_env EMAILBISON_API_TOKEN     "<client-eb-token>"
+set_env WORKSPACE_ID             "<id>"
+set_env WORKSPACE_NAME           "<ClientName>"
+set_env INFRASTRUCTURE_API_URL   "http://ccssgc4gowsog04wck400o0w.31.97.142.123.sslip.io"
+set_env INFRASTRUCTURE_CLIENT_ID "<charm-os-uuid>"
+set_env NEXT_PUBLIC_DASHBOARD_TITLE "<ClientName> Dashboard"
+set_env NEXT_PUBLIC_AUTO_REFRESH_MS "300000"
+set_env DASHBOARD_PASSWORD       "<clientname><year>"
+set_env DATABASE_URL             "file:./data/heyreach.db"
+```
+
+### Step 7 — Deploy
+
+```bash
+curl -X GET "$COOLIFY_URL/api/v1/applications/$APP_UUID/start" \
+  -H "Authorization: Bearer $TOKEN"
+```
+
+Monitor the build in the Coolify UI or poll:
+
+```bash
+curl -s -H "Authorization: Bearer $TOKEN" \
+  "$COOLIFY_URL/api/v1/deployments/<DEPLOY_UUID>" | node -e \
+  "const d=require('fs').readFileSync(0,'utf8'); console.log(JSON.parse(d).status)"
+```
+
+### Step 8 — Set Domain (after verifying on temp URL)
+
+Test on the auto-generated sslip.io URL first. Once verified:
+
+```bash
+curl -X PATCH "$COOLIFY_URL/api/v1/applications/$APP_UUID" \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"domains":"https://<clientname>.hirecharm.com"}'
+```
+
+Add a DNS `A` record on `hirecharm.com`: `<clientname>` → `82.180.160.120`. Coolify provisions SSL via Let's Encrypt automatically.
+
+### Step 9 — Record the UUID
+
+Add the new app UUID to `.env.coolify.local`:
+
+```env
+COOLIFY_<CLIENTNAME>_UUID=<APP_UUID>
+```
+
+---
 
 ## HeyReach Social Tab Setup
 
