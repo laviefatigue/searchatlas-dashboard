@@ -55,11 +55,11 @@ const PERIOD_LABELS: Record<Period, string> = {
 function LinkedInFunnel({ funnel }: { funnel: SocialDashboardData['funnel'] }) {
   const steps = [
     { label: 'Total Leads', value: funnel.totalLeads, color: 'from-gray-600 to-gray-700' },
-    { label: 'Conn. Sent', value: funnel.connectionsSent, color: 'from-searchatlas-cyan/70 to-searchatlas-cyan/50' },
+    { label: 'Conn. Sent', value: funnel.connectionsSent, color: 'from-guardare-lime/70 to-guardare-lime/50' },
     { label: 'Accepted', value: funnel.accepted, color: 'from-blue-500/70 to-blue-500/50' },
-    { label: 'Replied', value: funnel.replied, color: 'from-searchatlas-purple/70 to-searchatlas-purple/50' },
+    { label: 'Replied', value: funnel.replied, color: 'from-guardare-purple/70 to-guardare-purple/50' },
     ...(funnel.interested > 0
-      ? [{ label: 'Interested', value: funnel.interested, color: 'from-searchatlas-green/70 to-searchatlas-green/50' }]
+      ? [{ label: 'Interested', value: funnel.interested, color: 'from-guardare-lime/70 to-guardare-lime/50' }]
       : []),
   ];
 
@@ -111,7 +111,7 @@ function CampaignPerformance({ campaigns }: { campaigns: SocialCampaignRow[] }) 
 
   const statusColor = (status: string) => {
     switch (status) {
-      case 'IN_PROGRESS': return 'bg-searchatlas-green';
+      case 'IN_PROGRESS': return 'bg-guardare-lime';
       case 'PAUSED': return 'bg-yellow-500';
       case 'FINISHED': return 'bg-blue-500';
       case 'FAILED': return 'bg-red-500';
@@ -132,7 +132,7 @@ function CampaignPerformance({ campaigns }: { campaigns: SocialCampaignRow[] }) 
 
   return (
     <div className="rounded-lg border bg-card shadow-sm overflow-hidden">
-      <div className="p-4 bg-gradient-to-r from-searchatlas-cyan/10 to-searchatlas-dark/10 border-b">
+      <div className="p-4 bg-gradient-to-r from-guardare-lime/10 to-guardare-dark/10 border-b">
         <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-2">
           <BarChart3 className="h-4 w-4" />
           Campaign Performance
@@ -191,7 +191,7 @@ function CampaignPerformance({ campaigns }: { campaigns: SocialCampaignRow[] }) 
                     <div className="flex items-center gap-2 justify-end">
                       <div className="w-16 h-1.5 bg-muted rounded-full overflow-hidden">
                         <div
-                          className="h-full bg-searchatlas-cyan rounded-full transition-all duration-500"
+                          className="h-full bg-guardare-lime rounded-full transition-all duration-500"
                           style={{ width: `${c.totalLeads > 0 ? ((c.finished / c.totalLeads) * 100) : 0}%` }}
                         />
                       </div>
@@ -230,7 +230,7 @@ function CampaignPerformance({ campaigns }: { campaigns: SocialCampaignRow[] }) 
                             <span className="font-medium">{c.acceptanceRate}%</span>
                           </div>
                           <div className="h-2 bg-muted rounded-full overflow-hidden">
-                            <div className="h-full bg-searchatlas-cyan rounded-full transition-all duration-500" style={{ width: `${Math.min(c.acceptanceRate, 100)}%` }} />
+                            <div className="h-full bg-guardare-lime rounded-full transition-all duration-500" style={{ width: `${Math.min(c.acceptanceRate, 100)}%` }} />
                           </div>
                         </div>
                         <div>
@@ -239,7 +239,7 @@ function CampaignPerformance({ campaigns }: { campaigns: SocialCampaignRow[] }) 
                             <span className="font-medium">{c.replyRate}%</span>
                           </div>
                           <div className="h-2 bg-muted rounded-full overflow-hidden">
-                            <div className="h-full bg-searchatlas-purple rounded-full transition-all duration-500" style={{ width: `${Math.min(c.replyRate, 100)}%` }} />
+                            <div className="h-full bg-guardare-purple rounded-full transition-all duration-500" style={{ width: `${Math.min(c.replyRate, 100)}%` }} />
                           </div>
                         </div>
                       </div>
@@ -330,7 +330,7 @@ function SenderPerformance({ senders }: { senders: SocialDashboardData['senders'
 
   return (
     <div className="rounded-lg border bg-card shadow-sm overflow-hidden">
-      <div className="p-4 bg-gradient-to-r from-searchatlas-purple/10 to-searchatlas-dark/10 border-b">
+      <div className="p-4 bg-gradient-to-r from-guardare-purple/10 to-guardare-dark/10 border-b">
         <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-2">
           <Users className="h-4 w-4" />
           Sender Performance
@@ -341,8 +341,8 @@ function SenderPerformance({ senders }: { senders: SocialDashboardData['senders'
           <div key={s.id} className="rounded-lg border bg-card p-4 space-y-3">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <div className="h-8 w-8 rounded-full bg-searchatlas-purple/20 flex items-center justify-center">
-                  <Linkedin className="h-4 w-4 text-searchatlas-purple" />
+                <div className="h-8 w-8 rounded-full bg-guardare-purple/20 flex items-center justify-center">
+                  <Linkedin className="h-4 w-4 text-guardare-purple" />
                 </div>
                 <div>
                   <p className="font-medium text-sm">{s.name}</p>
@@ -351,7 +351,7 @@ function SenderPerformance({ senders }: { senders: SocialDashboardData['senders'
               </div>
               <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${
                 s.status !== 'disconnected'
-                  ? 'bg-searchatlas-green/20 text-searchatlas-green'
+                  ? 'bg-guardare-lime/20 text-guardare-lime'
                   : 'bg-red-950/30 text-red-400'
               }`}>
                 {s.status !== 'disconnected' ? 'Connected' : 'Disconnected'}
@@ -384,7 +384,7 @@ function SenderPerformance({ senders }: { senders: SocialDashboardData['senders'
                   <span className="font-medium">{s.acceptanceRate}%</span>
                 </div>
                 <div className="h-1.5 bg-muted rounded-full overflow-hidden">
-                  <div className="h-full bg-searchatlas-cyan rounded-full transition-all duration-500" style={{ width: `${Math.min(s.acceptanceRate, 100)}%` }} />
+                  <div className="h-full bg-guardare-lime rounded-full transition-all duration-500" style={{ width: `${Math.min(s.acceptanceRate, 100)}%` }} />
                 </div>
               </div>
               <div>
@@ -393,7 +393,7 @@ function SenderPerformance({ senders }: { senders: SocialDashboardData['senders'
                   <span className="font-medium">{s.replyRate}%</span>
                 </div>
                 <div className="h-1.5 bg-muted rounded-full overflow-hidden">
-                  <div className="h-full bg-searchatlas-purple rounded-full transition-all duration-500" style={{ width: `${Math.min(s.replyRate, 100)}%` }} />
+                  <div className="h-full bg-guardare-purple rounded-full transition-all duration-500" style={{ width: `${Math.min(s.replyRate, 100)}%` }} />
                 </div>
               </div>
             </div>
@@ -442,10 +442,10 @@ function ReplyFeed({ replies, campaigns }: { replies: SocialReplyItem[]; campaig
 
   return (
     <div className="rounded-lg border bg-card shadow-sm overflow-hidden">
-      <div className="p-4 bg-gradient-to-r from-searchatlas-cyan/10 to-searchatlas-dark/10 border-b space-y-3">
+      <div className="p-4 bg-gradient-to-r from-guardare-lime/10 to-guardare-dark/10 border-b space-y-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 bg-searchatlas-purple/20 rounded-lg flex items-center justify-center">
+            <div className="w-8 h-8 bg-guardare-purple/20 rounded-lg flex items-center justify-center">
               <MessageSquare className="h-4 w-4 text-white" />
             </div>
             <h3 className="text-lg font-bold">
@@ -457,7 +457,7 @@ function ReplyFeed({ replies, campaigns }: { replies: SocialReplyItem[]; campaig
             <button
               onClick={() => setShowFilters(!showFilters)}
               className={`flex items-center gap-1 px-3 py-1.5 text-xs font-medium rounded-lg border transition-colors ${
-                showFilters ? 'bg-searchatlas-purple text-white border-searchatlas-purple' : 'bg-secondary hover:bg-accent'
+                showFilters ? 'bg-guardare-purple text-white border-guardare-purple' : 'bg-secondary hover:bg-accent'
               }`}
             >
               <Filter className="h-3 w-3" />
@@ -470,7 +470,7 @@ function ReplyFeed({ replies, campaigns }: { replies: SocialReplyItem[]; campaig
                 placeholder="Search replies..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-48 h-9 pl-9 pr-3 text-sm rounded-lg border bg-background focus:outline-none focus:ring-2 focus:ring-searchatlas-cyan/20"
+                className="w-48 h-9 pl-9 pr-3 text-sm rounded-lg border bg-background focus:outline-none focus:ring-2 focus:ring-guardare-lime/20"
               />
             </div>
           </div>
@@ -514,7 +514,7 @@ function ReplyFeed({ replies, campaigns }: { replies: SocialReplyItem[]; campaig
                   </td>
                   <td className="py-3 px-4">
                     <p className="font-medium text-foreground">{reply.firstName} {reply.lastName}</p>
-                    {reply.position && <p className="text-xs text-searchatlas-cyan">{reply.position}</p>}
+                    {reply.position && <p className="text-xs text-guardare-lime">{reply.position}</p>}
                   </td>
                   <td className="py-3 px-4 text-muted-foreground">{reply.companyName || '—'}</td>
                   <td className="py-3 px-4 text-muted-foreground">{reply.senderName}</td>
@@ -541,7 +541,7 @@ function ReplyFeed({ replies, campaigns }: { replies: SocialReplyItem[]; campaig
                               {reply.location}
                             </span>
                           )}
-                          <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-searchatlas-green/20 text-searchatlas-green font-medium text-xs">
+                          <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-guardare-lime/20 text-guardare-lime font-medium text-xs">
                             <MessageSquare className="h-3 w-3" />
                             {reply.messageStatus === 'InMailReply' ? 'InMail Reply' : 'Message Reply'}
                           </span>
@@ -560,7 +560,7 @@ function ReplyFeed({ replies, campaigns }: { replies: SocialReplyItem[]; campaig
                             rel="noopener noreferrer"
                             className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border bg-secondary hover:bg-accent text-xs font-medium transition-colors flex-shrink-0"
                           >
-                            <Linkedin className="h-3.5 w-3.5 text-searchatlas-cyan" />
+                            <Linkedin className="h-3.5 w-3.5 text-guardare-lime" />
                             LinkedIn Profile
                             <ExternalLink className="h-3 w-3 text-muted-foreground" />
                           </a>
@@ -715,7 +715,7 @@ export default function SocialAnalyticsPage() {
           <p className="text-sm text-red-400 mb-4">{error}</p>
           <button
             onClick={handleSync}
-            className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg bg-searchatlas-purple hover:bg-searchatlas-purple/80 text-white transition-colors"
+            className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg bg-guardare-purple hover:bg-guardare-purple/80 text-white transition-colors"
           >
             <RefreshCw className="h-4 w-4" />
             Try Syncing Data
@@ -737,7 +737,7 @@ export default function SocialAnalyticsPage() {
                 onClick={() => setPeriod(p)}
                 className={`px-4 py-2 text-sm font-medium rounded-lg border transition-colors whitespace-nowrap ${
                   period === p
-                    ? 'bg-searchatlas-purple text-white border-searchatlas-purple'
+                    ? 'bg-guardare-purple text-white border-guardare-purple'
                     : 'bg-secondary hover:bg-accent border-border'
                 }`}
               >

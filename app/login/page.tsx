@@ -43,21 +43,21 @@ function LoginForm() {
 
   return (
     <div className="w-full max-w-sm">
-      {/* SearchAtlas Logo */}
+      {/* Guardare Logo */}
       <div className="flex justify-center mb-8">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
-          src="https://searchatlas.com/wp-content/uploads/2023/12/white.svg"
-          alt="SearchAtlas"
+          src="/guardare-logo.svg"
+          alt="Guardare"
           className="h-10 w-auto"
         />
       </div>
 
       {/* Login Card */}
-      <div className="bg-[#1C1D24] border border-[#2A2B35] rounded-xl p-6 shadow-xl">
+      <div className="bg-[#1c1525] border border-[#2d2040] rounded-xl p-6 shadow-xl">
         <div className="flex items-center gap-3 mb-6">
-          <div className="w-10 h-10 rounded-lg bg-[#A57BEA]/10 flex items-center justify-center">
-            <Lock className="w-5 h-5 text-[#A57BEA]" />
+          <div className="w-10 h-10 rounded-lg bg-guardare-purple/10 flex items-center justify-center">
+            <Lock className="w-5 h-5 text-guardare-purple" />
           </div>
           <div>
             <h1 className="text-lg font-semibold text-white">Dashboard Access</h1>
@@ -78,7 +78,7 @@ function LoginForm() {
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Enter password"
                 autoFocus
-                className="w-full px-4 py-3 bg-[#14151A] border border-[#2A2B35] rounded-lg text-white placeholder:text-[#5C5E6A] focus:outline-none focus:ring-2 focus:ring-[#A57BEA] focus:border-transparent transition-all"
+                className="w-full px-4 py-3 bg-guardare-dark border border-[#2d2040] rounded-lg text-white placeholder:text-[#5C5E6A] focus:outline-none focus:ring-2 focus:ring-guardare-purple focus:border-transparent transition-all"
               />
               <button
                 type="button"
@@ -103,7 +103,7 @@ function LoginForm() {
           <button
             type="submit"
             disabled={isLoading || !password}
-            className="w-full py-3 px-4 bg-[#A57BEA] hover:bg-[#9066D8] disabled:bg-[#A57BEA]/50 disabled:cursor-not-allowed text-white font-medium rounded-lg transition-colors flex items-center justify-center gap-2"
+            className="w-full py-3 px-4 bg-guardare-purple hover:bg-[#6a3db8] disabled:bg-guardare-purple/50 disabled:cursor-not-allowed text-white font-medium rounded-lg transition-colors flex items-center justify-center gap-2"
           >
             {isLoading ? (
               <>
@@ -129,11 +129,11 @@ function LoginFallback() {
   return (
     <div className="w-full max-w-sm">
       <div className="flex justify-center mb-8">
-        <div className="h-10 w-32 bg-[#2A2B35] rounded animate-pulse" />
+        <div className="h-10 w-32 bg-[#2d2040] rounded animate-pulse" />
       </div>
-      <div className="bg-[#1C1D24] border border-[#2A2B35] rounded-xl p-6">
+      <div className="bg-[#1c1525] border border-[#2d2040] rounded-xl p-6">
         <div className="h-40 flex items-center justify-center">
-          <Loader2 className="w-6 h-6 animate-spin text-[#A57BEA]" />
+          <Loader2 className="w-6 h-6 animate-spin text-guardare-purple" />
         </div>
       </div>
     </div>
@@ -142,7 +142,7 @@ function LoginFallback() {
 
 export default function LoginPage() {
   return (
-    <div className="min-h-screen bg-[#14151A] flex items-center justify-center p-4">
+    <div className="min-h-screen bg-guardare-dark flex items-center justify-center p-4">
       <Suspense fallback={<LoginFallback />}>
         <LoginForm />
       </Suspense>
