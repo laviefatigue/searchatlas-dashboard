@@ -1,6 +1,17 @@
-# SearchAtlas Client Analytics Dashboard
+# Charm Client Health Dashboard
 
-Real-time analytics, campaign management, and infrastructure health monitoring dashboard for email outreach campaigns.
+Multi-client analytics, campaign management, and infrastructure health monitoring dashboard. One codebase, one repo — each client gets their own branch and Coolify deployment.
+
+## Deployed Clients
+
+| Client | Domain | Branch | Coolify UUID |
+|--------|--------|--------|--------------|
+| SearchAtlas | https://searchatlas.hirecharm.com | `client/searchatlas` | `b4804kg4wk0gkss8o08ws040` |
+| LinkGraph | https://linkgraph.hirecharm.com | `client/linkgraph` | `xccss0cokssowsw4s40k4ook` |
+| Guardare | https://guardare.hirecharm.com | `client/guardare` | `e8k408g8o4gw8o8cw8cc4480` |
+| Stable Kernel | https://skmr.hirecharm.com | `client/stablekernel` | `joc000wkko4wow8wo80kcw0k` |
+
+All deployments are on server `82.180.160.120`, Coolify panel at `http://82.180.160.120:8000`.
 
 ## Tech Stack
 
@@ -9,7 +20,7 @@ Real-time analytics, campaign management, and infrastructure health monitoring d
 - **Tailwind CSS v4**
 - **Recharts** for data visualizations
 - **shadcn/ui** (Radix UI) for accessible components
-- **Dark theme** with SearchAtlas brand colors
+- **Dark theme** with per-client brand tokens
 
 ## Dashboard Tabs
 
@@ -108,6 +119,10 @@ docker-compose logs -f
 | `INFRASTRUCTURE_API_URL` | Yes | Infrastructure health API endpoint |
 | `INFRASTRUCTURE_CLIENT_ID` | Yes | Client UUID in the infrastructure database |
 | `DASHBOARD_PASSWORD` | Yes | Password for dashboard login |
+| `NEXT_PUBLIC_CLIENT_LOGO` | Yes | Path to logo file in `/public` (e.g. `/client-logo.svg`) |
+| `NEXT_PUBLIC_CLIENT_NAME` | Yes | Client display name — shown in sidebar and login |
+| `NEXT_PUBLIC_DASHBOARD_TITLE` | Yes | Browser tab title (e.g. `SearchAtlas Dashboard`) |
+| `NEXT_PUBLIC_AUTO_REFRESH_MS` | No | Dashboard auto-refresh interval in ms (default: 300000) |
 | `HEYREACH_API_KEY` | For Social tab | HeyReach API key (Integrations → HeyReach API) |
 | `HEYREACH_CAMPAIGN_IDS` | For Social tab | Comma-separated campaign IDs for this client |
 | `HEYREACH_SENDER_IDS` | For Social tab | Comma-separated sender account IDs for this client |
@@ -127,66 +142,54 @@ Follow these steps every time a new client dashboard is spun up.
 ### Step 1 — Create a Git Branch
 
 ```bash
-git checkout searchatlas-dashboard   # always branch from the current base
+git checkout template   # always branch from template — NOT from a live client branch
 git checkout -b client/<clientname>
 git push -u origin client/<clientname>
 ```
 
 Branch naming convention: `client/<clientname>` (e.g. `client/guardare`, `client/linkgraph`).
 
+> ⚠️ **Branch from `template`, not `searchatlas-dashboard`.** The `searchatlas-dashboard` branch is the SearchAtlas client deployment. The `template` branch is a clean base with no client branding — it only has the `BrandLogo` component and env-var-driven theming wired up.
+
 ### Step 2 — Apply Client Branding
 
-**a) Scan the client's website for brand assets** using Playwright or browser DevTools:
+The logo and client name are driven entirely by env vars via the shared `BrandLogo` component (`components/layout/BrandLogo.tsx`). No component edits needed for a standard onboarding.
+
+**a) Scan the client's website for brand assets:**
 - Logo URL (SVG preferred — look in `<img>` tags or CDN references)
-- CSS custom properties on `:root` (background, primary, accent colors)
+- Primary and accent colors (CSS custom properties on `:root` or DevTools computed styles)
 - Font families
 
-**b) Download the logo:**
+**b) Download the logo into `public/`:**
 
 ```bash
 curl -sL "<logo-url>" -o public/<clientname>-logo.svg
+# or for PNG:
+curl -sL "<logo-url>" -o public/<clientname>-logo.png
 ```
 
-**c) Update `app/globals.css`** — replace brand color tokens in `@theme inline`, `:root`, and `.dark`:
+**c) Set the branding env vars** (see Step 3 — these are all that's needed for logo + name):
+
+```env
+NEXT_PUBLIC_CLIENT_LOGO=/<clientname>-logo.svg
+NEXT_PUBLIC_CLIENT_NAME=<ClientName>
+NEXT_PUBLIC_DASHBOARD_TITLE=<ClientName> Dashboard
+```
+
+The `BrandLogo` component reads these at build time. It renders the logo with `h-X w-auto` so wide SVG wordmarks scale correctly without clipping.
+
+**d) Update `app/globals.css`** (only if the client has distinct brand colors):
+
+Replace color tokens in `@theme inline`, `:root`, and `.dark`:
 
 | Token | What to update |
 |-------|---------------|
-| `--color-<brand>-purple` | Primary brand color |
-| `--color-<brand>-lime` / accent | CTA / accent color |
-| `--color-<brand>-dark` | Page background |
+| `--color-<brand>-*` | Primary, accent, background colors |
 | `--chart-1` through `--chart-5` | Chart palette |
 | `--primary`, `--ring`, `--sidebar-primary` | Match primary brand color |
 
-**d) Update `components/layout/Sidebar.tsx`** — swap the logo `src` and `alt`.
-
-**e) Update `app/login/page.tsx`** — swap logo, update all hardcoded hex colors to the new brand tokens. Also update `DASHBOARD_PASSWORD` (see Step 3).
-
-**f) Replace all previous client color token references** across the codebase:
-
-```bash
-# Adapt token names to match whatever was renamed in globals.css
-for f in "app/(dashboard)/analytics/page.tsx" \
-          "app/(dashboard)/analytics/social/page.tsx" \
-          "app/(dashboard)/infrastructure/page.tsx" \
-          "components/infrastructure/InfrastructureDashboard.tsx"; do
-  sed -i \
-    -e 's/oldbrand-purple/newbrand-purple/g' \
-    -e 's/oldbrand-cyan/newbrand-lime/g' \
-    -e 's/oldbrand-green/newbrand-lime/g' \
-    -e 's/oldbrand-dark/newbrand-dark/g' \
-    "$f"
-done
-```
-
-> **Rule:** Every time you apply a new client brand, search the full codebase for the previous client's color token names and replace them all. Orphaned tokens will silently break charts and UI elements.
-
-**g) Confirm `app/layout.tsx`** uses the env-driven title:
-
-```ts
-export const metadata: Metadata = {
-  title: process.env.NEXT_PUBLIC_DASHBOARD_TITLE ?? "<ClientName> Dashboard",
-};
-```
+> **Rule:** If you rename color tokens, search the full codebase for old token names and replace them. Orphaned tokens silently break charts and UI elements. Key files to check:
+> `app/(dashboard)/analytics/page.tsx`, `app/(dashboard)/analytics/social/page.tsx`, `app/(dashboard)/infrastructure/page.tsx`, `components/infrastructure/InfrastructureDashboard.tsx`
 
 ### Step 3 — Set Environment Variables
 
@@ -198,6 +201,8 @@ WORKSPACE_ID=<client-eb-workspace-id>
 WORKSPACE_NAME=<ClientName>
 INFRASTRUCTURE_CLIENT_ID=<client-uuid-in-charm-os>
 INFRASTRUCTURE_API_URL=http://ccssgc4gowsog04wck400o0w.31.97.142.123.sslip.io
+NEXT_PUBLIC_CLIENT_LOGO=/<clientname>-logo.svg
+NEXT_PUBLIC_CLIENT_NAME=<ClientName>
 NEXT_PUBLIC_DASHBOARD_TITLE=<ClientName> Dashboard
 NEXT_PUBLIC_AUTO_REFRESH_MS=300000
 DASHBOARD_PASSWORD=<clientname><year>
@@ -212,13 +217,16 @@ HEYREACH_SENDER_IDS=
 ### Step 4 — Commit and Push
 
 ```bash
-git add app/globals.css app/layout.tsx app/login/page.tsx \
-        components/layout/Sidebar.tsx \
-        "app/(dashboard)/analytics/page.tsx" \
+# Always commit the logo file — env vars go into Coolify, not git
+git add public/<clientname>-logo.svg
+
+# If you updated brand colors in globals.css, add those too:
+git add app/globals.css
+# And any pages where color tokens were replaced:
+git add "app/(dashboard)/analytics/page.tsx" \
         "app/(dashboard)/analytics/social/page.tsx" \
         "app/(dashboard)/infrastructure/page.tsx" \
-        "components/infrastructure/InfrastructureDashboard.tsx" \
-        public/<clientname>-logo.svg
+        "components/infrastructure/InfrastructureDashboard.tsx"
 
 git commit -m "feat: apply <ClientName> brand theme and logo"
 git push
@@ -226,12 +234,14 @@ git push
 
 ### Step 5 — Create the Coolify App (via API)
 
+> **Each client should have its own Coolify project.** Create a new project in the Coolify UI first (Projects → New), then use its UUID below. Do not add new clients to an existing client's project.
+
 ```bash
 curl -X POST "http://82.180.160.120:8000/api/v1/applications/public" \
   -H "Authorization: Bearer <COOLIFY_API_TOKEN>" \
   -H "Content-Type: application/json" \
   -d '{
-    "project_uuid": "egc0kgcwckw8osgkgkkggcwc",
+    "project_uuid": "<client-project-uuid>",
     "environment_name": "production",
     "server_uuid": "bw40kkoo8kwwc8sssg0sg4ko",
     "destination_uuid": "m084g4s8wk04cc8o88g0owoc",
@@ -279,31 +289,43 @@ set_env() {
     -d "{\"key\":\"$1\",\"value\":\"$2\",\"is_buildtime\":true}"
 }
 
-set_env EMAILBISON_API_URL       "https://spellcast.hirecharm.com"
-set_env EMAILBISON_API_TOKEN     "<client-eb-token>"
-set_env WORKSPACE_ID             "<id>"
-set_env WORKSPACE_NAME           "<ClientName>"
-set_env INFRASTRUCTURE_API_URL   "http://ccssgc4gowsog04wck400o0w.31.97.142.123.sslip.io"
-set_env INFRASTRUCTURE_CLIENT_ID "<charm-os-uuid>"
-set_env NEXT_PUBLIC_DASHBOARD_TITLE "<ClientName> Dashboard"
-set_env NEXT_PUBLIC_AUTO_REFRESH_MS "300000"
-set_env DASHBOARD_PASSWORD       "<clientname><year>"
-set_env DATABASE_URL             "file:./data/heyreach.db"
+set_env EMAILBISON_API_URL            "https://spellcast.hirecharm.com"
+set_env EMAILBISON_API_TOKEN          "<client-eb-token>"
+set_env WORKSPACE_ID                  "<id>"
+set_env WORKSPACE_NAME                "<ClientName>"
+set_env INFRASTRUCTURE_API_URL        "http://ccssgc4gowsog04wck400o0w.31.97.142.123.sslip.io"
+set_env INFRASTRUCTURE_CLIENT_ID      "<charm-os-uuid>"
+set_env NEXT_PUBLIC_CLIENT_LOGO       "/<clientname>-logo.svg"
+set_env NEXT_PUBLIC_CLIENT_NAME       "<ClientName>"
+set_env NEXT_PUBLIC_DASHBOARD_TITLE   "<ClientName> Dashboard"
+set_env NEXT_PUBLIC_AUTO_REFRESH_MS   "300000"
+set_env DASHBOARD_PASSWORD            "<clientname><year>"
+set_env DATABASE_URL                  "file:./data/heyreach.db"
 ```
 
 ### Step 7 — Deploy
 
 ```bash
-curl -X GET "$COOLIFY_URL/api/v1/applications/$APP_UUID/start" \
+# Triggers a deploy and returns the deployment UUID
+curl -s -X GET "$COOLIFY_URL/api/v1/deploy?uuid=$APP_UUID" \
   -H "Authorization: Bearer $TOKEN"
+# → {"deployments":[{"message":"...queued.","deployment_uuid":"<DEPLOY_UUID>"}]}
 ```
 
-Monitor the build in the Coolify UI or poll:
+> ⚠️ **Use `/api/v1/deploy?uuid=` not `/api/v1/applications/$UUID/start`.** The `/start` endpoint returns 404 — the correct trigger endpoint is the deploy one above.
+
+Poll until `finished` or `failed`:
 
 ```bash
-curl -s -H "Authorization: Bearer $TOKEN" \
-  "$COOLIFY_URL/api/v1/deployments/<DEPLOY_UUID>" | node -e \
-  "const d=require('fs').readFileSync(0,'utf8'); console.log(JSON.parse(d).status)"
+DEPLOY_UUID="<DEPLOY_UUID>"
+while true; do
+  STATUS=$(curl -s -H "Authorization: Bearer $TOKEN" \
+    "$COOLIFY_URL/api/v1/deployments/$DEPLOY_UUID" | node -e \
+    "let d='';process.stdin.on('data',c=>d+=c);process.stdin.on('end',()=>console.log(JSON.parse(d).status))")
+  echo "$(date '+%H:%M:%S') — $STATUS"
+  [[ "$STATUS" == "finished" || "$STATUS" == "failed" ]] && break
+  sleep 15
+done
 ```
 
 ### Step 8 — Set Domain + Patch Traefik Labels (after verifying on temp URL)
@@ -362,7 +384,7 @@ curl -X PATCH "$COOLIFY_URL/api/v1/applications/$APP_UUID" \
 **8c — Redeploy to apply the new labels:**
 
 ```bash
-curl -X GET "$COOLIFY_URL/api/v1/applications/$APP_UUID/start" \
+curl -s -X GET "$COOLIFY_URL/api/v1/deploy?uuid=$APP_UUID" \
   -H "Authorization: Bearer $TOKEN"
 ```
 
@@ -507,9 +529,11 @@ The SQLite database (`data/heyreach.db`) has these tables:
 
 ## Brand Colors
 
-| Color | Hex | Usage |
-|-------|-----|-------|
-| Purple | `#936BDA` | Primary accent |
-| Cyan | `#88C2FF` | Secondary accent, links |
-| Green | `#9CFFAC` | Positive indicators |
-| Pink | `#FFADDB` | Highlights |
+Each client has their own color tokens defined in `app/globals.css`. The `BrandLogo` component and all layout components read from these tokens — no hardcoded hex values in components.
+
+| Client | Primary | Background |
+|--------|---------|------------|
+| SearchAtlas | `#936BDA` (purple) | `#14151A` |
+| Guardare | `#A57BEA` (purple) | `#14151A` |
+| Stable Kernel | `#1B5FA6` (blue) | `#161D22` |
+| LinkGraph | — | — |
