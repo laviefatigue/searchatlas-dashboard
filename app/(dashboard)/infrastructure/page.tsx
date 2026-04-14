@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import { exportToCSV } from '@/lib/export-csv';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { BrandLogo } from '@/components/layout/BrandLogo';
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // SEARCHATLAS BRAND COLORS - IMPROVED READABILITY
@@ -800,13 +801,7 @@ export default function InfrastructurePage() {
         <header className="mb-8">
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center gap-4">
-              {/* SearchAtlas Logo */}
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src="https://searchatlas.com/wp-content/uploads/2023/12/white.svg"
-                alt="SearchAtlas"
-                className="h-8 w-auto"
-              />
+              <BrandLogo size="md" showName={false} />
             </div>
             <div className="relative">
               <button
