@@ -46,3 +46,17 @@ next-env.d.ts
 /lib/generated/prisma
 /data/*.db
 /data/*.db-journal
+
+# Design artifacts (large binary files)
+.design/screenshots/
+.design/reviews/
+
+# Tool artifacts
+.cache/
+.playwright-mcp/
+.claude/
+.mcp.json
+
+# Loose screenshots/exports from dev sessions
+*.png
+*.pdf
