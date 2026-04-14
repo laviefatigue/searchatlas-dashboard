@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
+import { BrandLogo } from '@/components/layout/BrandLogo';
 import { BarChart3, Server } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
@@ -28,14 +29,9 @@ export function Sidebar() {
 
   return (
     <div className="flex h-screen w-64 flex-col border-r border-sidebar-border bg-sidebar">
-      {/* Guardare Logo */}
+      {/* Client Logo */}
       <div className="flex h-16 items-center border-b border-sidebar-border px-6">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src="/guardare-logo.svg"
-          alt="Guardare"
-          className="h-7 w-auto"
-        />
+        <BrandLogo size="sm" showName={false} />
       </div>
 
       {/* Navigation */}

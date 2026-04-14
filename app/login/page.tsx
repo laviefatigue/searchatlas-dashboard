@@ -3,6 +3,7 @@
 import { Suspense, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Lock, Eye, EyeOff, Loader2 } from 'lucide-react';
+import { BrandLogo } from '@/components/layout/BrandLogo';
 
 function LoginForm() {
   const router = useRouter();
@@ -43,14 +44,9 @@ function LoginForm() {
 
   return (
     <div className="w-full max-w-sm">
-      {/* Guardare Logo */}
+      {/* Client Logo */}
       <div className="flex justify-center mb-8">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src="/guardare-logo.svg"
-          alt="Guardare"
-          className="h-10 w-auto"
-        />
+        <BrandLogo size="lg" showName={false} />
       </div>
 
       {/* Login Card */}
