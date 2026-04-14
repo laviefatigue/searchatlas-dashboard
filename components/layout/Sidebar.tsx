@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
+import { BrandLogo } from '@/components/layout/BrandLogo';
 import { BarChart3, Server } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
@@ -28,15 +29,9 @@ export function Sidebar() {
 
   return (
     <div className="flex h-screen w-64 flex-col border-r border-sidebar-border bg-sidebar">
-      {/* Stable Kernel Logo */}
-      <div className="flex h-16 items-center border-b border-sidebar-border px-6 gap-3">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src="/stablekernel-logo.png"
-          alt="Stable Kernel"
-          className="h-8 w-8 rounded-md object-contain"
-        />
-        <span className="text-sm font-semibold text-sidebar-foreground tracking-wide">Stable Kernel</span>
+      {/* Client Logo */}
+      <div className="flex h-16 items-center border-b border-sidebar-border px-6">
+        <BrandLogo size="md" />
       </div>
 
       {/* Navigation */}

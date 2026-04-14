@@ -3,6 +3,7 @@
 import { Suspense, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Lock, Eye, EyeOff, Loader2 } from 'lucide-react';
+import { BrandLogo } from '@/components/layout/BrandLogo';
 
 function LoginForm() {
   const router = useRouter();
@@ -43,15 +44,9 @@ function LoginForm() {
 
   return (
     <div className="w-full max-w-sm">
-      {/* Stable Kernel Logo */}
-      <div className="flex items-center justify-center gap-3 mb-8">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src="/stablekernel-logo.png"
-          alt="Stable Kernel"
-          className="h-10 w-10 rounded-md object-contain"
-        />
-        <span className="text-lg font-semibold text-white tracking-wide">Stable Kernel</span>
+      {/* Client Logo */}
+      <div className="flex justify-center mb-8">
+        <BrandLogo size="lg" />
       </div>
 
       {/* Login Card */}

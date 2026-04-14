@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import { exportToCSV } from '@/lib/export-csv';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { BrandLogo } from '@/components/layout/BrandLogo';
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // Stable Kernel Brand Colors
@@ -800,14 +801,7 @@ export default function InfrastructurePage() {
         <header className="mb-8">
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center gap-4">
-              {/* Stable Kernel Logo */}
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src="/stablekernel-logo.png"
-                alt="Stable Kernel"
-                className="h-8 w-8 rounded-md object-contain"
-              />
-              <span className="text-sm font-semibold text-white tracking-wide">Stable Kernel</span>
+              <BrandLogo size="md" />
             </div>
             <div className="relative">
               <button
