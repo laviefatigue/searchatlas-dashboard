@@ -17,10 +17,10 @@ import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // SEARCHATLAS BRAND COLORS - IMPROVED READABILITY
-// Primary: Purple #A57BEA (brighter)
+// Primary: Purple #2F48C4 (brighter)
 // Secondary: Cyan #93C5FD (brighter)
 // Accent: Green #86EFAC, Pink #F9A8D4
-// Background: Dark #14151A / Card #1D1E24
+// Background: Dark #161D22 / Card #1E2831
 // ═══════════════════════════════════════════════════════════════════════════════
 
 // Types
@@ -142,7 +142,7 @@ function HealthScoreGauge({ score, size = 'md' }: { score: number; size?: 'sm' |
 
   const getStrokeColor = (score: number) => {
     if (score >= 80) return '#86EFAC'; // SearchAtlas green
-    if (score >= 60) return '#A57BEA'; // SearchAtlas purple
+    if (score >= 60) return '#2F48C4'; // Stable Kernel blue
     if (score >= 40) return '#F9A8D4'; // SearchAtlas pink
     return '#ef4444';
   };
@@ -174,7 +174,7 @@ function HealthScoreGauge({ score, size = 'md' }: { score: number; size?: 'sm' |
           className="transform -rotate-90 relative"
         >
           <circle
-            stroke="#3A3C47"
+            stroke="#2E3D47"
             fill="transparent"
             strokeWidth={stroke}
             r={normalizedRadius}
@@ -261,12 +261,12 @@ function VolumeTooltip({ active, payload, label }: { active?: boolean; payload?:
   const replyRate = sent > 0 ? ((replied / sent) * 100).toFixed(1) : '0';
 
   return (
-    <div className="bg-[#1D1E24] border border-[#3A3C47] rounded-xl p-4 shadow-2xl min-w-[180px]">
+    <div className="bg-[#1E2831] border border-[#2E3D47] rounded-xl p-4 shadow-2xl min-w-[180px]">
       <p className="text-white font-semibold text-sm mb-3">{label}</p>
       <div className="space-y-2">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <div className="w-2 h-2 rounded-full bg-[#A57BEA]" />
+            <div className="w-2 h-2 rounded-full bg-[#2F48C4]" />
             <span className="text-xs text-gray-400">Sent</span>
           </div>
           <span className="text-sm font-medium text-white">{sent.toLocaleString()}</span>
@@ -288,7 +288,7 @@ function VolumeTooltip({ active, payload, label }: { active?: boolean; payload?:
           </div>
         )}
         {sent > 0 && (
-          <div className="pt-1 border-t border-[#3A3C47] flex items-center justify-between">
+          <div className="pt-1 border-t border-[#2E3D47] flex items-center justify-between">
             <span className="text-xs text-gray-400">Reply Rate</span>
             <span className="text-sm font-bold text-[#86EFAC]">{replyRate}%</span>
           </div>
@@ -319,7 +319,7 @@ function VolumeHistoryChart({ data }: { data: VolumeHistory }) {
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-6">
           <div className="flex items-center gap-2">
-            <div className="w-3 h-3 rounded-sm bg-[#A57BEA]" />
+            <div className="w-3 h-3 rounded-sm bg-[#2F48C4]" />
             <span className="text-xs text-gray-400">Sent</span>
             <span className="text-xs font-medium text-white ml-1">{totalSent.toLocaleString()}</span>
           </div>
@@ -346,8 +346,8 @@ function VolumeHistoryChart({ data }: { data: VolumeHistory }) {
           <AreaChart data={chartData} margin={{ top: 20, right: 10, left: 0, bottom: 0 }}>
             <defs>
               <linearGradient id="gradientSent" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="#A57BEA" stopOpacity={0.35} />
-                <stop offset="100%" stopColor="#A57BEA" stopOpacity={0.02} />
+                <stop offset="0%" stopColor="#2F48C4" stopOpacity={0.35} />
+                <stop offset="100%" stopColor="#2F48C4" stopOpacity={0.02} />
               </linearGradient>
               <linearGradient id="gradientReplied" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="0%" stopColor="#86EFAC" stopOpacity={0.3} />
@@ -357,23 +357,23 @@ function VolumeHistoryChart({ data }: { data: VolumeHistory }) {
 
             <CartesianGrid
               strokeDasharray="3 3"
-              stroke="#2A2B35"
+              stroke="#2E3D47"
               vertical={false}
             />
 
             <XAxis
               dataKey="date"
               tick={{ fontSize: 11, fill: '#6B7280' }}
-              stroke="#2A2B35"
+              stroke="#2E3D47"
               tickLine={false}
-              axisLine={{ stroke: '#2A2B35' }}
+              axisLine={{ stroke: '#2E3D47' }}
               interval={interval}
               dy={8}
             />
 
             <YAxis
               tick={{ fontSize: 11, fill: '#6B7280' }}
-              stroke="#2A2B35"
+              stroke="#2E3D47"
               tickLine={false}
               axisLine={false}
               tickFormatter={(value) => value >= 1000 ? `${(value / 1000).toFixed(1)}k` : value.toString()}
@@ -390,7 +390,7 @@ function VolumeHistoryChart({ data }: { data: VolumeHistory }) {
             <Area
               type="monotone"
               dataKey="sent"
-              stroke="#A57BEA"
+              stroke="#2F48C4"
               strokeWidth={2.5}
               fill="url(#gradientSent)"
               isAnimationActive={true}
@@ -419,7 +419,7 @@ function VolumeHistoryChart({ data }: { data: VolumeHistory }) {
 function ProviderCapacityCharts({ providers }: { providers: ProviderMetrics[] }) {
   const getHealthColor = (score: number) => {
     if (score >= 80) return '#86EFAC';
-    if (score >= 60) return '#A57BEA';
+    if (score >= 60) return '#2F48C4';
     if (score >= 40) return '#F9A8D4';
     return '#ef4444';
   };
@@ -427,11 +427,11 @@ function ProviderCapacityCharts({ providers }: { providers: ProviderMetrics[] })
   const totalKills = providers.reduce((sum, p) => sum + p.dead_count, 0);
 
   return (
-    <div className="bg-[#1D1E24] border border-[#3A3C47] rounded-2xl p-6 hover:border-[#A57BEA]/50 transition-colors">
+    <div className="bg-[#1E2831] border border-[#2E3D47] rounded-2xl p-6 hover:border-[#2F48C4]/50 transition-colors">
       {/* Header with Legend */}
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-2">
-          <Server className="h-4 w-4 text-[#A57BEA]" />
+          <Server className="h-4 w-4 text-[#2F48C4]" />
           <span className="text-xs font-medium text-gray-400 uppercase tracking-wide">Capacity Pipeline</span>
         </div>
         <div className="flex items-center gap-4 text-xs">
@@ -500,14 +500,14 @@ function ProviderCapacityCharts({ providers }: { providers: ProviderMetrics[] })
               </div>
 
               {/* Stacked Pipeline Bar - proportional by inbox count */}
-              <div className="relative h-10 bg-[#14151A] rounded-lg overflow-hidden flex">
+              <div className="relative h-10 bg-[#161D22] rounded-lg overflow-hidden flex">
                 {/* Live Segment */}
                 <div
                   className="h-full bg-gradient-to-r from-[#86EFAC] to-[#4ade80] transition-all duration-700 flex items-center justify-center relative overflow-hidden"
                   style={{ width: `${livePercent}%` }}
                 >
                   {livePercent >= 15 && (
-                    <span className="text-sm font-bold text-[#14151A] whitespace-nowrap">{liveTotal}</span>
+                    <span className="text-sm font-bold text-[#161D22] whitespace-nowrap">{liveTotal}</span>
                   )}
                 </div>
 
@@ -517,7 +517,7 @@ function ProviderCapacityCharts({ providers }: { providers: ProviderMetrics[] })
                   style={{ width: `${reservePercent}%` }}
                 >
                   {reservePercent >= 15 && (
-                    <span className="text-sm font-bold text-[#14151A] whitespace-nowrap">{reserveTotal}</span>
+                    <span className="text-sm font-bold text-[#161D22] whitespace-nowrap">{reserveTotal}</span>
                   )}
                 </div>
 
@@ -528,7 +528,7 @@ function ProviderCapacityCharts({ providers }: { providers: ProviderMetrics[] })
                     style={{ width: `${inboxFlaggedPercent}%` }}
                   >
                     {inboxFlaggedPercent >= 8 && (
-                      <span className="text-sm font-bold text-[#14151A] whitespace-nowrap">{inboxFlagged}</span>
+                      <span className="text-sm font-bold text-[#161D22] whitespace-nowrap">{inboxFlagged}</span>
                     )}
                   </div>
                 )}
@@ -572,7 +572,7 @@ function ProviderCapacityCharts({ providers }: { providers: ProviderMetrics[] })
       </div>
 
       {/* Total Summary */}
-      <div className="mt-6 pt-4 border-t border-[#3A3C47]">
+      <div className="mt-6 pt-4 border-t border-[#2E3D47]">
         <div className="flex items-center justify-between">
           <div className="text-xs text-gray-400 uppercase tracking-wide">Total Infrastructure</div>
           <div className="flex items-center gap-6 text-sm">
@@ -733,9 +733,9 @@ export default function InfrastructurePage() {
 
   if (loading && !data) {
     return (
-      <div className="min-h-screen bg-[#14151A] flex items-center justify-center">
+      <div className="min-h-screen bg-[#161D22] flex items-center justify-center">
         <div className="flex items-center gap-3 text-gray-400">
-          <Loader2 className="h-5 w-5 animate-spin text-[#A57BEA]" />
+          <Loader2 className="h-5 w-5 animate-spin text-[#2F48C4]" />
           <span>Loading dashboard...</span>
         </div>
       </div>
@@ -744,12 +744,12 @@ export default function InfrastructurePage() {
 
   if (error && !data) {
     return (
-      <div className="min-h-screen bg-[#14151A] flex items-center justify-center">
+      <div className="min-h-screen bg-[#161D22] flex items-center justify-center">
         <div className="text-center">
           <p className="text-gray-400 mb-4">{error}</p>
           <button
             onClick={fetchData}
-            className="px-4 py-2 rounded-lg bg-[#A57BEA] text-white hover:bg-[#a57de6] transition-colors"
+            className="px-4 py-2 rounded-lg bg-[#2F48C4] text-white hover:bg-[#a57de6] transition-colors"
           >
             Retry
           </button>
@@ -786,7 +786,7 @@ export default function InfrastructurePage() {
 
   const getStatusMessage = () => {
     if (infrastructure.avg_health_score >= 85) return { text: 'All systems operational', icon: CheckCircle2, color: 'text-[#86EFAC]' };
-    if (infrastructure.avg_health_score >= 70) return { text: 'Systems operational with minor issues', icon: CheckCircle2, color: 'text-[#A57BEA]' };
+    if (infrastructure.avg_health_score >= 70) return { text: 'Systems operational with minor issues', icon: CheckCircle2, color: 'text-[#2F48C4]' };
     return { text: 'Some systems need attention', icon: Activity, color: 'text-[#F9A8D4]' };
   };
 
@@ -794,7 +794,7 @@ export default function InfrastructurePage() {
   const StatusIcon = status.icon;
 
   return (
-    <div className="min-h-screen h-screen overflow-y-auto bg-[#14151A]">
+    <div className="min-h-screen h-screen overflow-y-auto bg-[#161D22]">
       <main className="max-w-5xl mx-auto px-6 py-8">
         {/* Header with Logo and Export */}
         <header className="mb-8">
@@ -812,7 +812,7 @@ export default function InfrastructurePage() {
               <button
                 onClick={() => setExportMenuOpen(!exportMenuOpen)}
                 disabled={exporting}
-                className="flex items-center gap-2 px-4 py-2 rounded-lg border border-[#3A3C47] bg-[#1D1E24] text-white hover:border-[#A57BEA] hover:bg-[#A57BEA]/10 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex items-center gap-2 px-4 py-2 rounded-lg border border-[#2E3D47] bg-[#1E2831] text-white hover:border-[#2F48C4] hover:bg-[#2F48C4]/10 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {exporting ? (
                   <Loader2 className="h-4 w-4 animate-spin" />
@@ -825,17 +825,17 @@ export default function InfrastructurePage() {
               {exportMenuOpen && (
                 <>
                   <div className="fixed inset-0 z-40" onClick={() => setExportMenuOpen(false)} />
-                  <div className="absolute right-0 top-full mt-1 z-50 w-56 rounded-lg border border-[#3A3C47] bg-[#1D1E24] shadow-xl overflow-hidden">
+                  <div className="absolute right-0 top-full mt-1 z-50 w-56 rounded-lg border border-[#2E3D47] bg-[#1E2831] shadow-xl overflow-hidden">
                     <button
                       onClick={() => handleExport('inboxes')}
-                      className="w-full px-4 py-3 text-left text-sm text-white hover:bg-[#A57BEA]/10 transition-colors border-b border-[#3A3C47]"
+                      className="w-full px-4 py-3 text-left text-sm text-white hover:bg-[#2F48C4]/10 transition-colors border-b border-[#2E3D47]"
                     >
                       <div className="font-medium">All Inboxes</div>
                       <div className="text-xs text-gray-400 mt-0.5">Full inbox health report</div>
                     </button>
                     <button
                       onClick={() => handleExport('kill-triggers')}
-                      className="w-full px-4 py-3 text-left text-sm text-white hover:bg-[#A57BEA]/10 transition-colors"
+                      className="w-full px-4 py-3 text-left text-sm text-white hover:bg-[#2F48C4]/10 transition-colors"
                     >
                       <div className="font-medium">Kill Triggers</div>
                       <div className="text-xs text-gray-400 mt-0.5">Flagged inboxes with severity &amp; date</div>
@@ -854,7 +854,7 @@ export default function InfrastructurePage() {
         {/* Hero - Health + Package */}
         <div className="grid grid-cols-2 gap-6 mb-6">
           {/* Health Score */}
-          <div className="bg-[#1D1E24] border border-[#3A3C47] rounded-2xl p-6 hover:border-[#A57BEA]/50 transition-colors">
+          <div className="bg-[#1E2831] border border-[#2E3D47] rounded-2xl p-6 hover:border-[#2F48C4]/50 transition-colors">
             <div className="flex items-center justify-between">
               <div className="flex-1">
                 <p className="text-xs font-medium text-gray-400 uppercase tracking-wide mb-6">
@@ -877,7 +877,7 @@ export default function InfrastructurePage() {
           </div>
 
           {/* Package Status */}
-          <div className="bg-[#1D1E24] border border-[#3A3C47] rounded-2xl p-6 hover:border-[#A57BEA]/50 transition-colors">
+          <div className="bg-[#1E2831] border border-[#2E3D47] rounded-2xl p-6 hover:border-[#2F48C4]/50 transition-colors">
             <p className="text-xs font-medium text-gray-400 uppercase tracking-wide mb-4">
               Your Package
             </p>
@@ -889,16 +889,16 @@ export default function InfrastructurePage() {
                 </p>
               </div>
               <div className="text-right">
-                <p className="text-3xl font-bold text-[#A57BEA]">{Math.min(100, packagePercent)}%</p>
+                <p className="text-3xl font-bold text-[#2F48C4]">{Math.min(100, packagePercent)}%</p>
                 <p className="text-xs text-gray-400">fulfilled</p>
               </div>
             </div>
-            <div className="h-3 bg-[#14151A] rounded-full overflow-hidden">
+            <div className="h-3 bg-[#161D22] rounded-full overflow-hidden">
               <div
                 className="h-full rounded-full transition-all duration-700"
                 style={{
                   width: `${Math.min(100, packagePercent)}%`,
-                  background: 'linear-gradient(90deg, #A57BEA, #C4B5FD)'
+                  background: 'linear-gradient(90deg, #2F48C4, #7CB9FF)'
                 }}
               />
             </div>
@@ -927,10 +927,10 @@ export default function InfrastructurePage() {
         {/* Key Metrics Row */}
         <div className="grid grid-cols-3 gap-4 mb-6">
           {/* Sending Capacity with Live/Reserve Breakdown */}
-          <div className="bg-[#1D1E24] border border-[#3A3C47] rounded-2xl p-5 hover:border-[#A57BEA]/50 transition-colors">
+          <div className="bg-[#1E2831] border border-[#2E3D47] rounded-2xl p-5 hover:border-[#2F48C4]/50 transition-colors">
             <div className="flex items-center gap-2 mb-3">
-              <div className="w-8 h-8 rounded-lg bg-[#A57BEA]/20 flex items-center justify-center">
-                <Zap className="h-4 w-4 text-[#A57BEA]" />
+              <div className="w-8 h-8 rounded-lg bg-[#2F48C4]/20 flex items-center justify-center">
+                <Zap className="h-4 w-4 text-[#2F48C4]" />
               </div>
               <span className="text-xs font-medium text-gray-400 uppercase tracking-wide">Sending Capacity</span>
             </div>
@@ -938,7 +938,7 @@ export default function InfrastructurePage() {
               {totalCapacity.toLocaleString()}
             </p>
             {/* Live/Reserve Stacked Bar */}
-            <div className="h-2 bg-[#14151A] rounded-full overflow-hidden flex mb-2">
+            <div className="h-2 bg-[#161D22] rounded-full overflow-hidden flex mb-2">
               <div
                 className="h-full bg-[#86EFAC] transition-all duration-500"
                 style={{ width: `${livePercent}%` }}
@@ -964,7 +964,7 @@ export default function InfrastructurePage() {
           </div>
 
           {/* Avg Daily Volume */}
-          <div className="bg-[#1D1E24] border border-[#3A3C47] rounded-2xl p-5 hover:border-[#A57BEA]/50 transition-colors">
+          <div className="bg-[#1E2831] border border-[#2E3D47] rounded-2xl p-5 hover:border-[#2F48C4]/50 transition-colors">
             <div className="flex items-center gap-2 mb-3">
               <div className="w-8 h-8 rounded-lg bg-[#93C5FD]/20 flex items-center justify-center">
                 <Mail className="h-4 w-4 text-[#93C5FD]" />
@@ -978,7 +978,7 @@ export default function InfrastructurePage() {
           </div>
 
           {/* Domains */}
-          <div className="bg-[#1D1E24] border border-[#3A3C47] rounded-2xl p-5 hover:border-[#A57BEA]/50 transition-colors">
+          <div className="bg-[#1E2831] border border-[#2E3D47] rounded-2xl p-5 hover:border-[#2F48C4]/50 transition-colors">
             <div className="flex items-center gap-2 mb-3">
               <div className="w-8 h-8 rounded-lg bg-[#86EFAC]/20 flex items-center justify-center">
                 <Server className="h-4 w-4 text-[#86EFAC]" />
@@ -1001,10 +1001,10 @@ export default function InfrastructurePage() {
 
         {/* Volume Chart */}
         {volumeHistory && (
-          <div className="bg-[#1D1E24] border border-[#3A3C47] rounded-2xl p-6 mb-6 hover:border-[#A57BEA]/50 transition-colors">
+          <div className="bg-[#1E2831] border border-[#2E3D47] rounded-2xl p-6 mb-6 hover:border-[#2F48C4]/50 transition-colors">
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-2">
-                <TrendingUp className="h-4 w-4 text-[#A57BEA]" />
+                <TrendingUp className="h-4 w-4 text-[#2F48C4]" />
                 <span className="text-xs font-medium text-gray-400 uppercase tracking-wide">
                   Sending Volume
                 </span>
@@ -1016,7 +1016,7 @@ export default function InfrastructurePage() {
         )}
 
         {/* Footer */}
-        <footer className="mt-10 pt-6 border-t border-[#3A3C47] text-center">
+        <footer className="mt-10 pt-6 border-t border-[#2E3D47] text-center">
           <div className="text-xs text-gray-400 flex items-center justify-center gap-2">
             <span className="flex items-center gap-1.5">
               <span className="w-1.5 h-1.5 rounded-full bg-[#86EFAC] animate-pulse inline-block" />

@@ -28,14 +28,15 @@ export function Sidebar() {
 
   return (
     <div className="flex h-screen w-64 flex-col border-r border-sidebar-border bg-sidebar">
-      {/* SearchAtlas Logo */}
-      <div className="flex h-16 items-center border-b border-sidebar-border px-6">
+      {/* Stable Kernel Logo */}
+      <div className="flex h-16 items-center border-b border-sidebar-border px-6 gap-3">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
-          src="https://searchatlas.com/wp-content/uploads/2023/12/white.svg"
-          alt="SearchAtlas"
-          className="h-7 w-auto"
+          src="/stablekernel-logo.png"
+          alt="Stable Kernel"
+          className="h-8 w-8 rounded-md object-contain"
         />
+        <span className="text-sm font-semibold text-sidebar-foreground tracking-wide">Stable Kernel</span>
       </div>
 
       {/* Navigation */}
@@ -66,7 +67,7 @@ export function Sidebar() {
       <div className="border-t border-sidebar-border p-4 space-y-4">
         <div className="flex items-center gap-3">
           <Avatar className="h-8 w-8">
-            <AvatarFallback className="bg-[#A57BEA] text-white text-xs">
+            <AvatarFallback className="bg-sk-blue text-white text-xs">
               {user?.name ? getInitials(user.name) : 'U'}
             </AvatarFallback>
           </Avatar>
