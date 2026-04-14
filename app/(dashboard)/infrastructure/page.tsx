@@ -16,7 +16,7 @@ import { exportToCSV } from '@/lib/export-csv';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// SEARCHATLAS BRAND COLORS - IMPROVED READABILITY
+// Stable Kernel Brand Colors
 // Primary: Purple #2F48C4 (brighter)
 // Secondary: Cyan #93C5FD (brighter)
 // Accent: Green #86EFAC, Pink #F9A8D4
@@ -141,9 +141,9 @@ function HealthScoreGauge({ score, size = 'md' }: { score: number; size?: 'sm' |
   const strokeDashoffset = circumference - (score / 100) * circumference;
 
   const getStrokeColor = (score: number) => {
-    if (score >= 80) return '#86EFAC'; // SearchAtlas green
+    if (score >= 80) return '#86EFAC'; // green
     if (score >= 60) return '#2F48C4'; // Stable Kernel blue
-    if (score >= 40) return '#F9A8D4'; // SearchAtlas pink
+    if (score >= 40) return '#F9A8D4'; // pink
     return '#ef4444';
   };
 
@@ -800,13 +800,14 @@ export default function InfrastructurePage() {
         <header className="mb-8">
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center gap-4">
-              {/* SearchAtlas Logo */}
+              {/* Stable Kernel Logo */}
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
-                src="https://searchatlas.com/wp-content/uploads/2023/12/white.svg"
-                alt="SearchAtlas"
-                className="h-8 w-auto"
+                src="/stablekernel-logo.png"
+                alt="Stable Kernel"
+                className="h-8 w-8 rounded-md object-contain"
               />
+              <span className="text-sm font-semibold text-white tracking-wide">Stable Kernel</span>
             </div>
             <div className="relative">
               <button
