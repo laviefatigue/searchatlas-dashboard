@@ -306,9 +306,11 @@ curl -s -H "Authorization: Bearer $TOKEN" \
   "const d=require('fs').readFileSync(0,'utf8'); console.log(JSON.parse(d).status)"
 ```
 
-### Step 8 — Set Domain (after verifying on temp URL)
+### Step 8 — Set Domain + Patch Traefik Labels (after verifying on temp URL)
 
-Test on the auto-generated sslip.io URL first. Once verified:
+Test on the auto-generated sslip.io URL first. Once verified, **both** of the following are required — the domain patch alone is not enough.
+
+**8a — Set the domain:**
 
 ```bash
 curl -X PATCH "$COOLIFY_URL/api/v1/applications/$APP_UUID" \
@@ -317,7 +319,60 @@ curl -X PATCH "$COOLIFY_URL/api/v1/applications/$APP_UUID" \
   -d '{"domains":"https://<clientname>.hirecharm.com"}'
 ```
 
-Add a DNS `A` record on `hirecharm.com`: `<clientname>` → `82.180.160.120`. Coolify provisions SSL via Let's Encrypt automatically.
+> ⚠️ **Critical — also patch `custom_labels`.**
+>
+> Setting `domains` via the API updates Coolify's database but does NOT regenerate the running container's Traefik routing labels. The container will still only route the sslip.io URL, and the custom domain returns "no available server". You must manually set the correct labels and redeploy.
+
+**8b — Patch the Traefik labels:**
+
+```bash
+DOMAIN="<clientname>.hirecharm.com"
+
+LABELS="traefik.enable=true
+traefik.http.middlewares.gzip.compress=true
+traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https
+traefik.http.routers.http-0-${APP_UUID}.entryPoints=http
+traefik.http.routers.http-0-${APP_UUID}.middlewares=redirect-to-https
+traefik.http.routers.http-0-${APP_UUID}.rule=Host(\`${DOMAIN}\`) && PathPrefix(\`/\`)
+traefik.http.routers.http-0-${APP_UUID}.service=http-0-${APP_UUID}
+traefik.http.routers.https-0-${APP_UUID}.entryPoints=https
+traefik.http.routers.https-0-${APP_UUID}.middlewares=gzip
+traefik.http.routers.https-0-${APP_UUID}.rule=Host(\`${DOMAIN}\`) && PathPrefix(\`/\`)
+traefik.http.routers.https-0-${APP_UUID}.service=https-0-${APP_UUID}
+traefik.http.routers.https-0-${APP_UUID}.tls.certresolver=letsencrypt
+traefik.http.routers.https-0-${APP_UUID}.tls=true
+traefik.http.services.http-0-${APP_UUID}.loadbalancer.server.port=3000
+traefik.http.services.https-0-${APP_UUID}.loadbalancer.server.port=3000
+caddy_0.encode=zstd gzip
+caddy_0.handle_path.0_reverse_proxy={{upstreams 3000}}
+caddy_0.handle_path=/*
+caddy_0.header=-Server
+caddy_0.try_files={path} /index.html /index.php
+caddy_0=https://${DOMAIN}
+caddy_ingress_network=coolify"
+
+ENCODED=$(echo "$LABELS" | base64 -w 0)
+
+curl -X PATCH "$COOLIFY_URL/api/v1/applications/$APP_UUID" \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/json" \
+  -d "{\"custom_labels\":\"$ENCODED\"}"
+```
+
+**8c — Redeploy to apply the new labels:**
+
+```bash
+curl -X GET "$COOLIFY_URL/api/v1/applications/$APP_UUID/start" \
+  -H "Authorization: Bearer $TOKEN"
+```
+
+**8d — Add DNS record** (Cloudflare — gray cloud / DNS only, not proxied):
+
+| Type | Name | Value | Proxy |
+|------|------|-------|-------|
+| `A` | `<clientname>` | `82.180.160.120` | DNS only ☁️ (gray) |
+
+Coolify provisions SSL via Let's Encrypt automatically once the domain is reachable.
 
 ### Step 9 — Record the UUID
 
@@ -326,6 +381,20 @@ Add the new app UUID to `.env.coolify.local`:
 ```env
 COOLIFY_<CLIENTNAME>_UUID=<APP_UUID>
 ```
+
+### Step 10 — Trigger Initial HeyReach Sync and Verify Senders
+
+Once the dashboard is live, trigger the first sync from the Social tab or via API:
+
+```bash
+curl -X POST https://<dashboard-url>/api/heyreach/sync
+```
+
+After the sync completes, open the Social tab and check for a red warning banner. If it reads:
+
+> **"[Sender Name(s)] are disconnected from HeyReach. Historical data is still shown."**
+
+This means those LinkedIn sender accounts have an expired or revoked session in HeyReach. Historical data still displays correctly, but new outreach activity will not sync until the sender reconnects their LinkedIn account inside HeyReach (Settings → LinkedIn Accounts → Reconnect). Flag this to the client — it is a HeyReach auth issue, not a dashboard issue.
 
 ---
 
@@ -428,6 +497,7 @@ The SQLite database (`data/heyreach.db`) has these tables:
 - **HeyReach API pagination**: The `GetLeadsFromCampaign` endpoint only returns processed leads (InProgress, Finished, Failed). Pending and Excluded leads are not exposed by the API, so `totalLeads` from campaign stats may be higher than the actual lead count in the database.
 - **`campaignAccountIds` can be incomplete**: The HeyReach campaign object sometimes omits sender IDs. The sync engine backfills sender mappings from lead data to compensate.
 - **Single HeyReach workspace**: All clients share one HeyReach API key (one workspace). Per-client isolation is achieved by filtering to specific campaign and sender IDs.
+- **Disconnected senders**: If a LinkedIn sender account's session expires or is revoked in HeyReach, the Social tab displays a red warning banner listing the affected senders. Historical data remains visible. New syncs will not fetch new activity for disconnected accounts. Resolution: sender must reconnect their LinkedIn account in HeyReach (Settings → LinkedIn Accounts → Reconnect). This is a HeyReach auth issue, not a dashboard issue — flag it to the client.
 
 ### Coolify Deployment Notes
 
