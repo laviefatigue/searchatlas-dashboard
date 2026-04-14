@@ -16,7 +16,7 @@ The main brand color. Two variants exist (bright and original).
 |------|---------|-----------------|
 | `app/globals.css` | 74, 97, 100, 109, 111, 114 | `--primary`, `--ring`, `--chart-1`, `--sidebar-primary`, `--sidebar-accent`, `--sidebar-ring` |
 | `app/globals.css` | 124, 137, 138, 145, 147, 150 | Same variables in `.dark` block |
-| `app/globals.css` | 8 | `--color-searchatlas-purple` (`#936BDA`) |
+| `app/globals.css` | 8 | `--color-brand-purple` (`#936BDA`) |
 | `lib/constants.ts` | 29 | Campaign status badge "Launching" (`bg-[#936BDA]`) |
 | `lib/constants.ts` | 38 | `CHART_COLORS.sent` |
 | `app/(dashboard)/infrastructure/page.tsx` | 145 | Health gauge stroke (score 60-79) |
@@ -52,7 +52,7 @@ Secondary brand color. Used for reserve/capacity indicators and reply metrics.
 
 | File | Line(s) | What It Controls |
 |------|---------|-----------------|
-| `app/globals.css` | 9 | `--color-searchatlas-cyan` (`#88C2FF`) |
+| `app/globals.css` | 9 | `--color-brand-cyan` (`#88C2FF`) |
 | `app/globals.css` | 101, 139 | `--chart-2` (`#93C5FD`) |
 | `lib/constants.ts` | 40 | `CHART_COLORS.replies` |
 | `app/(dashboard)/infrastructure/page.tsx` | 443, 484, 516 | Reserve bar legend; Gmail icon; reserve bar fill |
@@ -70,7 +70,7 @@ Used for "healthy" and "live" states. May or may not change per client.
 
 | File | Line(s) | What It Controls |
 |------|---------|-----------------|
-| `app/globals.css` | 10 | `--color-searchatlas-green` (`#9CFFAC`) |
+| `app/globals.css` | 10 | `--color-brand-green` (`#9CFFAC`) |
 | `app/globals.css` | 91, 102, 133, 140 | `--success`, `--chart-3` (`#86EFAC`) |
 | `lib/constants.ts` | 39 | `CHART_COLORS.opens` |
 | `app/(dashboard)/infrastructure/page.tsx` | 144 | Health gauge stroke — healthy |
@@ -91,7 +91,7 @@ Used for warnings, disconnected state, and chart accent.
 
 | File | Line(s) | What It Controls |
 |------|---------|-----------------|
-| `app/globals.css` | 11 | `--color-searchatlas-pink` (`#FFADDB`) |
+| `app/globals.css` | 11 | `--color-brand-pink` (`#FFADDB`) |
 | `app/globals.css` | 104, 142 | `--chart-5` (`#F9A8D4`) |
 | `lib/constants.ts` | 42 | `CHART_COLORS.interested` |
 | `app/(dashboard)/infrastructure/page.tsx` | 146 | Health gauge stroke — warning |
@@ -113,7 +113,7 @@ Used for warnings, disconnected state, and chart accent.
 | Sidebar bg | `#0F1014` | `globals.css` | `--sidebar` |
 | Border | `#3A3C47` | `globals.css`, `infrastructure/page.tsx` | `--border`, `--input`, all borders |
 | Grid lines | `#2A2B35` | `infrastructure/page.tsx`, `login/page.tsx` | Chart grids, card borders |
-| Brand dark | `#1D1E22` | `globals.css` | `--color-searchatlas-dark` |
+| Brand dark | `#1D1E22` | `globals.css` | `--color-brand-dark` |
 
 ---
 

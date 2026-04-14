@@ -142,14 +142,14 @@ Follow these steps every time a new client dashboard is spun up.
 ### Step 1 — Create a Git Branch
 
 ```bash
-git checkout template   # always branch from template — NOT from a live client branch
+git checkout main   # always branch from main — NOT from a live client branch
 git checkout -b client/<clientname>
 git push -u origin client/<clientname>
 ```
 
 Branch naming convention: `client/<clientname>` (e.g. `client/guardare`, `client/linkgraph`).
 
-> ⚠️ **Branch from `template`, not `searchatlas-dashboard`.** The `searchatlas-dashboard` branch is the SearchAtlas client deployment. The `template` branch is a clean base with no client branding — it only has the `BrandLogo` component and env-var-driven theming wired up.
+> ⚠️ **Branch from `main`, not from a client branch.** Client branches (`client/searchatlas`, `client/guardare`, etc.) contain client-specific branding and must never be used as a base. `main` is the clean template with generic `brand-*` tokens and the `BrandLogo` component. `v2` is an active redesign — do not branch new clients from it.
 
 ### Step 2 — Apply Client Branding
 

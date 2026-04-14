@@ -5,11 +5,11 @@
 
 @theme inline {
   /* SearchAtlas Brand Colors */
-  --color-searchatlas-purple: #936BDA;
-  --color-searchatlas-cyan: #88C2FF;
-  --color-searchatlas-green: #9CFFAC;
-  --color-searchatlas-pink: #FFADDB;
-  --color-searchatlas-dark: #1D1E22;
+  --color-brand-purple: #936BDA;
+  --color-brand-cyan: #88C2FF;
+  --color-brand-green: #9CFFAC;
+  --color-brand-pink: #FFADDB;
+  --color-brand-dark: #1D1E22;
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
