@@ -62,7 +62,7 @@ export function Sidebar() {
       <div className="border-t border-sidebar-border p-4 space-y-4">
         <div className="flex items-center gap-3">
           <Avatar className="h-8 w-8">
-            <AvatarFallback className="bg-[#A57BEA] text-white text-xs">
+            <AvatarFallback className="bg-[#FF268E] text-white text-xs">
               {user?.name ? getInitials(user.name) : 'U'}
             </AvatarFallback>
           </Avatar>

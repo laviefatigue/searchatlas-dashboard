@@ -7,13 +7,12 @@ interface KillBreakdownPieProps {
   data: KillBreakdown;
 }
 
-// SearchAtlas-themed chart colors
 const COLORS = [
-  '#936BDA', // cyan
-  '#0F0F11', // navy
-  '#88C2FF', // gold
-  '#ef4444', // red
-  '#22c55e', // green
+  '#FF268E',
+  '#0F0F11',
+  '#FF644D',
+  '#ef4444',
+  '#22c55e',
 ];
 
 export function KillBreakdownPie({ data }: KillBreakdownPieProps) {

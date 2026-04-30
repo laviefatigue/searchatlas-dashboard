@@ -42,7 +42,7 @@ function addFooter(pdf: jsPDF, page: number, totalPages: number, margin: number,
   pdf.setFontSize(7);
   pdf.setTextColor(156, 163, 175);
   pdf.text(
-    'SearchAtlas Fulfillment  |  Outbound Analytics Report',
+    `${process.env.NEXT_PUBLIC_CLIENT_NAME || 'Client'} Fulfillment  |  Outbound Analytics Report`,
     margin,
     pageHeight - margin + 1
   );

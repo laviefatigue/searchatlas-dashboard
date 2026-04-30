@@ -4,11 +4,11 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
-  /* SearchAtlas Brand Colors */
-  --color-brand-purple: #936BDA;
-  --color-brand-cyan: #88C2FF;
+  /* LinkGraph Brand Colors — token names (purple/cyan/pink) kept for downstream Tailwind class compatibility; values map: purple=primary pink, cyan=secondary coral, pink=accent orange */
+  --color-brand-purple: #FF268E;
+  --color-brand-cyan: #FF644D;
   --color-brand-green: #9CFFAC;
-  --color-brand-pink: #FFADDB;
+  --color-brand-pink: #FD8460;
   --color-brand-dark: #1D1E22;
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -55,7 +55,7 @@
 }
 
 :root {
-  /* SearchAtlas Dashboard - IMPROVED READABILITY */
+  /* LinkGraph Dashboard - IMPROVED READABILITY */
   --radius: 0.5rem;
 
   /* Backgrounds - Softer dark, not pure black */
@@ -70,8 +70,8 @@
   --popover: #1D1E24;
   --popover-foreground: #F5F5F7;
 
-  /* Primary - SearchAtlas Purple (brighter for visibility) */
-  --primary: #A57BEA;
+  /* Primary - LinkGraph Hot Pink */
+  --primary: #FF268E;
   --primary-foreground: #ffffff;
 
   /* Secondary - Slightly lighter for contrast */
@@ -94,24 +94,24 @@
   /* Borders - More visible */
   --border: #3A3C47;
   --input: #3A3C47;
-  --ring: #A57BEA;
+  --ring: #FF268E;
 
-  /* Charts - Vibrant colors for dark background */
-  --chart-1: #A57BEA; /* Purple - brighter */
-  --chart-2: #93C5FD; /* Cyan - brighter */
-  --chart-3: #86EFAC; /* Green - brighter */
-  --chart-4: #F87171; /* Red - brighter */
-  --chart-5: #F9A8D4; /* Pink - brighter */
+  /* Charts - LinkGraph palette on dark background */
+  --chart-1: #FF268E; /* Pink - primary */
+  --chart-2: #FF644D; /* Coral - secondary */
+  --chart-3: #86EFAC; /* Green - status */
+  --chart-4: #F87171; /* Red - status */
+  --chart-5: #FD8460; /* Orange - accent */
 
   /* Sidebar */
   --sidebar: #0F1014;
   --sidebar-foreground: #F5F5F7;
-  --sidebar-primary: #A57BEA;
+  --sidebar-primary: #FF268E;
   --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: rgba(165, 123, 234, 0.15);
+  --sidebar-accent: rgba(255, 38, 142, 0.15);
   --sidebar-accent-foreground: #F5F5F7;
   --sidebar-border: #3A3C47;
-  --sidebar-ring: #A57BEA;
+  --sidebar-ring: #FF268E;
 }
 
 .dark {
@@ -121,7 +121,7 @@
   --card-foreground: #F5F5F7;
   --popover: #1D1E24;
   --popover-foreground: #F5F5F7;
-  --primary: #A57BEA;
+  --primary: #FF268E;
   --primary-foreground: #ffffff;
   --secondary: #282A32;
   --secondary-foreground: #F5F5F7;
@@ -134,20 +134,20 @@
   --warning: #FCD34D;
   --border: #3A3C47;
   --input: #3A3C47;
-  --ring: #A57BEA;
-  --chart-1: #A57BEA;
-  --chart-2: #93C5FD;
+  --ring: #FF268E;
+  --chart-1: #FF268E;
+  --chart-2: #FF644D;
   --chart-3: #86EFAC;
   --chart-4: #F87171;
-  --chart-5: #F9A8D4;
+  --chart-5: #FD8460;
   --sidebar: #0F1014;
   --sidebar-foreground: #F5F5F7;
-  --sidebar-primary: #A57BEA;
+  --sidebar-primary: #FF268E;
   --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: rgba(165, 123, 234, 0.15);
+  --sidebar-accent: rgba(255, 38, 142, 0.15);
   --sidebar-accent-foreground: #F5F5F7;
   --sidebar-border: #3A3C47;
-  --sidebar-ring: #A57BEA;
+  --sidebar-ring: #FF268E;
 }
 
 @layer base {
