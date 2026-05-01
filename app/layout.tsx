@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "SearchAtlas Dashboard",
+  title: process.env.NEXT_PUBLIC_DASHBOARD_TITLE || "Client Dashboard",
   description: "Monitor your email infrastructure",
 };
 
