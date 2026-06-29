@@ -26,7 +26,7 @@ export const STATUS_COLORS: Record<string, { bg: string; text: string }> = {
   active: { bg: 'bg-green-500', text: 'text-white' },
   paused: { bg: 'bg-amber-500', text: 'text-white' },
   draft: { bg: 'bg-gray-200', text: 'text-gray-700' },
-  launching: { bg: 'bg-[#936BDA]', text: 'text-white' },
+  launching: { bg: 'bg-[#F57C0E]', text: 'text-white' },
   completed: { bg: 'bg-purple-500', text: 'text-white' },
   stopped: { bg: 'bg-red-500', text: 'text-white' },
   failed: { bg: 'bg-red-600', text: 'text-white' },
@@ -35,10 +35,10 @@ export const STATUS_COLORS: Record<string, { bg: string; text: string }> = {
 };
 
 export const CHART_COLORS = {
-  sent: '#A57BEA',      // SearchAtlas Purple (brighter)
+  sent: '#FF8A1F',      // SearchAtlas Purple (brighter)
   opens: '#86EFAC',     // SearchAtlas Green (brighter)
-  replies: '#93C5FD',   // SearchAtlas Cyan (brighter)
+  replies: '#FFC400',   // SearchAtlas Cyan (brighter)
   bounced: '#F87171',   // Red (brighter)
-  interested: '#F9A8D4', // SearchAtlas Pink (brighter)
+  interested: '#B8410C', // SearchAtlas Pink (brighter)
   unsubscribed: '#9CA3AF', // Gray (brighter)
 };

@@ -293,28 +293,28 @@ function OutreachVolumeChart({ data }: { data: SocialDashboardData['dailyStats']
           <AreaChart data={formatted} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
             <defs>
               <linearGradient id="colorSent" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="#a57bea" stopOpacity={0.3} />
-                <stop offset="95%" stopColor="#a57bea" stopOpacity={0} />
+                <stop offset="5%" stopColor="#FF8A1F" stopOpacity={0.3} />
+                <stop offset="95%" stopColor="#FF8A1F" stopOpacity={0} />
               </linearGradient>
               <linearGradient id="colorAccepted" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="#93c5fd" stopOpacity={0.3} />
-                <stop offset="95%" stopColor="#93c5fd" stopOpacity={0} />
+                <stop offset="5%" stopColor="#FFC400" stopOpacity={0.3} />
+                <stop offset="95%" stopColor="#FFC400" stopOpacity={0} />
               </linearGradient>
               <linearGradient id="colorReplies" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="5%" stopColor="#86efac" stopOpacity={0.3} />
                 <stop offset="95%" stopColor="#86efac" stopOpacity={0} />
               </linearGradient>
             </defs>
-            <CartesianGrid strokeDasharray="3 3" stroke="#3A3C47" vertical={false} />
+            <CartesianGrid strokeDasharray="3 3" stroke="#3B3529" vertical={false} />
             <XAxis dataKey="dateLabel" tick={{ fontSize: 11, fill: '#A1A1AA' }} tickLine={false} axisLine={false} />
             <YAxis tick={{ fontSize: 11, fill: '#A1A1AA' }} tickLine={false} axisLine={false} />
             <Tooltip
-              contentStyle={{ backgroundColor: '#1D1E24', border: '1px solid #3A3C47', borderRadius: '8px', fontSize: '12px' }}
+              contentStyle={{ backgroundColor: '#1E1A13', border: '1px solid #3B3529', borderRadius: '8px', fontSize: '12px' }}
               labelStyle={{ color: '#F5F5F7' }}
             />
             <Legend wrapperStyle={{ fontSize: '12px' }} />
-            <Area type="monotone" dataKey="connectionsSent" name="Connections Sent" stroke="#a57bea" fill="url(#colorSent)" strokeWidth={2} />
-            <Area type="monotone" dataKey="accepted" name="Accepted" stroke="#93c5fd" fill="url(#colorAccepted)" strokeWidth={2} />
+            <Area type="monotone" dataKey="connectionsSent" name="Connections Sent" stroke="#FF8A1F" fill="url(#colorSent)" strokeWidth={2} />
+            <Area type="monotone" dataKey="accepted" name="Accepted" stroke="#FFC400" fill="url(#colorAccepted)" strokeWidth={2} />
             <Area type="monotone" dataKey="replies" name="Replies" stroke="#86efac" fill="url(#colorReplies)" strokeWidth={2} />
           </AreaChart>
         </ResponsiveContainer>
