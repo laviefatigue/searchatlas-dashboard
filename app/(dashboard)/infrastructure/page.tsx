@@ -514,7 +514,7 @@ function ProviderCapacityCharts({ providers }: { providers: ProviderMetrics[] })
 
                 {/* Reserve Segment */}
                 <div
-                  className="h-full bg-gradient-to-r from-[#FFC400] to-[#60a5fa] transition-all duration-700 flex items-center justify-center relative overflow-hidden"
+                  className="h-full bg-gradient-to-r from-[#FFC400] to-[#F59E0B] transition-all duration-700 flex items-center justify-center relative overflow-hidden"
                   style={{ width: `${reservePercent}%` }}
                 >
                   {reservePercent >= 15 && (
@@ -893,7 +893,7 @@ export default function InfrastructurePage() {
                 className="h-full rounded-full transition-all duration-700"
                 style={{
                   width: `${Math.min(100, packagePercent)}%`,
-                  background: 'linear-gradient(90deg, #FF8A1F, #C4B5FD)'
+                  background: 'linear-gradient(90deg, #FF8A1F, #FFC400)'
                 }}
               />
             </div>
