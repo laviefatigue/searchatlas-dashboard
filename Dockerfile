@@ -21,6 +21,18 @@ RUN npx prisma generate
 # Create empty database with schema applied (local DB is not committed)
 RUN mkdir -p data && npx prisma migrate deploy
 
+# Branding build args — Coolify injects build-time envs as --build-arg.
+# NEXT_PUBLIC_* values are inlined at build, so they MUST be present here
+# (declare the ARG + promote to ENV before `npm run build`).
+ARG NEXT_PUBLIC_CLIENT_NAME
+ARG NEXT_PUBLIC_CLIENT_LOGO
+ARG NEXT_PUBLIC_DASHBOARD_TITLE
+ARG NEXT_PUBLIC_AUTO_REFRESH_MS
+ENV NEXT_PUBLIC_CLIENT_NAME=$NEXT_PUBLIC_CLIENT_NAME
+ENV NEXT_PUBLIC_CLIENT_LOGO=$NEXT_PUBLIC_CLIENT_LOGO
+ENV NEXT_PUBLIC_DASHBOARD_TITLE=$NEXT_PUBLIC_DASHBOARD_TITLE
+ENV NEXT_PUBLIC_AUTO_REFRESH_MS=$NEXT_PUBLIC_AUTO_REFRESH_MS
+
 # Build the application
 ENV NEXT_TELEMETRY_DISABLED=1
 RUN npm run build
