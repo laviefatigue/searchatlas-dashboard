@@ -215,7 +215,10 @@ export async function GET(request: NextRequest) {
           sAccepted > 0
             ? Math.round((sReplied / sAccepted) * 1000) / 10
             : 0,
-        status: (s.isActive && s.authIsValid) ? 'connected' : ('disconnected' as const),
+        // Connection health is HeyReach `authIsValid` (LinkedIn session valid).
+        // `isActive` only means the account has a running campaign — an idle
+        // account with a finished campaign is still connected, not disconnected.
+        status: s.authIsValid ? 'connected' : ('disconnected' as const),
       };
     });
 
