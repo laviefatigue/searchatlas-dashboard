@@ -4,6 +4,7 @@ import React, { useEffect, useState, useMemo, useRef, useCallback } from 'react'
 import Link from 'next/link';
 import { PageContainer } from '@/components/layout';
 import { Skeleton } from '@/components/ui/skeleton';
+import { ResponseMetrics } from '@/components/analytics/ResponseMetrics';
 import type {
   AnalyticsReport,
   AnalyzedReply,
@@ -1293,6 +1294,9 @@ export default function AnalyticsPage() {
             </div>
           </div>
         )}
+
+        {/* ── Response Performance (first-touch / resolution clocks + response chains) ── */}
+        <ResponseMetrics />
 
         {/* ── PHASE 1: Conversion Funnel ────────────────────────── */}
         {filteredFastData && <ConversionFunnel funnel={filteredFastData.funnel} />}

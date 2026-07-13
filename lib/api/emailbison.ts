@@ -282,3 +282,37 @@ export async function getCampaignSequenceSteps(campaignId: number): Promise<{ da
   // If all endpoints fail, return empty array
   return { data: [] };
 }
+
+// ── Conversation threads (response-timing metrics) ─────────────────────
+// A single message inside a reply's conversation thread.
+export interface ThreadMessage {
+  id?: number;
+  folder?: string;              // 'Inbox' (lead) | 'Sent' (our team) | 'Bounced'
+  date_received?: string;
+  created_at?: string;
+  from_name?: string;
+  from_email_address?: string;
+  subject?: string;
+  text_body?: string;
+  html_body?: string;
+}
+
+export interface ConversationThread {
+  current_reply?: ThreadMessage;
+  older_messages?: ThreadMessage[];   // our original outreach before the reply
+  newer_messages?: ThreadMessage[];   // messages after the reply (our team's responses)
+}
+
+// Full conversation thread for a reply — GET /api/replies/{id}/conversation-thread.
+// `newer_messages` holds our team's responses (folder='Sent'), which lets us
+// compute first-touch = first newer-message timestamp − reply.date_received.
+export async function getConversationThread(replyId: number): Promise<ConversationThread> {
+  try {
+    const res = await fetchApi<{ data?: ConversationThread } & ConversationThread>(
+      `/api/replies/${replyId}/conversation-thread`
+    );
+    return res.data ?? res;
+  } catch {
+    return {};
+  }
+}
