@@ -6,6 +6,7 @@ import {
   getConversationThread,
   type ThreadMessage,
 } from '@/lib/api/emailbison';
+import { getCache, setCache } from '@/lib/cache';
 
 // Response-performance metrics, computed live from EmailBison.
 //
@@ -25,15 +26,24 @@ const RESOLUTION_TARGET_MIN = 24 * 60;
 // Bound the N+1 work so a busy workspace can't stall the request.
 const MAX_CAMPAIGNS = 20;
 const MAX_THREADS = 120;
-const THREAD_CONCURRENCY = 6;
+const THREAD_CONCURRENCY = 10;
 
 const stripHtml = (s?: string) => (s || '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
 const msgTs = (m: ThreadMessage) => m.date_received || m.created_at || '';
 const minutesBetween = (fromIso: string, toIso: string) =>
   Math.max(0, Math.round((new Date(toIso).getTime() - new Date(fromIso).getTime()) / 60000));
 
+const CACHE_KEY = `responses-metrics-ws-${WORKSPACE_ID}`;
+const CACHE_TTL_SECONDS = 600; // 10 min — response metrics don't change second-to-second
+
 export async function GET() {
   try {
+    // Served from cache within the TTL — the N+1 thread walk only runs on a miss.
+    const cached = await getCache<Record<string, unknown>>(CACHE_KEY);
+    if (cached) {
+      return NextResponse.json(cached, { headers: { 'X-Cache': 'HIT' } });
+    }
+
     if (WORKSPACE_ID > 0) await switchWorkspace(WORKSPACE_ID).catch(() => {});
 
     const { data: campaigns } = await getCampaigns();
@@ -117,7 +127,7 @@ export async function GET() {
     // Newest inbound first.
     threads.sort((a, b) => new Date(b.inboundAt as string).getTime() - new Date(a.inboundAt as string).getTime());
 
-    return NextResponse.json({
+    const payload = {
       clocks,
       threads,
       meta: {
@@ -126,7 +136,9 @@ export async function GET() {
         source: 'EmailBison',
         timeToBookAvailable: false,
       },
-    });
+    };
+    await setCache(CACHE_KEY, payload, CACHE_TTL_SECONDS);
+    return NextResponse.json(payload, { headers: { 'X-Cache': 'MISS' } });
   } catch (error) {
     // Return an empty payload (200) so the UI shows an empty state, not an error card.
     return NextResponse.json({
