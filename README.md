@@ -10,6 +10,7 @@ Multi-client analytics, campaign management, and infrastructure health monitorin
 | LinkGraph | https://linkgraph.hirecharm.com | `client/linkgraph` | `xccss0cokssowsw4s40k4ook` |
 | Guardare | https://guardare.hirecharm.com | `client/guardare` | `e8k408g8o4gw8o8cw8cc4480` |
 | Stable Kernel | https://skmr.hirecharm.com | `client/stablekernel` | `joc000wkko4wow8wo80kcw0k` |
+| Focal | https://focalheat.hirecharm.com | `client/focal` | `rw0kc8g8sww40kkg804gsk4o` |
 
 All deployments are on server `82.180.160.120`, Coolify panel at `http://82.180.160.120:8000`.
 
@@ -34,6 +35,7 @@ Three-phase progressive data loading powers the main analytics view:
 - **Sequence step performance** — breakdown by outreach step
 - **Sender and domain performance** — deliverability by sender/domain
 - **AI-powered response intelligence** — sentiment analysis, theme extraction, buying-signal detection
+- **Response performance** — first-touch time, time-to-resolution, and the full response chain per inbound reply, computed live from EmailBison's `conversation-thread` endpoint. Hero "clocks" are colour-coded against the **"1224" SLA** (12h first touch / 24h resolution). Time-to-book is stubbed until a booking source (Day.AI / calendar) is wired — EmailBison has no booking event. Served through a 10-minute in-memory cache (see Coolify Deployment Notes).
 - **Copy analysis** — subject line and body performance insights
 - **Lead deep-dive** — filterable lead-level data explorer
 - **Cycle-based filtering** — parses "Cycle N" from campaign names for cycle-level analysis
@@ -525,7 +527,15 @@ The SQLite database (`data/heyreach.db`) has these tables:
 
 - **Build pack**: Must use **Dockerfile**, not nixpacks (nixpacks fails to build native dependencies)
 - **Build pack switch** (if needed): `PATCH /api/v1/applications/<uuid>` with `{"build_pack":"dockerfile","dockerfile_location":"/Dockerfile"}`
-- Env vars set in Coolify are injected as Docker build ARGs automatically
+
+#### Operational gotchas (learned the hard way)
+
+- **Env changes need a full REDEPLOY, not a restart.** `POST /applications/<uuid>/restart` restarts the container with its *existing* env — it does **not** pick up env changes. To apply a changed `DASHBOARD_PASSWORD`, `EMAILBISON_API_TOKEN`, `WORKSPACE_ID`, etc., trigger a full deploy: `GET /api/v1/deploy?uuid=<uuid>`.
+- **`NEXT_PUBLIC_*` branding must be declared as `ARG` in the Dockerfile builder stage** to bake into the client bundle. Coolify passes build-time envs, but the Dockerfile has to accept them (`ARG NEXT_PUBLIC_CLIENT_NAME` … `ENV NEXT_PUBLIC_CLIENT_NAME=$NEXT_PUBLIC_CLIENT_NAME` before `npm run build`). Without this, env-driven logo/name/title are silently ignored and the defaults bake in.
+- **The HeyReach SQLite DB is ephemeral — re-sync after every deploy.** `data/heyreach.db` is baked empty into the image with no persistent volume, so each redeploy wipes synced LinkedIn data. Re-trigger `POST /api/heyreach/sync` after deploying, or add a Coolify persistent volume on `/app/data`.
+- **The file-based cache (`lib/cache.ts`) silently no-ops in the container** — its `.cache` dir isn't writable by the `nextjs` runtime user, so every call is a MISS. Use a **module-level in-memory cache** instead (the standalone `node server.js` is one long-lived process, so it persists across requests and resets on redeploy). This is what `/api/analytics/responses` uses.
+- **DNS — gray vs orange cloud.** Gray-cloud (DNS-only) lets Coolify provision the Let's Encrypt origin cert. Orange-cloud (Cloudflare-proxied) also works — Cloudflare serves its edge cert — but Coolify's LE cert won't issue while proxied, so SSL depends entirely on Cloudflare. Either is fine as long as the domain serves `200` over valid HTTPS.
+- **Setting env values via Git Bash mangles leading-slash paths** (`/logo.svg` → `C:/Program Files/Git/logo.svg`). Use `MSYS_NO_PATHCONV=1`, or build the JSON body inside `node`. Coolify may also create duplicate env rows for a key; `PATCH`-by-key updates only one — delete the stale duplicate by uuid (`DELETE /applications/<uuid>/envs/<env_uuid>`).
 
 ## Brand Colors
 
@@ -537,3 +547,4 @@ Each client has their own color tokens defined in `app/globals.css`. The `BrandL
 | Guardare | `#A57BEA` (purple) | `#14151A` |
 | Stable Kernel | `#1B5FA6` (blue) | `#161D22` |
 | LinkGraph | — | — |
+| Focal | `#FF8A1F` (orange) | `#16130F` (warm dark) |
