@@ -6,7 +6,6 @@ import {
   getConversationThread,
   type ThreadMessage,
 } from '@/lib/api/emailbison';
-import { getCache, setCache } from '@/lib/cache';
 
 // Response-performance metrics, computed live from EmailBison.
 //
@@ -33,15 +32,16 @@ const msgTs = (m: ThreadMessage) => m.date_received || m.created_at || '';
 const minutesBetween = (fromIso: string, toIso: string) =>
   Math.max(0, Math.round((new Date(toIso).getTime() - new Date(fromIso).getTime()) / 60000));
 
-const CACHE_KEY = `responses-metrics-ws-${WORKSPACE_ID}`;
-const CACHE_TTL_SECONDS = 600; // 10 min — response metrics don't change second-to-second
+const CACHE_TTL_MS = 600_000; // 10 min — response metrics don't change second-to-second
+// In-memory cache. The standalone Next server is a single long-lived process, so
+// this persists across requests; the file-based cache does not survive in the container.
+let memoryCache: { data: unknown; expires: number } | null = null;
 
 export async function GET() {
   try {
-    // Served from cache within the TTL — the N+1 thread walk only runs on a miss.
-    const cached = await getCache<Record<string, unknown>>(CACHE_KEY);
-    if (cached) {
-      return NextResponse.json(cached, { headers: { 'X-Cache': 'HIT' } });
+    // Served from the in-memory cache within the TTL — the N+1 thread walk only runs on a miss.
+    if (memoryCache && memoryCache.expires > Date.now()) {
+      return NextResponse.json(memoryCache.data, { headers: { 'X-Cache': 'HIT' } });
     }
 
     if (WORKSPACE_ID > 0) await switchWorkspace(WORKSPACE_ID).catch(() => {});
@@ -137,7 +137,7 @@ export async function GET() {
         timeToBookAvailable: false,
       },
     };
-    await setCache(CACHE_KEY, payload, CACHE_TTL_SECONDS);
+    memoryCache = { data: payload, expires: Date.now() + CACHE_TTL_MS };
     return NextResponse.json(payload, { headers: { 'X-Cache': 'MISS' } });
   } catch (error) {
     // Return an empty payload (200) so the UI shows an empty state, not an error card.
