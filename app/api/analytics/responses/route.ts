@@ -153,8 +153,14 @@ export async function GET() {
       .map((t) => num(t.firstTouchMinutes))
       .filter((n): n is number => n != null)
       .sort((a, b) => a - b);
-    const resolutions = threads.map((t) => num(t.resolutionMinutes)).filter((n): n is number => n != null);
-    const avg = (arr: number[]) => (arr.length ? Math.round(arr.reduce((s, x) => s + x, 0) / arr.length) : null);
+    // Resolution = time to a booked meeting. "Marked interested" is the booking
+    // signal (EmailBison has no booking event), so resolution is computed over
+    // interested threads only: their inbound → our last reply (the booking msg).
+    const interestedResolutions = threads
+      .filter((t) => t.interested && t.resolutionMinutes != null)
+      .map((t) => t.resolutionMinutes as number)
+      .sort((a, b) => a - b);
+    const bookedCount = threads.filter((t) => t.interested).length;
     // True median: average the two middle values for even-length arrays.
     const median = (arr: number[]) => {
       if (!arr.length) return null;
@@ -166,8 +172,8 @@ export async function GET() {
     const clocks = {
       firstTouchInterestedMedianMinutes: median(interestedFirstTouches),
       firstTouchAllMedianMinutes: median(allFirstTouches),
-      avgResolutionMinutes: avg(resolutions),
-      avgTimeToBookMinutes: null as number | null, // no booking source in EmailBison
+      resolutionBookedMedianMinutes: median(interestedResolutions),
+      bookedCount,
       totalInbound: threads.length,
       respondedCount: responded.length,
       interestedResponded: interestedFirstTouches.length,

@@ -35,8 +35,8 @@ interface ResponseThread {
 interface Clocks {
   firstTouchInterestedMedianMinutes: number | null;
   firstTouchAllMedianMinutes: number | null;
-  avgResolutionMinutes: number | null;
-  avgTimeToBookMinutes: number | null;
+  resolutionBookedMedianMinutes: number | null;
+  bookedCount: number;
   totalInbound: number;
   respondedCount: number;
   interestedResponded: number;
@@ -244,16 +244,16 @@ export function ResponseMetrics() {
           />
           <ClockTile
             icon={Clock}
-            label="Avg Time to Resolution"
-            value={fmtDuration(c?.avgResolutionMinutes ?? null)}
-            colorClass={slaColor(c?.avgResolutionMinutes ?? null, 24 * 60)}
-            sub="last team reply in thread"
+            label="Med. Time to Resolution"
+            value={fmtDuration(c?.resolutionBookedMedianMinutes ?? null)}
+            colorClass={slaColor(c?.resolutionBookedMedianMinutes ?? null, 24 * 60)}
+            sub={c && c.bookedCount > 0 ? `to booking · ${c.bookedCount} interested` : 'no booked threads yet'}
           />
           <ClockTile
             icon={CalendarClock}
-            label="Avg Time to Book"
-            value="—"
-            sub="needs a booking source (Day.AI)"
+            label="Meetings Booked"
+            value={String(c?.bookedCount ?? 0)}
+            sub="threads marked interested"
           />
         </div>
       )}
