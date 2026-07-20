@@ -102,24 +102,38 @@ export async function GET() {
     }
 
     // 3) Aggregate clocks.
-    const firstTouches = threads
-      .map((t) => t.firstTouchMinutes as number | null)
+    const num = (v: unknown) => v as number | null;
+    // First-touch is reported over INTERESTED threads (the leads that matter), using
+    // the MEDIAN so a single slow thread (e.g. a 7-day reply) doesn't distort it.
+    const interestedFirstTouches = threads
+      .filter((t) => t.interested && t.firstTouchMinutes != null)
+      .map((t) => t.firstTouchMinutes as number)
+      .sort((a, b) => a - b);
+    const allFirstTouches = threads
+      .map((t) => num(t.firstTouchMinutes))
       .filter((n): n is number => n != null)
       .sort((a, b) => a - b);
-    const resolutions = threads.map((t) => t.resolutionMinutes as number | null).filter((n): n is number => n != null);
+    const resolutions = threads.map((t) => num(t.resolutionMinutes)).filter((n): n is number => n != null);
     const avg = (arr: number[]) => (arr.length ? Math.round(arr.reduce((s, x) => s + x, 0) / arr.length) : null);
-    const median = (arr: number[]) => (arr.length ? arr[Math.floor(arr.length / 2)] : null);
+    // True median: average the two middle values for even-length arrays.
+    const median = (arr: number[]) => {
+      if (!arr.length) return null;
+      const mid = Math.floor(arr.length / 2);
+      return arr.length % 2 ? arr[mid] : Math.round((arr[mid - 1] + arr[mid]) / 2);
+    };
     const responded = threads.filter((t) => t.responded);
 
     const clocks = {
-      avgFirstTouchMinutes: avg(firstTouches),
-      medianFirstTouchMinutes: median(firstTouches),
+      firstTouchInterestedMedianMinutes: median(interestedFirstTouches),
+      firstTouchAllMedianMinutes: median(allFirstTouches),
       avgResolutionMinutes: avg(resolutions),
       avgTimeToBookMinutes: null as number | null, // no booking source in EmailBison
       totalInbound: threads.length,
       respondedCount: responded.length,
+      interestedResponded: interestedFirstTouches.length,
       responseRate: threads.length ? Math.round((responded.length / threads.length) * 1000) / 10 : 0,
-      withinFirstTouchSLA: firstTouches.filter((m) => m <= FIRST_TOUCH_TARGET_MIN).length,
+      // SLA count scoped to interested threads (matches the primary clock).
+      interestedWithinFirstTouchSLA: interestedFirstTouches.filter((m) => m <= FIRST_TOUCH_TARGET_MIN).length,
       firstTouchTargetMinutes: FIRST_TOUCH_TARGET_MIN,
       resolutionTargetMinutes: RESOLUTION_TARGET_MIN,
     };

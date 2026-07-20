@@ -33,14 +33,15 @@ interface ResponseThread {
   resolutionMinutes: number | null;
 }
 interface Clocks {
-  avgFirstTouchMinutes: number | null;
-  medianFirstTouchMinutes: number | null;
+  firstTouchInterestedMedianMinutes: number | null;
+  firstTouchAllMedianMinutes: number | null;
   avgResolutionMinutes: number | null;
   avgTimeToBookMinutes: number | null;
   totalInbound: number;
   respondedCount: number;
+  interestedResponded: number;
   responseRate: number;
-  withinFirstTouchSLA: number;
+  interestedWithinFirstTouchSLA: number;
   firstTouchTargetMinutes: number;
   resolutionTargetMinutes: number;
 }
@@ -218,17 +219,17 @@ export function ResponseMetrics() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <ClockTile
             icon={Timer}
-            label="Avg First Touch"
-            value={fmtDuration(c?.avgFirstTouchMinutes ?? null)}
-            colorClass={slaColor(c?.avgFirstTouchMinutes ?? null, 12 * 60)}
-            sub={c && c.respondedCount > 0 ? `across ${c.respondedCount} responded` : 'no responses yet'}
+            label="Med. First Touch · Interested"
+            value={fmtDuration(c?.firstTouchInterestedMedianMinutes ?? null)}
+            colorClass={slaColor(c?.firstTouchInterestedMedianMinutes ?? null, 12 * 60)}
+            sub={c && c.interestedResponded > 0 ? `median across ${c.interestedResponded} interested` : 'no interested responses yet'}
           />
           <ClockTile
             icon={Gauge}
-            label="Median First Touch"
-            value={fmtDuration(c?.medianFirstTouchMinutes ?? null)}
-            colorClass={slaColor(c?.medianFirstTouchMinutes ?? null, 12 * 60)}
-            sub="typical response speed"
+            label="Med. First Touch · All"
+            value={fmtDuration(c?.firstTouchAllMedianMinutes ?? null)}
+            colorClass={slaColor(c?.firstTouchAllMedianMinutes ?? null, 12 * 60)}
+            sub="all answered threads"
           />
           <ClockTile
             icon={Clock}
@@ -256,7 +257,7 @@ export function ResponseMetrics() {
             Response rate <span className="text-brand-cyan font-semibold">{c.responseRate}%</span>
           </span>
           <span>
-            <span className="text-brand-green font-semibold">{c.withinFirstTouchSLA}</span> within 12h SLA
+            <span className="text-brand-green font-semibold">{c.interestedWithinFirstTouchSLA}</span> interested within 12h SLA
           </span>
         </div>
       )}
