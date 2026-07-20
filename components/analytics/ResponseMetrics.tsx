@@ -78,7 +78,17 @@ function fmtWhen(iso: string): string {
   if (!iso) return '';
   const d = new Date(iso);
   if (isNaN(d.getTime())) return '';
-  return d.toLocaleString(undefined, { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
+  // Always show Pacific — the client is SF-based, and mixed timezones made the
+  // timestamps look ~7h off.
+  return (
+    d.toLocaleString('en-US', {
+      timeZone: 'America/Los_Angeles',
+      month: 'short',
+      day: 'numeric',
+      hour: 'numeric',
+      minute: '2-digit',
+    }) + ' PT'
+  );
 }
 
 // ── Clock tile ────────────────────────────────────────────────────────
@@ -202,7 +212,8 @@ export function ResponseMetrics() {
             <Zap className="h-5 w-5 text-brand-purple" /> Response Performance
           </h2>
           <p className="text-sm text-muted-foreground">
-            How fast we respond to people who write in — target <span className="text-brand-green font-medium">12h first touch</span>,{' '}
+            Response speed in <span className="text-foreground font-medium">business hours</span> (9 AM–5 PM PT, Mon–Fri) — after-hours
+            time isn&apos;t counted. Target <span className="text-brand-green font-medium">12h first touch</span>,{' '}
             <span className="text-brand-green font-medium">24h to resolution</span> (1224 model).
           </p>
         </div>

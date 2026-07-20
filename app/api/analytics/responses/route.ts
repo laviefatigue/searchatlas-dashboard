@@ -29,8 +29,48 @@ const THREAD_CONCURRENCY = 10;
 
 const stripHtml = (s?: string) => (s || '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
 const msgTs = (m: ThreadMessage) => m.date_received || m.created_at || '';
-const minutesBetween = (fromIso: string, toIso: string) =>
-  Math.max(0, Math.round((new Date(toIso).getTime() - new Date(fromIso).getTime()) / 60000));
+
+// ── Business-hours elapsed time ────────────────────────────────────────
+// Response time is counted only within the client's working window, so an
+// after-hours message that's answered first thing next morning reads as a
+// few minutes — not overnight. Focal works Pacific 09:00–17:00, Mon–Fri.
+// DST-safe: the window is wall-clock local and DST transitions (02:00) fall
+// outside business hours, so counting local minutes is unaffected.
+const BUSINESS_TZ = 'America/Los_Angeles';
+const BH_OPEN_MIN = 9 * 60;   // 09:00
+const BH_CLOSE_MIN = 17 * 60; // 17:00
+
+function localParts(iso: string) {
+  const parts = new Intl.DateTimeFormat('en-US', {
+    timeZone: BUSINESS_TZ,
+    year: 'numeric', month: '2-digit', day: '2-digit',
+    hour: '2-digit', minute: '2-digit', hourCycle: 'h23',
+  }).formatToParts(new Date(iso));
+  const g = (t: string) => Number(parts.find((p) => p.type === t)?.value);
+  return { year: g('year'), month: g('month'), day: g('day'), hour: g('hour'), minute: g('minute') };
+}
+
+// Minutes of business time (09:00–17:00 local, Mon–Fri) between two instants.
+function businessMinutesBetween(fromIso: string, toIso: string): number {
+  const s = localParts(fromIso);
+  const e = localParts(toIso);
+  const dayIndex = (p: { year: number; month: number; day: number }) =>
+    Math.floor(Date.UTC(p.year, p.month - 1, p.day) / 86_400_000);
+  const sIdx = dayIndex(s);
+  const eIdx = dayIndex(e);
+  const sMin = s.hour * 60 + s.minute;
+  const eMin = e.hour * 60 + e.minute;
+  if (eIdx < sIdx || (eIdx === sIdx && eMin <= sMin)) return 0;
+  let total = 0;
+  for (let d = sIdx; d <= eIdx; d++) {
+    const dow = new Date(d * 86_400_000).getUTCDay(); // 0=Sun … 6=Sat
+    if (dow === 0 || dow === 6) continue;              // skip weekends
+    const dayStart = d === sIdx ? Math.max(BH_OPEN_MIN, sMin) : BH_OPEN_MIN;
+    const dayEnd = d === eIdx ? Math.min(BH_CLOSE_MIN, eMin) : BH_CLOSE_MIN;
+    if (dayEnd > dayStart) total += dayEnd - dayStart;
+  }
+  return total;
+}
 
 const CACHE_TTL_MS = 600_000; // 10 min — response metrics don't change second-to-second
 // In-memory cache. The standalone Next server is a single long-lived process, so
@@ -93,8 +133,8 @@ export async function GET() {
             inboundText: stripHtml(reply.text_body || reply.html_body).slice(0, 400),
             responses,
             responded: responses.length > 0,
-            firstTouchMinutes: firstResponseAt && inboundAt ? minutesBetween(inboundAt, firstResponseAt) : null,
-            resolutionMinutes: lastResponseAt && inboundAt ? minutesBetween(inboundAt, lastResponseAt) : null,
+            firstTouchMinutes: firstResponseAt && inboundAt ? businessMinutesBetween(inboundAt, firstResponseAt) : null,
+            resolutionMinutes: lastResponseAt && inboundAt ? businessMinutesBetween(inboundAt, lastResponseAt) : null,
           };
         })
       );
