@@ -97,8 +97,35 @@ function LinkedInFunnel({ funnel }: { funnel: SocialDashboardData['funnel'] }) {
 
 // ── Campaign Performance Table ───────────────────────────────────────
 
+type CampaignSortKey = 'leads' | 'sent' | 'accepted' | 'acceptRate' | 'replies' | 'replyRate' | 'progress';
+
 function CampaignPerformance({ campaigns }: { campaigns: SocialCampaignRow[] }) {
   const [expandedId, setExpandedId] = useState<number | null>(null);
+  // Default: most-progressed campaigns first.
+  const [sort, setSort] = useState<{ key: CampaignSortKey; dir: 'asc' | 'desc' }>({ key: 'progress', dir: 'desc' });
+
+  const progressVal = (c: SocialCampaignRow) => (c.totalLeads > 0 ? c.finished / c.totalLeads : 0);
+  const sortVal = (c: SocialCampaignRow, key: CampaignSortKey): number => {
+    switch (key) {
+      case 'leads': return c.totalLeads;
+      case 'sent': return c.connectionsSent;
+      case 'accepted': return c.accepted;
+      case 'acceptRate': return c.acceptanceRate;
+      case 'replies': return c.replies;
+      case 'replyRate': return c.replyRate;
+      case 'progress': return progressVal(c);
+    }
+  };
+  const toggleSort = (key: CampaignSortKey) =>
+    setSort((s) => (s.key === key ? { key, dir: s.dir === 'asc' ? 'desc' : 'asc' } : { key, dir: 'desc' }));
+  const sortedCampaigns = useMemo(
+    () =>
+      [...campaigns].sort((a, b) => {
+        const diff = sortVal(a, sort.key) - sortVal(b, sort.key);
+        return sort.dir === 'asc' ? diff : -diff;
+      }),
+    [campaigns, sort]
+  );
 
   if (campaigns.length === 0) {
     return (
@@ -146,17 +173,30 @@ function CampaignPerformance({ campaigns }: { campaigns: SocialCampaignRow[] }) 
               <th className="h-10 px-4 text-left font-medium text-muted-foreground text-xs uppercase tracking-wider w-8"></th>
               <th className="h-10 px-4 text-left font-medium text-muted-foreground text-xs uppercase tracking-wider">Campaign</th>
               <th className="h-10 px-4 text-left font-medium text-muted-foreground text-xs uppercase tracking-wider">Sender(s)</th>
-              <th className="h-10 px-4 text-right font-medium text-muted-foreground text-xs uppercase tracking-wider">Leads</th>
-              <th className="h-10 px-4 text-right font-medium text-muted-foreground text-xs uppercase tracking-wider">Conn. Sent</th>
-              <th className="h-10 px-4 text-right font-medium text-muted-foreground text-xs uppercase tracking-wider">Accepted</th>
-              <th className="h-10 px-4 text-right font-medium text-muted-foreground text-xs uppercase tracking-wider">Accept %</th>
-              <th className="h-10 px-4 text-right font-medium text-muted-foreground text-xs uppercase tracking-wider">Replies</th>
-              <th className="h-10 px-4 text-right font-medium text-muted-foreground text-xs uppercase tracking-wider">Reply %</th>
-              <th className="h-10 px-4 text-right font-medium text-muted-foreground text-xs uppercase tracking-wider">Progress</th>
+              {([
+                ['leads', 'Leads'],
+                ['sent', 'Conn. Sent'],
+                ['accepted', 'Accepted'],
+                ['acceptRate', 'Accept %'],
+                ['replies', 'Replies'],
+                ['replyRate', 'Reply %'],
+                ['progress', 'Progress'],
+              ] as [CampaignSortKey, string][]).map(([key, label]) => (
+                <th key={key} className="h-10 px-4 text-right font-medium text-muted-foreground text-xs uppercase tracking-wider">
+                  <button
+                    onClick={() => toggleSort(key)}
+                    className={`inline-flex items-center gap-1 ml-auto uppercase tracking-wider transition-colors hover:text-foreground ${sort.key === key ? 'text-foreground' : ''}`}
+                    title={`Sort by ${label}`}
+                  >
+                    {label}
+                    <ChevronDown className={`h-3 w-3 transition-opacity ${sort.key === key ? `opacity-100 ${sort.dir === 'asc' ? 'rotate-180' : ''}` : 'opacity-30'}`} />
+                  </button>
+                </th>
+              ))}
             </tr>
           </thead>
           <tbody>
-            {campaigns.map((c) => (
+            {sortedCampaigns.map((c) => (
               <React.Fragment key={c.id}>
                 <tr
                   className="border-b border-border/50 hover:bg-muted/20 transition-colors cursor-pointer"

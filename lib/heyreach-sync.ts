@@ -33,8 +33,13 @@ export async function runFullSync(): Promise<SyncResult> {
   const startTime = Date.now();
   const campaignIds = getConfiguredCampaignIds();
   const senderIds = getConfiguredSenderIds();
+  // Workspace-isolated clients (a dedicated HeyReach workspace, e.g. Focal) can
+  // pull EVERY campaign + sender automatically — no HEYREACH_CAMPAIGN_IDS upkeep,
+  // and new campaigns show up on the next sync. Shared-workspace clients must keep
+  // the explicit allowlist to avoid pulling other clients' campaigns.
+  const pullAllCampaigns = process.env.HEYREACH_PULL_ALL_CAMPAIGNS === 'true';
 
-  if (campaignIds.length === 0) {
+  if (!pullAllCampaigns && campaignIds.length === 0) {
     return {
       success: false,
       type: 'full',
@@ -43,7 +48,9 @@ export async function runFullSync(): Promise<SyncResult> {
       leadsSynced: 0,
       statsDaysSynced: 0,
       durationMs: Date.now() - startTime,
-      error: 'HEYREACH_CAMPAIGN_IDS not configured. Set campaign IDs in env vars.',
+      error:
+        'HEYREACH_CAMPAIGN_IDS not configured. Set campaign IDs, or set ' +
+        'HEYREACH_PULL_ALL_CAMPAIGNS=true for a dedicated workspace.',
     };
   }
 
@@ -59,13 +66,17 @@ export async function runFullSync(): Promise<SyncResult> {
 
   try {
     // ── Step 1: Sync Senders ─────────────────────────────────────────
-    if (senderIds.length > 0) {
+    if (pullAllCampaigns || senderIds.length > 0) {
       const sendersResult = await getSenders(0, 100);
       const apiSenderMap = new Map(
         sendersResult.items.map((s) => [s.id, s])
       );
+      // Dedicated workspace → sync every sender; shared → only the allowlisted IDs.
+      const targetSenderIds = pullAllCampaigns
+        ? sendersResult.items.map((s) => s.id)
+        : senderIds;
 
-      for (const senderId of senderIds) {
+      for (const senderId of targetSenderIds) {
         const sender = apiSenderMap.get(senderId);
         const isActive = sender?.isActive ?? false;
         const authIsValid = sender?.authIsValid ?? false;
@@ -102,7 +113,7 @@ export async function runFullSync(): Promise<SyncResult> {
 
     // ── Step 2: Sync Campaigns ───────────────────────────────────────
     // Fetch all campaigns from API then filter to configured ones
-    const allCampaigns = await getCampaigns(0, 100, campaignIds);
+    const allCampaigns = await getCampaigns(0, 100, pullAllCampaigns ? undefined : campaignIds);
 
     for (const campaign of allCampaigns.items) {
       // Get fresh campaign details for progress stats
@@ -156,7 +167,7 @@ export async function runFullSync(): Promise<SyncResult> {
 
       // Sync campaign ↔ sender relationships
       const campaignSenderIds = (campaign.campaignAccountIds || []).filter(
-        (id) => senderIds.length === 0 || senderIds.includes(id)
+        (id) => pullAllCampaigns || senderIds.length === 0 || senderIds.includes(id)
       );
 
       for (const senderId of campaignSenderIds) {
