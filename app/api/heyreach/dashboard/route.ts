@@ -52,12 +52,17 @@ export async function GET(request: NextRequest) {
       orderBy: { createdAt: 'desc' },
     });
 
-    // ── Leads (filtered by date) ─────────────────────────────────────
-    const leads = await prisma.lead.findMany({
-      where: {
-        createdAt: { gte: dateFrom },
-      },
-    });
+    // ── Leads (ALL — cumulative) ─────────────────────────────────────
+    // Connection/message statuses are the lead's CURRENT lifetime state, so the
+    // funnel, campaign rows, and sender cards count ALL leads. The period
+    // selector applies only to the daily volume chart (statsDaily) below.
+    //
+    // Filtering these by lead `createdAt` was wrong on two counts: (1) it's the
+    // date a lead was ADDED, not when the connection/reply happened, and (2) it
+    // hid older campaigns' real activity while `totalLeads` (from progressStats)
+    // stayed unfiltered — e.g. Naples rendered "9 leads / 0 sent". Cumulative
+    // status + progressStats totals keeps every row internally consistent.
+    const leads = await prisma.lead.findMany();
 
     // ── Senders ──────────────────────────────────────────────────────
     const senders = await prisma.sender.findMany({
@@ -127,8 +132,12 @@ export async function GET(request: NextRequest) {
     };
 
     // ── Compute Funnel ───────────────────────────────────────────────
+    // Top of funnel = HeyReach's authoritative per-campaign totalUsers
+    // (progressStats), which counts Pending/Excluded leads that the lead
+    // endpoint refuses to return. `leads.length` undercounted the target base.
+    const totalTargetedLeads = campaigns.reduce((sum, c) => sum + (c.totalLeads || 0), 0);
     const funnel: SocialFunnelData = {
-      totalLeads: leads.length,
+      totalLeads: totalTargetedLeads,
       connectionsSent,
       accepted,
       replied,

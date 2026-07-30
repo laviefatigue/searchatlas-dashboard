@@ -752,11 +752,11 @@ export default function SocialAnalyticsPage() {
           {/* ── Campaign Performance ────────────────────────────── */}
           <CampaignPerformance campaigns={data.campaigns} />
 
-          {/* ── Volume Chart + Sender Performance ───────────────── */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <OutreachVolumeChart data={data.dailyStats} />
-            <SenderPerformance senders={data.senders} />
-          </div>
+          {/* ── Outreach Volume (period-filtered trend) ─────────── */}
+          <OutreachVolumeChart data={data.dailyStats} />
+
+          {/* ── Sender Performance (full width so cards breathe) ── */}
+          <SenderPerformance senders={data.senders} />
 
           {/* ── Reply Feed ──────────────────────────────────────── */}
           <ReplyFeed replies={data.replies} campaigns={data.campaigns} />
