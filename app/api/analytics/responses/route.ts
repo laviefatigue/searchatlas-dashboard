@@ -36,7 +36,7 @@ const msgTs = (m: ThreadMessage) => m.date_received || m.created_at || '';
 // few minutes — not overnight. Focal works Pacific 09:00–17:00, Mon–Fri.
 // DST-safe: the window is wall-clock local and DST transitions (02:00) fall
 // outside business hours, so counting local minutes is unaffected.
-const BUSINESS_TZ = 'America/Los_Angeles';
+const BUSINESS_TZ = process.env.NEXT_PUBLIC_BUSINESS_TZ || 'America/Los_Angeles';
 const BH_OPEN_MIN = 9 * 60;   // 09:00
 const BH_CLOSE_MIN = 17 * 60; // 17:00
 

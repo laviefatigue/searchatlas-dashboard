@@ -25,25 +25,25 @@ export function KillVelocityChart({ data }: KillVelocityChartProps) {
         <AreaChart data={chartData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
           <defs>
             <linearGradient id="gradientDeaths" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="#ef4444" stopOpacity={0.4} />
-              <stop offset="100%" stopColor="#ef4444" stopOpacity={0.02} />
+              <stop offset="0%" stopColor="#EF7A6C" stopOpacity={0.4} />
+              <stop offset="100%" stopColor="#EF7A6C" stopOpacity={0.02} />
             </linearGradient>
           </defs>
           <CartesianGrid
             strokeDasharray="3 3"
-            stroke="#e5e5e5"
+            stroke="#E8ECEA"
             vertical={false}
           />
           <XAxis
             dataKey="week"
-            tick={{ fontSize: 10, fill: '#737373' }}
-            stroke="#e5e5e5"
+            tick={{ fontSize: 10, fill: '#7C8B87' }}
+            stroke="#E8ECEA"
             tickLine={false}
             axisLine={false}
           />
           <YAxis
-            tick={{ fontSize: 11, fill: '#737373' }}
-            stroke="#e5e5e5"
+            tick={{ fontSize: 11, fill: '#7C8B87' }}
+            stroke="#E8ECEA"
             domain={[0, yAxisMax]}
             tickLine={false}
             axisLine={false}
@@ -51,17 +51,17 @@ export function KillVelocityChart({ data }: KillVelocityChartProps) {
           <Tooltip
             contentStyle={{
               backgroundColor: '#ffffff',
-              border: '1px solid #e5e5e5',
+              border: '1px solid #E8ECEA',
               borderRadius: '8px',
               boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
             }}
-            labelStyle={{ color: '#1a1a1a', fontWeight: 500 }}
+            labelStyle={{ color: '#131B19', fontWeight: 500 }}
             formatter={(value: number) => [`${value} terminated`, 'Inboxes']}
           />
           <Area
             type="monotone"
             dataKey="deaths"
-            stroke="#ef4444"
+            stroke="#EF7A6C"
             strokeWidth={2}
             fillOpacity={1}
             fill="url(#gradientDeaths)"

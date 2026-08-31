@@ -333,29 +333,29 @@ function OutreachVolumeChart({ data }: { data: SocialDashboardData['dailyStats']
           <AreaChart data={formatted} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
             <defs>
               <linearGradient id="colorSent" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="#a57bea" stopOpacity={0.3} />
-                <stop offset="95%" stopColor="#a57bea" stopOpacity={0} />
+                <stop offset="5%" stopColor="#5BB8B0" stopOpacity={0.3} />
+                <stop offset="95%" stopColor="#5BB8B0" stopOpacity={0} />
               </linearGradient>
               <linearGradient id="colorAccepted" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="#93c5fd" stopOpacity={0.3} />
-                <stop offset="95%" stopColor="#93c5fd" stopOpacity={0} />
+                <stop offset="5%" stopColor="#5A86E8" stopOpacity={0.3} />
+                <stop offset="95%" stopColor="#5A86E8" stopOpacity={0} />
               </linearGradient>
               <linearGradient id="colorReplies" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="#86efac" stopOpacity={0.3} />
-                <stop offset="95%" stopColor="#86efac" stopOpacity={0} />
+                <stop offset="5%" stopColor="#57C98A" stopOpacity={0.3} />
+                <stop offset="95%" stopColor="#57C98A" stopOpacity={0} />
               </linearGradient>
             </defs>
-            <CartesianGrid strokeDasharray="3 3" stroke="#3A3C47" vertical={false} />
-            <XAxis dataKey="dateLabel" tick={{ fontSize: 11, fill: '#A1A1AA' }} tickLine={false} axisLine={false} />
-            <YAxis tick={{ fontSize: 11, fill: '#A1A1AA' }} tickLine={false} axisLine={false} />
+            <CartesianGrid strokeDasharray="3 3" stroke="#26332F" vertical={false} />
+            <XAxis dataKey="dateLabel" tick={{ fontSize: 11, fill: '#8A9B96' }} tickLine={false} axisLine={false} />
+            <YAxis tick={{ fontSize: 11, fill: '#8A9B96' }} tickLine={false} axisLine={false} />
             <Tooltip
-              contentStyle={{ backgroundColor: '#1D1E24', border: '1px solid #3A3C47', borderRadius: '8px', fontSize: '12px' }}
-              labelStyle={{ color: '#F5F5F7' }}
+              contentStyle={{ backgroundColor: '#17201E', border: '1px solid #26332F', borderRadius: '8px', fontSize: '12px' }}
+              labelStyle={{ color: '#F1F3F1' }}
             />
             <Legend wrapperStyle={{ fontSize: '12px' }} />
-            <Area type="monotone" dataKey="connectionsSent" name="Connections Sent" stroke="#a57bea" fill="url(#colorSent)" strokeWidth={2} />
-            <Area type="monotone" dataKey="accepted" name="Accepted" stroke="#93c5fd" fill="url(#colorAccepted)" strokeWidth={2} />
-            <Area type="monotone" dataKey="replies" name="Replies" stroke="#86efac" fill="url(#colorReplies)" strokeWidth={2} />
+            <Area type="monotone" dataKey="connectionsSent" name="Connections Sent" stroke="#5BB8B0" fill="url(#colorSent)" strokeWidth={2} />
+            <Area type="monotone" dataKey="accepted" name="Accepted" stroke="#5A86E8" fill="url(#colorAccepted)" strokeWidth={2} />
+            <Area type="monotone" dataKey="replies" name="Replies" stroke="#57C98A" fill="url(#colorReplies)" strokeWidth={2} />
           </AreaChart>
         </ResponsiveContainer>
       </div>

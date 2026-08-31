@@ -19,10 +19,10 @@ export function HealthScoreGauge({ score, label, size = 'lg' }: HealthScoreGauge
   const strokeDashoffset = circumference - (score / 100) * circumference;
 
   const getStrokeColor = (score: number) => {
-    if (score >= 80) return '#22c55e';
-    if (score >= 60) return '#936BDA';
+    if (score >= 80) return '#57C98A';
+    if (score >= 60) return '#1DA89D';
     if (score >= 40) return '#f59e0b';
-    return '#ef4444';
+    return '#EF7A6C';
   };
 
   const getGlowColor = (score: number) => {
@@ -53,7 +53,7 @@ export function HealthScoreGauge({ score, label, size = 'lg' }: HealthScoreGauge
           className="transform -rotate-90 relative"
         >
           <circle
-            stroke="#e5e5e5"
+            stroke="#E8ECEA"
             fill="transparent"
             strokeWidth={stroke}
             r={normalizedRadius}

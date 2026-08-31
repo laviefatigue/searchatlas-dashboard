@@ -20,29 +20,29 @@ export function VolumeHistoryChart({ data }: VolumeHistoryChartProps) {
         <AreaChart data={chartData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
           <defs>
             <linearGradient id="gradientSent" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="#936BDA" stopOpacity={0.4} />
-              <stop offset="100%" stopColor="#936BDA" stopOpacity={0.02} />
+              <stop offset="0%" stopColor="#1DA89D" stopOpacity={0.4} />
+              <stop offset="100%" stopColor="#1DA89D" stopOpacity={0.02} />
             </linearGradient>
             <linearGradient id="gradientCapacity" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="#88C2FF" stopOpacity={0.4} />
-              <stop offset="100%" stopColor="#88C2FF" stopOpacity={0.02} />
+              <stop offset="0%" stopColor="#2C64D2" stopOpacity={0.4} />
+              <stop offset="100%" stopColor="#2C64D2" stopOpacity={0.02} />
             </linearGradient>
           </defs>
           <CartesianGrid
             strokeDasharray="3 3"
-            stroke="#e5e5e5"
+            stroke="#E8ECEA"
             vertical={false}
           />
           <XAxis
             dataKey="date"
-            tick={{ fontSize: 11, fill: '#737373' }}
-            stroke="#e5e5e5"
+            tick={{ fontSize: 11, fill: '#7C8B87' }}
+            stroke="#E8ECEA"
             tickLine={false}
             axisLine={false}
           />
           <YAxis
-            tick={{ fontSize: 11, fill: '#737373' }}
-            stroke="#e5e5e5"
+            tick={{ fontSize: 11, fill: '#7C8B87' }}
+            stroke="#E8ECEA"
             tickLine={false}
             axisLine={false}
             tickFormatter={(value) => value >= 1000 ? `${(value / 1000).toFixed(0)}k` : value}
@@ -50,12 +50,12 @@ export function VolumeHistoryChart({ data }: VolumeHistoryChartProps) {
           <Tooltip
             contentStyle={{
               backgroundColor: '#ffffff',
-              border: '1px solid #e5e5e5',
+              border: '1px solid #E8ECEA',
               borderRadius: '12px',
               boxShadow: '0 4px 16px rgba(0, 0, 0, 0.1)',
             }}
-            labelStyle={{ color: '#0F0F11', fontWeight: 500, marginBottom: 4 }}
-            itemStyle={{ color: '#936BDA' }}
+            labelStyle={{ color: '#6E7C78', fontWeight: 500, marginBottom: 4 }}
+            itemStyle={{ color: '#1DA89D' }}
           />
           <Legend
             wrapperStyle={{ fontSize: '12px', paddingTop: '12px' }}
@@ -64,7 +64,7 @@ export function VolumeHistoryChart({ data }: VolumeHistoryChartProps) {
           <Area
             type="monotone"
             dataKey="Emails Sent"
-            stroke="#936BDA"
+            stroke="#1DA89D"
             strokeWidth={2}
             fillOpacity={1}
             fill="url(#gradientSent)"
@@ -72,7 +72,7 @@ export function VolumeHistoryChart({ data }: VolumeHistoryChartProps) {
           <Area
             type="monotone"
             dataKey="Capacity"
-            stroke="#88C2FF"
+            stroke="#2C64D2"
             strokeWidth={2}
             fillOpacity={1}
             fill="url(#gradientCapacity)"

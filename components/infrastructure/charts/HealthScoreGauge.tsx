@@ -20,10 +20,10 @@ export function HealthScoreGauge({ score, label, size = 'lg' }: HealthScoreGauge
 
   // Color scheme adapted for light/dark mode
   const getStrokeColor = (score: number) => {
-    if (score >= 80) return '#22c55e'; // success green
+    if (score >= 80) return '#57C98A'; // success green
     if (score >= 60) return '#3b82f6'; // info blue
     if (score >= 40) return '#f59e0b'; // warning amber
-    return '#ef4444'; // danger red
+    return '#EF7A6C'; // danger red
   };
 
   const getGlowColor = (score: number) => {

@@ -26,7 +26,7 @@ export const STATUS_COLORS: Record<string, { bg: string; text: string }> = {
   active: { bg: 'bg-green-500', text: 'text-white' },
   paused: { bg: 'bg-amber-500', text: 'text-white' },
   draft: { bg: 'bg-gray-200', text: 'text-gray-700' },
-  launching: { bg: 'bg-[#936BDA]', text: 'text-white' },
+  launching: { bg: 'bg-[#1DA89D]', text: 'text-white' },
   completed: { bg: 'bg-purple-500', text: 'text-white' },
   stopped: { bg: 'bg-red-500', text: 'text-white' },
   failed: { bg: 'bg-red-600', text: 'text-white' },
@@ -35,10 +35,13 @@ export const STATUS_COLORS: Record<string, { bg: string; text: string }> = {
 };
 
 export const CHART_COLORS = {
-  sent: '#A57BEA',      // SearchAtlas Purple (brighter)
-  opens: '#86EFAC',     // SearchAtlas Green (brighter)
-  replies: '#93C5FD',   // SearchAtlas Cyan (brighter)
-  bounced: '#F87171',   // Red (brighter)
-  interested: '#F9A8D4', // SearchAtlas Pink (brighter)
-  unsubscribed: '#9CA3AF', // Gray (brighter)
+  // Funnel stages are ordinal, not categorical: one hue, stepped lightness,
+  // so the order reads in the colour itself. Validated against --background #0F1614.
+  sent: '#0D625C',
+  opens: '#168179',
+  replies: '#1E9F95',
+  interested: '#50BCB2',
+  // Reserved status colours — never reused as a series hue.
+  bounced: '#EF7A6C',
+  unsubscribed: '#6E7C78',
 };

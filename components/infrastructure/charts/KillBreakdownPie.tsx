@@ -9,11 +9,11 @@ interface KillBreakdownPieProps {
 
 // SearchAtlas-themed chart colors
 const COLORS = [
-  '#936BDA', // cyan
-  '#0F0F11', // navy
-  '#88C2FF', // gold
-  '#ef4444', // red
-  '#22c55e', // green
+  '#1DA89D', // cyan
+  '#6E7C78', // navy
+  '#2C64D2', // gold
+  '#EF7A6C', // red
+  '#57C98A', // green
 ];
 
 export function KillBreakdownPie({ data }: KillBreakdownPieProps) {
@@ -49,11 +49,11 @@ export function KillBreakdownPie({ data }: KillBreakdownPieProps) {
           <Tooltip
             contentStyle={{
               backgroundColor: '#ffffff',
-              border: '1px solid #e5e5e5',
+              border: '1px solid #E8ECEA',
               borderRadius: '8px',
               boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
             }}
-            labelStyle={{ color: '#1a1a1a', fontWeight: 500 }}
+            labelStyle={{ color: '#131B19', fontWeight: 500 }}
           />
         </PieChart>
       </ResponsiveContainer>
