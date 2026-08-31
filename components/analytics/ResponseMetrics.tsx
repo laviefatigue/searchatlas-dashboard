@@ -82,7 +82,7 @@ function fmtWhen(iso: string): string {
   // timestamps look ~7h off.
   return (
     d.toLocaleString('en-US', {
-      timeZone: 'America/Los_Angeles',
+      timeZone: process.env.NEXT_PUBLIC_BUSINESS_TZ || 'America/Los_Angeles',
       month: 'short',
       day: 'numeric',
       hour: 'numeric',
