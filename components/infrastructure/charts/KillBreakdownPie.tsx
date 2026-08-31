@@ -9,9 +9,9 @@ interface KillBreakdownPieProps {
 
 // SearchAtlas-themed chart colors
 const COLORS = [
-  '#F57C0E', // cyan
+  '#936BDA', // cyan
   '#0F0F11', // navy
-  '#FFC400', // gold
+  '#88C2FF', // gold
   '#ef4444', // red
   '#22c55e', // green
 ];

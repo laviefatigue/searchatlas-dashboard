@@ -18,10 +18,10 @@ import { BrandLogo } from '@/components/layout/BrandLogo';
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // SEARCHATLAS BRAND COLORS - IMPROVED READABILITY
-// Primary: Purple #FF8A1F (brighter)
-// Secondary: Cyan #FFC400 (brighter)
-// Accent: Green #86EFAC, Pink #B8410C
-// Background: Dark #16130F / Card #1E1A13
+// Primary: Purple #A57BEA (brighter)
+// Secondary: Cyan #93C5FD (brighter)
+// Accent: Green #86EFAC, Pink #F9A8D4
+// Background: Dark #14151A / Card #1D1E24
 // ═══════════════════════════════════════════════════════════════════════════════
 
 // Types
@@ -143,8 +143,8 @@ function HealthScoreGauge({ score, size = 'md' }: { score: number; size?: 'sm' |
 
   const getStrokeColor = (score: number) => {
     if (score >= 80) return '#86EFAC'; // SearchAtlas green
-    if (score >= 60) return '#FF8A1F'; // SearchAtlas purple
-    if (score >= 40) return '#B8410C'; // SearchAtlas pink
+    if (score >= 60) return '#A57BEA'; // SearchAtlas purple
+    if (score >= 40) return '#F9A8D4'; // SearchAtlas pink
     return '#ef4444';
   };
 
@@ -175,7 +175,7 @@ function HealthScoreGauge({ score, size = 'md' }: { score: number; size?: 'sm' |
           className="transform -rotate-90 relative"
         >
           <circle
-            stroke="#3B3529"
+            stroke="#3A3C47"
             fill="transparent"
             strokeWidth={stroke}
             r={normalizedRadius}
@@ -262,12 +262,12 @@ function VolumeTooltip({ active, payload, label }: { active?: boolean; payload?:
   const replyRate = sent > 0 ? ((replied / sent) * 100).toFixed(1) : '0';
 
   return (
-    <div className="bg-[#1E1A13] border border-[#3B3529] rounded-xl p-4 shadow-2xl min-w-[180px]">
+    <div className="bg-[#1D1E24] border border-[#3A3C47] rounded-xl p-4 shadow-2xl min-w-[180px]">
       <p className="text-white font-semibold text-sm mb-3">{label}</p>
       <div className="space-y-2">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <div className="w-2 h-2 rounded-full bg-[#FF8A1F]" />
+            <div className="w-2 h-2 rounded-full bg-[#A57BEA]" />
             <span className="text-xs text-gray-400">Sent</span>
           </div>
           <span className="text-sm font-medium text-white">{sent.toLocaleString()}</span>
@@ -289,7 +289,7 @@ function VolumeTooltip({ active, payload, label }: { active?: boolean; payload?:
           </div>
         )}
         {sent > 0 && (
-          <div className="pt-1 border-t border-[#3B3529] flex items-center justify-between">
+          <div className="pt-1 border-t border-[#3A3C47] flex items-center justify-between">
             <span className="text-xs text-gray-400">Reply Rate</span>
             <span className="text-sm font-bold text-[#86EFAC]">{replyRate}%</span>
           </div>
@@ -320,7 +320,7 @@ function VolumeHistoryChart({ data }: { data: VolumeHistory }) {
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-6">
           <div className="flex items-center gap-2">
-            <div className="w-3 h-3 rounded-sm bg-[#FF8A1F]" />
+            <div className="w-3 h-3 rounded-sm bg-[#A57BEA]" />
             <span className="text-xs text-gray-400">Sent</span>
             <span className="text-xs font-medium text-white ml-1">{totalSent.toLocaleString()}</span>
           </div>
@@ -347,8 +347,8 @@ function VolumeHistoryChart({ data }: { data: VolumeHistory }) {
           <AreaChart data={chartData} margin={{ top: 20, right: 10, left: 0, bottom: 0 }}>
             <defs>
               <linearGradient id="gradientSent" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="#FF8A1F" stopOpacity={0.35} />
-                <stop offset="100%" stopColor="#FF8A1F" stopOpacity={0.02} />
+                <stop offset="0%" stopColor="#A57BEA" stopOpacity={0.35} />
+                <stop offset="100%" stopColor="#A57BEA" stopOpacity={0.02} />
               </linearGradient>
               <linearGradient id="gradientReplied" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="0%" stopColor="#86EFAC" stopOpacity={0.3} />
@@ -384,14 +384,14 @@ function VolumeHistoryChart({ data }: { data: VolumeHistory }) {
 
             <Tooltip
               content={<VolumeTooltip />}
-              cursor={{ stroke: 'rgba(255, 138, 31, 0.2)' }}
+              cursor={{ stroke: 'rgba(165, 123, 234, 0.2)' }}
             />
 
             {/* Sends area (main volume) */}
             <Area
               type="monotone"
               dataKey="sent"
-              stroke="#FF8A1F"
+              stroke="#A57BEA"
               strokeWidth={2.5}
               fill="url(#gradientSent)"
               isAnimationActive={true}
@@ -420,19 +420,19 @@ function VolumeHistoryChart({ data }: { data: VolumeHistory }) {
 function ProviderCapacityCharts({ providers }: { providers: ProviderMetrics[] }) {
   const getHealthColor = (score: number) => {
     if (score >= 80) return '#86EFAC';
-    if (score >= 60) return '#FF8A1F';
-    if (score >= 40) return '#B8410C';
+    if (score >= 60) return '#A57BEA';
+    if (score >= 40) return '#F9A8D4';
     return '#ef4444';
   };
 
   const totalKills = providers.reduce((sum, p) => sum + p.dead_count, 0);
 
   return (
-    <div className="bg-[#1E1A13] border border-[#3B3529] rounded-2xl p-6 hover:border-[#FF8A1F]/50 transition-colors">
+    <div className="bg-[#1D1E24] border border-[#3A3C47] rounded-2xl p-6 hover:border-[#A57BEA]/50 transition-colors">
       {/* Header with Legend */}
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-2">
-          <Server className="h-4 w-4 text-[#FF8A1F]" />
+          <Server className="h-4 w-4 text-[#A57BEA]" />
           <span className="text-xs font-medium text-gray-400 uppercase tracking-wide">Capacity Pipeline</span>
         </div>
         <div className="flex items-center gap-4 text-xs">
@@ -441,7 +441,7 @@ function ProviderCapacityCharts({ providers }: { providers: ProviderMetrics[] })
             <span className="text-gray-300">Live</span>
           </span>
           <span className="flex items-center gap-1.5">
-            <div className="w-3 h-3 rounded bg-[#FFC400]" />
+            <div className="w-3 h-3 rounded bg-[#93C5FD]" />
             <span className="text-gray-300">Reserve</span>
           </span>
           {providers.some(p => (p.inbox_flagged_count || 0) > 0) && (
@@ -482,9 +482,9 @@ function ProviderCapacityCharts({ providers }: { providers: ProviderMetrics[] })
               <div className="flex items-center justify-between mb-2">
                 <div className="flex items-center gap-3">
                   {provider.name.toLowerCase().includes('microsoft') ? (
-                    <Cloud className="h-5 w-5 text-[#FFC400]" />
+                    <Cloud className="h-5 w-5 text-[#93C5FD]" />
                   ) : (
-                    <Mail className="h-5 w-5 text-[#B8410C]" />
+                    <Mail className="h-5 w-5 text-[#F9A8D4]" />
                   )}
                   <span className="text-lg font-semibold text-white">{provider.name}</span>
                   <span
@@ -501,24 +501,24 @@ function ProviderCapacityCharts({ providers }: { providers: ProviderMetrics[] })
               </div>
 
               {/* Stacked Pipeline Bar - proportional by inbox count */}
-              <div className="relative h-10 bg-[#16130F] rounded-lg overflow-hidden flex">
+              <div className="relative h-10 bg-[#14151A] rounded-lg overflow-hidden flex">
                 {/* Live Segment */}
                 <div
                   className="h-full bg-gradient-to-r from-[#86EFAC] to-[#4ade80] transition-all duration-700 flex items-center justify-center relative overflow-hidden"
                   style={{ width: `${livePercent}%` }}
                 >
                   {livePercent >= 15 && (
-                    <span className="text-sm font-bold text-[#16130F] whitespace-nowrap">{liveTotal}</span>
+                    <span className="text-sm font-bold text-[#14151A] whitespace-nowrap">{liveTotal}</span>
                   )}
                 </div>
 
                 {/* Reserve Segment */}
                 <div
-                  className="h-full bg-gradient-to-r from-[#FFC400] to-[#60a5fa] transition-all duration-700 flex items-center justify-center relative overflow-hidden"
+                  className="h-full bg-gradient-to-r from-[#93C5FD] to-[#60a5fa] transition-all duration-700 flex items-center justify-center relative overflow-hidden"
                   style={{ width: `${reservePercent}%` }}
                 >
                   {reservePercent >= 15 && (
-                    <span className="text-sm font-bold text-[#16130F] whitespace-nowrap">{reserveTotal}</span>
+                    <span className="text-sm font-bold text-[#14151A] whitespace-nowrap">{reserveTotal}</span>
                   )}
                 </div>
 
@@ -529,7 +529,7 @@ function ProviderCapacityCharts({ providers }: { providers: ProviderMetrics[] })
                     style={{ width: `${inboxFlaggedPercent}%` }}
                   >
                     {inboxFlaggedPercent >= 8 && (
-                      <span className="text-sm font-bold text-[#16130F] whitespace-nowrap">{inboxFlagged}</span>
+                      <span className="text-sm font-bold text-[#14151A] whitespace-nowrap">{inboxFlagged}</span>
                     )}
                   </div>
                 )}
@@ -553,18 +553,18 @@ function ProviderCapacityCharts({ providers }: { providers: ProviderMetrics[] })
                   <span className="text-gray-400">
                     <span className="text-[#86EFAC]">Live:</span> {provider.live_set_count} connected
                     {(provider.live_set_disconnected || 0) > 0 && (
-                      <span className="text-[#B8410C]"> · {provider.live_set_disconnected} disconnected</span>
+                      <span className="text-[#F9A8D4]"> · {provider.live_set_disconnected} disconnected</span>
                     )}
                   </span>
                   <span className="text-gray-400">
-                    <span className="text-[#FFC400]">Reserve:</span> {provider.reserve_set_count} connected
+                    <span className="text-[#93C5FD]">Reserve:</span> {provider.reserve_set_count} connected
                     {(provider.reserve_set_disconnected || 0) > 0 && (
-                      <span className="text-[#B8410C]"> · {provider.reserve_set_disconnected} disconnected</span>
+                      <span className="text-[#F9A8D4]"> · {provider.reserve_set_disconnected} disconnected</span>
                     )}
                   </span>
                 </div>
                 <span className="text-gray-400">
-                  Warming: <span className="text-[#B8410C] font-medium">{provider.warming_count}</span>
+                  Warming: <span className="text-[#F9A8D4] font-medium">{provider.warming_count}</span>
                 </span>
               </div>
             </div>
@@ -573,7 +573,7 @@ function ProviderCapacityCharts({ providers }: { providers: ProviderMetrics[] })
       </div>
 
       {/* Total Summary */}
-      <div className="mt-6 pt-4 border-t border-[#3B3529]">
+      <div className="mt-6 pt-4 border-t border-[#3A3C47]">
         <div className="flex items-center justify-between">
           <div className="text-xs text-gray-400 uppercase tracking-wide">Total Infrastructure</div>
           <div className="flex items-center gap-6 text-sm">
@@ -585,7 +585,7 @@ function ProviderCapacityCharts({ providers }: { providers: ProviderMetrics[] })
               </span>
             </span>
             <span className="flex items-center gap-2">
-              <div className="w-2 h-2 rounded-full bg-[#FFC400]" />
+              <div className="w-2 h-2 rounded-full bg-[#93C5FD]" />
               <span className="text-gray-400">Reserve:</span>
               <span className="text-white font-bold">
                 {providers.reduce((sum, p) => sum + p.reserve_set_count + (p.reserve_set_disconnected || 0), 0).toLocaleString()}
@@ -734,9 +734,9 @@ export default function InfrastructurePage() {
 
   if (loading && !data) {
     return (
-      <div className="min-h-screen bg-[#16130F] flex items-center justify-center">
+      <div className="min-h-screen bg-[#14151A] flex items-center justify-center">
         <div className="flex items-center gap-3 text-gray-400">
-          <Loader2 className="h-5 w-5 animate-spin text-[#FF8A1F]" />
+          <Loader2 className="h-5 w-5 animate-spin text-[#A57BEA]" />
           <span>Loading dashboard...</span>
         </div>
       </div>
@@ -745,12 +745,12 @@ export default function InfrastructurePage() {
 
   if (error && !data) {
     return (
-      <div className="min-h-screen bg-[#16130F] flex items-center justify-center">
+      <div className="min-h-screen bg-[#14151A] flex items-center justify-center">
         <div className="text-center">
           <p className="text-gray-400 mb-4">{error}</p>
           <button
             onClick={fetchData}
-            className="px-4 py-2 rounded-lg bg-[#FF8A1F] text-white hover:bg-[#a57de6] transition-colors"
+            className="px-4 py-2 rounded-lg bg-[#A57BEA] text-white hover:bg-[#a57de6] transition-colors"
           >
             Retry
           </button>
@@ -787,15 +787,15 @@ export default function InfrastructurePage() {
 
   const getStatusMessage = () => {
     if (infrastructure.avg_health_score >= 85) return { text: 'All systems operational', icon: CheckCircle2, color: 'text-[#86EFAC]' };
-    if (infrastructure.avg_health_score >= 70) return { text: 'Systems operational with minor issues', icon: CheckCircle2, color: 'text-[#FF8A1F]' };
-    return { text: 'Some systems need attention', icon: Activity, color: 'text-[#B8410C]' };
+    if (infrastructure.avg_health_score >= 70) return { text: 'Systems operational with minor issues', icon: CheckCircle2, color: 'text-[#A57BEA]' };
+    return { text: 'Some systems need attention', icon: Activity, color: 'text-[#F9A8D4]' };
   };
 
   const status = getStatusMessage();
   const StatusIcon = status.icon;
 
   return (
-    <div className="min-h-screen h-screen overflow-y-auto bg-[#16130F]">
+    <div className="min-h-screen h-screen overflow-y-auto bg-[#14151A]">
       <main className="max-w-5xl mx-auto px-6 py-8">
         {/* Header with Logo and Export */}
         <header className="mb-8">
@@ -807,7 +807,7 @@ export default function InfrastructurePage() {
               <button
                 onClick={() => setExportMenuOpen(!exportMenuOpen)}
                 disabled={exporting}
-                className="flex items-center gap-2 px-4 py-2 rounded-lg border border-[#3B3529] bg-[#1E1A13] text-white hover:border-[#FF8A1F] hover:bg-[#FF8A1F]/10 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex items-center gap-2 px-4 py-2 rounded-lg border border-[#3A3C47] bg-[#1D1E24] text-white hover:border-[#A57BEA] hover:bg-[#A57BEA]/10 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {exporting ? (
                   <Loader2 className="h-4 w-4 animate-spin" />
@@ -820,17 +820,17 @@ export default function InfrastructurePage() {
               {exportMenuOpen && (
                 <>
                   <div className="fixed inset-0 z-40" onClick={() => setExportMenuOpen(false)} />
-                  <div className="absolute right-0 top-full mt-1 z-50 w-56 rounded-lg border border-[#3B3529] bg-[#1E1A13] shadow-xl overflow-hidden">
+                  <div className="absolute right-0 top-full mt-1 z-50 w-56 rounded-lg border border-[#3A3C47] bg-[#1D1E24] shadow-xl overflow-hidden">
                     <button
                       onClick={() => handleExport('inboxes')}
-                      className="w-full px-4 py-3 text-left text-sm text-white hover:bg-[#FF8A1F]/10 transition-colors border-b border-[#3B3529]"
+                      className="w-full px-4 py-3 text-left text-sm text-white hover:bg-[#A57BEA]/10 transition-colors border-b border-[#3A3C47]"
                     >
                       <div className="font-medium">All Inboxes</div>
                       <div className="text-xs text-gray-400 mt-0.5">Full inbox health report</div>
                     </button>
                     <button
                       onClick={() => handleExport('kill-triggers')}
-                      className="w-full px-4 py-3 text-left text-sm text-white hover:bg-[#FF8A1F]/10 transition-colors"
+                      className="w-full px-4 py-3 text-left text-sm text-white hover:bg-[#A57BEA]/10 transition-colors"
                     >
                       <div className="font-medium">Kill Triggers</div>
                       <div className="text-xs text-gray-400 mt-0.5">Flagged inboxes with severity &amp; date</div>
@@ -849,7 +849,7 @@ export default function InfrastructurePage() {
         {/* Hero - Health + Package */}
         <div className="grid grid-cols-2 gap-6 mb-6">
           {/* Health Score */}
-          <div className="bg-[#1E1A13] border border-[#3B3529] rounded-2xl p-6 hover:border-[#FF8A1F]/50 transition-colors">
+          <div className="bg-[#1D1E24] border border-[#3A3C47] rounded-2xl p-6 hover:border-[#A57BEA]/50 transition-colors">
             <div className="flex items-center justify-between">
               <div className="flex-1">
                 <p className="text-xs font-medium text-gray-400 uppercase tracking-wide mb-6">
@@ -872,7 +872,7 @@ export default function InfrastructurePage() {
           </div>
 
           {/* Package Status */}
-          <div className="bg-[#1E1A13] border border-[#3B3529] rounded-2xl p-6 hover:border-[#FF8A1F]/50 transition-colors">
+          <div className="bg-[#1D1E24] border border-[#3A3C47] rounded-2xl p-6 hover:border-[#A57BEA]/50 transition-colors">
             <p className="text-xs font-medium text-gray-400 uppercase tracking-wide mb-4">
               Your Package
             </p>
@@ -884,16 +884,16 @@ export default function InfrastructurePage() {
                 </p>
               </div>
               <div className="text-right">
-                <p className="text-3xl font-bold text-[#FF8A1F]">{Math.min(100, packagePercent)}%</p>
+                <p className="text-3xl font-bold text-[#A57BEA]">{Math.min(100, packagePercent)}%</p>
                 <p className="text-xs text-gray-400">fulfilled</p>
               </div>
             </div>
-            <div className="h-3 bg-[#16130F] rounded-full overflow-hidden">
+            <div className="h-3 bg-[#14151A] rounded-full overflow-hidden">
               <div
                 className="h-full rounded-full transition-all duration-700"
                 style={{
                   width: `${Math.min(100, packagePercent)}%`,
-                  background: 'linear-gradient(90deg, #FF8A1F, #C4B5FD)'
+                  background: 'linear-gradient(90deg, #A57BEA, #C4B5FD)'
                 }}
               />
             </div>
@@ -901,7 +901,7 @@ export default function InfrastructurePage() {
             {infrastructure.disconnected_inboxes > 0 || infrastructure.dead_inboxes > 0 ? (
               <div className="flex items-center gap-3 mt-2 text-xs">
                 {infrastructure.disconnected_inboxes > 0 && (
-                  <span className="text-[#B8410C]">
+                  <span className="text-[#F9A8D4]">
                     +{infrastructure.disconnected_inboxes} inboxes being provisioned
                   </span>
                 )}
@@ -922,10 +922,10 @@ export default function InfrastructurePage() {
         {/* Key Metrics Row */}
         <div className="grid grid-cols-3 gap-4 mb-6">
           {/* Sending Capacity with Live/Reserve Breakdown */}
-          <div className="bg-[#1E1A13] border border-[#3B3529] rounded-2xl p-5 hover:border-[#FF8A1F]/50 transition-colors">
+          <div className="bg-[#1D1E24] border border-[#3A3C47] rounded-2xl p-5 hover:border-[#A57BEA]/50 transition-colors">
             <div className="flex items-center gap-2 mb-3">
-              <div className="w-8 h-8 rounded-lg bg-[#FF8A1F]/20 flex items-center justify-center">
-                <Zap className="h-4 w-4 text-[#FF8A1F]" />
+              <div className="w-8 h-8 rounded-lg bg-[#A57BEA]/20 flex items-center justify-center">
+                <Zap className="h-4 w-4 text-[#A57BEA]" />
               </div>
               <span className="text-xs font-medium text-gray-400 uppercase tracking-wide">Sending Capacity</span>
             </div>
@@ -933,13 +933,13 @@ export default function InfrastructurePage() {
               {totalCapacity.toLocaleString()}
             </p>
             {/* Live/Reserve Stacked Bar */}
-            <div className="h-2 bg-[#16130F] rounded-full overflow-hidden flex mb-2">
+            <div className="h-2 bg-[#14151A] rounded-full overflow-hidden flex mb-2">
               <div
                 className="h-full bg-[#86EFAC] transition-all duration-500"
                 style={{ width: `${livePercent}%` }}
               />
               <div
-                className="h-full bg-[#FFC400] transition-all duration-500"
+                className="h-full bg-[#93C5FD] transition-all duration-500"
                 style={{ width: `${100 - livePercent}%` }}
               />
             </div>
@@ -951,7 +951,7 @@ export default function InfrastructurePage() {
                 <span className="text-white font-medium">{liveCapacity.toLocaleString()}</span>
               </span>
               <span className="flex items-center gap-1.5">
-                <div className="w-2 h-2 rounded-full bg-[#FFC400]" />
+                <div className="w-2 h-2 rounded-full bg-[#93C5FD]" />
                 <span className="text-gray-400">Reserve:</span>
                 <span className="text-white font-medium">{reserveCapacity.toLocaleString()}</span>
               </span>
@@ -959,10 +959,10 @@ export default function InfrastructurePage() {
           </div>
 
           {/* Avg Daily Volume */}
-          <div className="bg-[#1E1A13] border border-[#3B3529] rounded-2xl p-5 hover:border-[#FF8A1F]/50 transition-colors">
+          <div className="bg-[#1D1E24] border border-[#3A3C47] rounded-2xl p-5 hover:border-[#A57BEA]/50 transition-colors">
             <div className="flex items-center gap-2 mb-3">
-              <div className="w-8 h-8 rounded-lg bg-[#FFC400]/20 flex items-center justify-center">
-                <Mail className="h-4 w-4 text-[#FFC400]" />
+              <div className="w-8 h-8 rounded-lg bg-[#93C5FD]/20 flex items-center justify-center">
+                <Mail className="h-4 w-4 text-[#93C5FD]" />
               </div>
               <span className="text-xs font-medium text-gray-400 uppercase tracking-wide">Avg. Daily Sent</span>
             </div>
@@ -973,7 +973,7 @@ export default function InfrastructurePage() {
           </div>
 
           {/* Domains */}
-          <div className="bg-[#1E1A13] border border-[#3B3529] rounded-2xl p-5 hover:border-[#FF8A1F]/50 transition-colors">
+          <div className="bg-[#1D1E24] border border-[#3A3C47] rounded-2xl p-5 hover:border-[#A57BEA]/50 transition-colors">
             <div className="flex items-center gap-2 mb-3">
               <div className="w-8 h-8 rounded-lg bg-[#86EFAC]/20 flex items-center justify-center">
                 <Server className="h-4 w-4 text-[#86EFAC]" />
@@ -996,10 +996,10 @@ export default function InfrastructurePage() {
 
         {/* Volume Chart */}
         {volumeHistory && (
-          <div className="bg-[#1E1A13] border border-[#3B3529] rounded-2xl p-6 mb-6 hover:border-[#FF8A1F]/50 transition-colors">
+          <div className="bg-[#1D1E24] border border-[#3A3C47] rounded-2xl p-6 mb-6 hover:border-[#A57BEA]/50 transition-colors">
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-2">
-                <TrendingUp className="h-4 w-4 text-[#FF8A1F]" />
+                <TrendingUp className="h-4 w-4 text-[#A57BEA]" />
                 <span className="text-xs font-medium text-gray-400 uppercase tracking-wide">
                   Sending Volume
                 </span>
@@ -1011,7 +1011,7 @@ export default function InfrastructurePage() {
         )}
 
         {/* Footer */}
-        <footer className="mt-10 pt-6 border-t border-[#3B3529] text-center">
+        <footer className="mt-10 pt-6 border-t border-[#3A3C47] text-center">
           <div className="text-xs text-gray-400 flex items-center justify-center gap-2">
             <span className="flex items-center gap-1.5">
               <span className="w-1.5 h-1.5 rounded-full bg-[#86EFAC] animate-pulse inline-block" />
