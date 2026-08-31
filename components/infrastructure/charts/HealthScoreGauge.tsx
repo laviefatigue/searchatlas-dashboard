@@ -21,14 +21,14 @@ export function HealthScoreGauge({ score, label, size = 'lg' }: HealthScoreGauge
   // Color scheme adapted for light/dark mode
   const getStrokeColor = (score: number) => {
     if (score >= 80) return '#22c55e'; // success green
-    if (score >= 60) return '#84cc16'; // info blue
+    if (score >= 60) return '#3b82f6'; // info blue
     if (score >= 40) return '#f59e0b'; // warning amber
     return '#ef4444'; // danger red
   };
 
   const getGlowColor = (score: number) => {
     if (score >= 80) return 'rgba(34, 197, 94, 0.3)';
-    if (score >= 60) return 'rgba(132, 204, 22, 0.3)';
+    if (score >= 60) return 'rgba(59, 130, 246, 0.3)';
     if (score >= 40) return 'rgba(245, 158, 11, 0.3)';
     return 'rgba(239, 68, 68, 0.3)';
   };
