@@ -448,6 +448,12 @@ function ProviderCapacityCharts({ providers }: { providers: ProviderMetrics[] })
             <div className="w-3 h-3 rounded bg-[#8EA5B4]" />
             <span className="text-gray-300">Reserve</span>
           </span>
+          {providers.some(p => (p.incubating_count || 0) > 0) && (
+            <span className="flex items-center gap-1.5">
+              <div className="w-3 h-3 rounded" style={{ backgroundColor: '#C87055' }} />
+              <span className="text-gray-300">Incubating</span>
+            </span>
+          )}
           {providers.some(p => (p.inbox_flagged_count || 0) > 0) && (
             <span className="flex items-center gap-1.5">
               <div className="w-3 h-3 rounded bg-[#FB923C]" />
@@ -614,6 +620,15 @@ function ProviderCapacityCharts({ providers }: { providers: ProviderMetrics[] })
                 {providers.reduce((sum, p) => sum + p.reserve_set_count + (p.reserve_set_disconnected || 0), 0).toLocaleString()}
               </span>
             </span>
+            {providers.reduce((sum, p) => sum + (p.incubating_count || 0), 0) > 0 && (
+              <span className="flex items-center gap-2">
+                <div className="w-2 h-2 rounded-full" style={{ backgroundColor: '#C87055' }} />
+                <span className="text-gray-400">Incubating:</span>
+                <span className="text-white font-bold">
+                  {providers.reduce((sum, p) => sum + (p.incubating_count || 0) + (p.incubating_disconnected || 0), 0).toLocaleString()}
+                </span>
+              </span>
+            )}
             {totalKills > 0 && (
               <>
                 {providers.reduce((sum, p) => sum + (p.inbox_flagged_count || 0), 0) > 0 && (
@@ -806,7 +821,10 @@ export default function InfrastructurePage() {
   const liveCapacity = infrastructure.providers?.reduce((sum, p) => sum + (p.live_set_capacity || 0), 0) || 0;
   const reserveCapacity = infrastructure.providers?.reduce((sum, p) => sum + (p.reserve_set_capacity || 0), 0) || 0;
   const totalCapacity = infrastructure.operational_capacity;
+  const incubatingCapacity = infrastructure.providers?.reduce((sum, p) => sum + (p.incubating_capacity || 0), 0) || 0;
   const livePercent = totalCapacity > 0 ? Math.round((liveCapacity / totalCapacity) * 100) : 0;
+  const reservePercent = totalCapacity > 0 ? Math.round((reserveCapacity / totalCapacity) * 100) : 0;
+  const incubatingPercent = totalCapacity > 0 ? Math.round((incubatingCapacity / totalCapacity) * 100) : 0;
 
   const getStatusMessage = () => {
     if (infrastructure.avg_health_score >= 85) return { text: 'All systems operational', icon: CheckCircle2, color: 'text-[#54A56D]' };
@@ -963,7 +981,11 @@ export default function InfrastructurePage() {
               />
               <div
                 className="h-full bg-[#8EA5B4] transition-all duration-500"
-                style={{ width: `${100 - livePercent}%` }}
+                style={{ width: `${reservePercent}%` }}
+              />
+              <div
+                className="h-full transition-all duration-500"
+                style={{ width: `${incubatingPercent}%`, backgroundColor: '#C87055' }}
               />
             </div>
             {/* Live/Reserve Labels */}
@@ -978,6 +1000,13 @@ export default function InfrastructurePage() {
                 <span className="text-gray-400">Reserve:</span>
                 <span className="text-white font-medium">{reserveCapacity.toLocaleString()}</span>
               </span>
+              {incubatingCapacity > 0 && (
+                <span className="flex items-center gap-1.5">
+                  <div className="w-2 h-2 rounded-full" style={{ backgroundColor: '#C87055' }} />
+                  <span className="text-gray-400">Incubating:</span>
+                  <span className="text-white font-medium">{incubatingCapacity.toLocaleString()}</span>
+                </span>
+              )}
             </div>
           </div>
 
