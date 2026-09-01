@@ -56,6 +56,10 @@ interface ProviderMetrics {
   reserve_set_count: number;
   reserve_set_capacity: number;
   reserve_set_disconnected: number;
+  // Incubating — warming inventory not yet graduated into a set
+  incubating_count: number;
+  incubating_capacity: number;
+  incubating_disconnected: number;
   // Capacity & warming
   daily_capacity: number;
   warming_count: number;
@@ -469,10 +473,14 @@ function ProviderCapacityCharts({ providers }: { providers: ProviderMetrics[] })
           const domainFlagged = provider.domain_flagged_count || 0;
           const inboxFlagged = provider.inbox_flagged_count || 0;
           const totalFlagged = domainFlagged + inboxFlagged;
-          const totalInboxes = liveTotal + reserveTotal + totalFlagged;
+          const incubatingTotal = (provider.incubating_count || 0) + (provider.incubating_disconnected || 0);
+          const totalInboxes = liveTotal + reserveTotal + incubatingTotal + totalFlagged;
 
-          const livePercent = totalInboxes > 0 ? (liveTotal / totalInboxes) * 100 : 50;
-          const reservePercent = totalInboxes > 0 ? (reserveTotal / totalInboxes) * 100 : 50;
+          // No fallback percentages: an empty pipeline renders empty, never a
+          // fabricated 50/50 split.
+          const livePercent = totalInboxes > 0 ? (liveTotal / totalInboxes) * 100 : 0;
+          const reservePercent = totalInboxes > 0 ? (reserveTotal / totalInboxes) * 100 : 0;
+          const incubatingPercent = totalInboxes > 0 ? (incubatingTotal / totalInboxes) * 100 : 0;
           const domainFlaggedPercent = totalInboxes > 0 && domainFlagged > 0 ? (domainFlagged / totalInboxes) * 100 : 0;
           const inboxFlaggedPercent = totalInboxes > 0 && inboxFlagged > 0 ? (inboxFlagged / totalInboxes) * 100 : 0;
 
@@ -522,6 +530,18 @@ function ProviderCapacityCharts({ providers }: { providers: ProviderMetrics[] })
                   )}
                 </div>
 
+                {/* Incubating Segment — warming, not yet assigned to a set */}
+                {incubatingTotal > 0 && (
+                  <div
+                    className="h-full transition-all duration-700 flex items-center justify-center relative overflow-hidden"
+                    style={{ width: `${incubatingPercent}%`, backgroundColor: '#C87055' }}
+                  >
+                    {incubatingPercent >= 15 && (
+                      <span className="text-sm font-bold text-[#0F1614] whitespace-nowrap">{incubatingTotal}</span>
+                    )}
+                  </div>
+                )}
+
                 {/* Inbox-Flagged Segment (orange - less severe) */}
                 {inboxFlagged > 0 && (
                   <div
@@ -561,6 +581,9 @@ function ProviderCapacityCharts({ providers }: { providers: ProviderMetrics[] })
                     {(provider.reserve_set_disconnected || 0) > 0 && (
                       <span className="text-[#C87055]"> · {provider.reserve_set_disconnected} disconnected</span>
                     )}
+                  </span>
+                  <span className="text-gray-400">
+                    <span style={{ color: '#C87055' }}>Incubating:</span> {provider.incubating_count || 0}
                   </span>
                 </div>
                 <span className="text-gray-400">

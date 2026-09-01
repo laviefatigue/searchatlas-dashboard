@@ -220,12 +220,15 @@ export async function GET() {
     // Helper to detect Live/Reserve set from tags
     // Live: "A Set", "live", "live set"
     // Reserve: "B Set", "bset", "reserve", "reserve set"
-    function getInboxSet(inbox: SenderEmail): 'A' | 'B' | null {
+    function getInboxSet(inbox: SenderEmail): 'A' | 'B' | 'INCUBATING' | null {
       const tags = inbox.tags || [];
       for (const tag of tags) {
         const name = tag.name.toLowerCase();
         if (name === 'a set' || name.includes('a set') || name === 'live' || name.includes('live set')) return 'A';
         if (name === 'b set' || name.includes('b set') || name === 'bset' || name === 'reserve' || name.includes('reserve set')) return 'B';
+        // Fresh inventory is tagged `incubating` by the Charm OS lifecycle sync.
+        // It is neither Live nor Reserve yet — it graduates into one later.
+        if (name === 'incubating' || name.includes('incubating')) return 'INCUBATING';
       }
       return null;
     }
@@ -252,6 +255,10 @@ export async function GET() {
       reserve_set_count: number;
       reserve_set_capacity: number;
       reserve_set_disconnected: number;
+      // Incubating - warming inventory that has not graduated to a set yet
+      incubating_count: number;
+      incubating_capacity: number;
+      incubating_disconnected: number;
     }>();
 
     inboxes.forEach((inbox: SenderEmail) => {
@@ -275,6 +282,9 @@ export async function GET() {
         reserve_set_count: 0,
         reserve_set_capacity: 0,
         reserve_set_disconnected: 0,
+        incubating_count: 0,
+        incubating_capacity: 0,
+        incubating_disconnected: 0,
       };
 
       existing.total_sent += inbox.emails_sent_count || 0;
@@ -295,6 +305,9 @@ export async function GET() {
           } else if (set === 'B') {
             existing.reserve_set_count++;
             existing.reserve_set_capacity += inboxCapacity;
+          } else if (set === 'INCUBATING') {
+            existing.incubating_count++;
+            existing.incubating_capacity += inboxCapacity;
           }
         } else {
           // Track disconnected by set
@@ -349,6 +362,9 @@ export async function GET() {
       reserve_set_count: data.reserve_set_count,
       reserve_set_capacity: data.reserve_set_capacity,
       reserve_set_disconnected: data.reserve_set_disconnected,
+      incubating_count: data.incubating_count,
+      incubating_capacity: data.incubating_capacity,
+      incubating_disconnected: data.incubating_disconnected,
       // Capacity & warming
       daily_capacity: data.daily_capacity,
       warming_count: data.warming_count,
